@@ -642,7 +642,7 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
 
     hint.textContent = "تم التحويل بنجاح...";
     closeSwitchDriverModal();
-    location.href = "./driver.html";
+
   } catch (e) {
     hint.textContent = (e?.message || "حدث خطأ أثناء التحويل.");
   }
