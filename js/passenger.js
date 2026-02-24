@@ -602,7 +602,6 @@ $("#switchDriverBackdrop")?.addEventListener("click", closeSwitchDriverModal);
 
 $("#switchDriverSave")?.addEventListener("click", async () => {
 
-  alert("clicked");
 
   const hint = $("#switchDriverHint");
   hint.textContent = "جارٍ التحويل...";
