@@ -128,7 +128,6 @@ registerForm.addEventListener("submit", async (e) => {
       profile = {
         governorate: pGov.value,
         center: pCenter.value,
-        vehicleType: passengerVehicle
       };
     } else {
       profile = {
