@@ -32,7 +32,7 @@ const driverExtras = $("#driverExtras");
 let role = "passenger";
 let admin = null;
 
-const pGov = $("#pGov"), pCenter = $("#pCenter"), pVehicles = $("#pVehicles");
+const pGov = $("#pGov"), pCenter = $("#pCenter");
 const dGov = $("#dGov"), dCenter = $("#dCenter"), dVehicles = $("#dVehicles");
 const dAddress = $("#dAddress"), dVehicleCode = $("#dVehicleCode");
 
