@@ -8,9 +8,6 @@ export function createMap(mapElId, options = {}) {
   maxZoom: 20,
   attribution: "&copy; OpenStreetMap",
 }).addTo(map);
-    maxZoom: 20,
-    attribution: "&copy; OpenStreetMap &copy; CARTO",
-  }).addTo(map);
 
   return map;
 }
