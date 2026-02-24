@@ -643,6 +643,7 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
     closeSwitchDriverModal();
 
   } catch (e) {
-    hint.textContent = (e?.message || "حدث خطأ أثناء التحويل.");
-  }
+  console.error("SWITCH DRIVER ERROR:", e);
+  hint.textContent = (e?.message || "حدث خطأ أثناء التحويل");
+}
 });
