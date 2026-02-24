@@ -1,6 +1,7 @@
-import adminData from "../assets/egypt_admin.json" assert { type: "json" };
 export async function loadEgyptAdmin() {
-  return adminData;
+  const res = await fetch("/Meshwarko/assets/egypt_admin.json");
+  if (!res.ok) throw new Error("تعذر تحميل بيانات المحافظات");
+  return await res.json();
 }
 
 export function fillSelect(selectEl, items, placeholder = "اختر") {
