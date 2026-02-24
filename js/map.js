@@ -62,6 +62,17 @@ export function bindSearch(inputEl, resultsEl, onPick) {
   }, 350);
 
   inputEl.addEventListener("input", doSearch);
+  // اختيار أول نتيجة بالـ Enter
+  inputEl.addEventListener("keydown", async (e) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const items = await geocodeNominatim(inputEl.value);
+    if (items && items[0]) {
+      resultsEl.classList.add("hidden");
+      resultsEl.innerHTML = "";
+      onPick(items[0]);
+    }
+  });
   inputEl.addEventListener("blur", () => setTimeout(() => resultsEl.classList.add("hidden"), 200));
 }
 
