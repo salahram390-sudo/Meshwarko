@@ -83,17 +83,13 @@ async function initAdmin() {
   dGov.addEventListener("change", () => setCenters(dGov.value, dCenter));
 
   const vehicles = admin.vehicleTypes;
-  const render = () => {
-    renderVehicleGrid(pVehicles, vehicles, passengerVehicle, (id) => {
-      passengerVehicle = id;
-      render();
-    });
-    renderVehicleGrid(dVehicles, vehicles, driverVehicle, (id) => {
-      driverVehicle = id;
-      render();
-    });
-  };
-  render();
+const render = () => {
+  renderVehicleGrid(dVehicles, vehicles, driverVehicle, (id) => {
+    driverVehicle = id;
+    render();
+  });
+};
+render();
 }
 
 loginForm.addEventListener("submit", async (e) => {
