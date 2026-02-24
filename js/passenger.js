@@ -557,3 +557,92 @@ starsRoot?.addEventListener("click", (e) => {
   if (!t || !t.classList.contains("star")) return;
   renderStars(Number(t.dataset.v || 0));
 });
+
+// ===== Switch to Driver Modal =====
+let sdSelectedVehicle = null;
+
+function $(sel) { return document.querySelector(sel); }
+
+async function openSwitchDriverModal() {
+  const modal = $("#switchDriverModal");
+  const hint = $("#switchDriverHint");
+  hint.textContent = "";
+
+  // fill gov/center + vehicles using same admin data if available
+  const admin = await loadEgyptAdmin(); // موجودة غالبًا عندك في passenger.js أو utils
+  const govs = admin.governorates.map(g => g.name);
+
+  fillSelect($("#sdGov"), govs);
+  const setCenters = () => {
+    const g = admin.governorates.find(x => x.name === $("#sdGov").value);
+    fillSelect($("#sdCenter"), (g?.centers || ["-"]));
+  };
+  setCenters();
+  $("#sdGov").addEventListener("change", setCenters);
+
+  // vehicles grid
+  sdSelectedVehicle = admin.vehicleTypes?.[0]?.id || null;
+  const render = () => {
+    renderVehicleGrid($("#sdVehicles"), admin.vehicleTypes, sdSelectedVehicle, (id) => {
+      sdSelectedVehicle = id;
+      render();
+    });
+  };
+  render();
+
+  // show modal
+  modal.classList.remove("hidden");
+}
+
+function closeSwitchDriverModal() {
+  $("#switchDriverModal").classList.add("hidden");
+}
+
+$("#switchDriverClose")?.addEventListener("click", closeSwitchDriverModal);
+$("#switchDriverCancel")?.addEventListener("click", closeSwitchDriverModal);
+$("#switchDriverBackdrop")?.addEventListener("click", closeSwitchDriverModal);
+
+$("#switchDriverSave")?.addEventListener("click", async () => {
+  const hint = $("#switchDriverHint");
+  hint.textContent = "جارٍ التحويل...";
+
+  const gov = $("#sdGov").value;
+  const center = $("#sdCenter").value;
+  const vehicleType = sdSelectedVehicle;
+  const vehicleCode = ($("#sdVehicleCode").value || "").trim();
+  const address = ($("#sdAddress").value || "").trim();
+
+  if (!gov || gov === "-" || !center || center === "-") {
+    hint.textContent = "اختر المحافظة والمركز.";
+    return;
+  }
+  if (!vehicleType) {
+    hint.textContent = "اختر نوع المركبة.";
+    return;
+  }
+  if (!vehicleCode) {
+    hint.textContent = "اكتب كود المركبة.";
+    return;
+  }
+
+  try {
+    const u = auth.currentUser;
+    if (!u) throw new Error("لا يوجد مستخدم مسجل.");
+
+    await updateDoc(doc(db, "users", u.uid), {
+      role: "driver",
+      governorate: gov,
+      center,
+      vehicleType,
+      vehicleCode,
+      address,
+      updatedAt: serverTimestamp(),
+    });
+
+    hint.textContent = "تم التحويل بنجاح...";
+    closeSwitchDriverModal();
+    location.href = "./driver.html";
+  } catch (e) {
+    hint.textContent = (e?.message || "حدث خطأ أثناء التحويل.");
+  }
+});
