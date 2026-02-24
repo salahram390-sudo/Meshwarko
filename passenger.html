@@ -169,6 +169,51 @@
       <p class="hint" id="rateHint"></p>
     </div>
   </div>
+<!-- Switch to Driver Modal -->
+<div id="switchDriverModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" id="switchDriverBackdrop"></div>
+  <div class="modal-card">
+    <div class="modal-head">
+      <div class="modal-title">التحويل إلى سائق</div>
+      <button id="switchDriverClose" class="btn ghost small" type="button">✕</button>
+    </div>
+
+    <div class="grid2" style="margin-top:10px">
+      <div class="form-row">
+        <label class="label">المحافظة</label>
+        <select id="sdGov" class="input"></select>
+      </div>
+      <div class="form-row">
+        <label class="label">المركز/الحي</label>
+        <select id="sdCenter" class="input"></select>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-top:10px">
+      <label class="label">نوع المركبة</label>
+      <div id="sdVehicles" class="vehicle-grid"></div>
+      <p class="hint">اختر نوع مركبة واحد.</p>
+    </div>
+
+    <div class="grid2" style="margin-top:10px">
+      <div class="form-row">
+        <label class="label">كود المركبة</label>
+        <input id="sdVehicleCode" class="input" type="text" placeholder="مثال: 1234" />
+      </div>
+      <div class="form-row">
+        <label class="label">العنوان (اختياري)</label>
+        <input id="sdAddress" class="input" type="text" placeholder="شارع..." />
+      </div>
+    </div>
+
+    <div class="modal-actions" style="margin-top:12px; display:flex; gap:10px">
+      <button id="switchDriverSave" class="btn primary" type="button">تحويل الآن</button>
+      <button id="switchDriverCancel" class="btn ghost" type="button">إلغاء</button>
+    </div>
+
+    <p class="hint" id="switchDriverHint" style="margin-top:10px"></p>
+  </div>
+</div>
 
 </body>
 </html>
