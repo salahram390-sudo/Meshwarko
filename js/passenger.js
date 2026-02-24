@@ -15,6 +15,7 @@ import { notify, ensureNotificationPermission } from "./notify.js";
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
+switchRoleBtn?.addEventListener("click", openSwitchDriverModal);
 const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 
