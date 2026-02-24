@@ -180,3 +180,20 @@ body{
 .star{ cursor:pointer; opacity:.45; user-select:none; }
 .star.active{ opacity:1; }
 textarea.input{ padding:10px 12px; height:auto; min-height:92px; }
+.modal.hidden { display: none; }
+.modal { position: fixed; inset: 0; z-index: 9999; }
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); }
+.modal-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(520px, calc(100vw - 24px));
+  background: rgba(18, 24, 33, .98);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.55);
+}
+.modal-head { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.modal-title { font-weight: 700; }
