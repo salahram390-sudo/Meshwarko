@@ -1,5 +1,5 @@
 export async function loadEgyptAdmin() {
-  const res = await fetch("./assets/egypt_admin.json", { cache: "no-store" });
+  const res = await fetch("../assets/egypt_admin.json", { cache: "no-store" });
   if (!res.ok) throw new Error("تعذر تحميل بيانات المحافظات");
   return await res.json();
 }
