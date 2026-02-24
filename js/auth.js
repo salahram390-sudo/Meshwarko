@@ -36,7 +36,6 @@ const pGov = $("#pGov"), pCenter = $("#pCenter");
 const dGov = $("#dGov"), dCenter = $("#dCenter"), dVehicles = $("#dVehicles");
 const dAddress = $("#dAddress"), dVehicleCode = $("#dVehicleCode");
 
-let passengerVehicle = "sedan";
 let driverVehicle = "sedan";
 
 function setRole(next) {
