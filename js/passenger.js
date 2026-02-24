@@ -252,9 +252,7 @@ logoutBtn.addEventListener("click", async () => {
   location.href = "./index.html";
 });
 
-switchRoleBtn.addEventListener("click", () => {
-  location.href = "./driver.html";
-});
+
 
 async function initAdmin() {
   admin = await loadEgyptAdmin();
