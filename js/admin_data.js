@@ -1,5 +1,4 @@
 import adminData from "../assets/egypt_admin.json" assert { type: "json" };
-
 export async function loadEgyptAdmin() {
   return adminData;
 }
