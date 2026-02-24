@@ -4,7 +4,10 @@ export function createMap(mapElId, options = {}) {
   const map = L.map(mapElId, { zoomControl: true, preferCanvas: true })
     .setView(options.center ?? [26.56, 31.70], options.zoom ?? 13);
 
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 20,
+  attribution: "&copy; OpenStreetMap",
+}).addTo(map);
     maxZoom: 20,
     attribution: "&copy; OpenStreetMap &copy; CARTO",
   }).addTo(map);
