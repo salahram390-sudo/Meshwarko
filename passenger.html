@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مشوارك - الراكب</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <div class="brand-title">مشوارك</div>
+          <div class="brand-sub">واجهة الراكب</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="meBadge" class="badge">...</span>
+        <button id="switchRoleBtn" class="btn ghost small" type="button">تحويل لسائق</button>
+        <button id="logoutBtn" class="btn ghost small" type="button">خروج</button>
+      </div>
+    </header>
+
+    <main class="map-layout">
+      <section class="map-area">
+        <div id="map" class="map"></div>
+        <div class="map-fabs">
+          <button id="btnLocate" class="fab" title="موقعي">📍</button>
+          <button id="btnClear" class="fab" title="مسح">✖</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">طلب مشوار</div>
+            <div class="panel-sub" id="routeMeta">اختر قيام/وصول لرسم المسار</div>
+          </div>
+          <span class="pill-status" id="rideStatus">جاهز</span>
+        </div>
+
+        <div class="panel-body">
+
+          <div class="card-lite">
+            <div class="panel-title">تحديد المنطقة ونوع المركبة</div>
+            <div class="grid2" style="margin-top:10px">
+              <div class="form-row">
+                <label class="label">المحافظة</label>
+                <select id="pGov"></select>
+              </div>
+              <div class="form-row">
+                <label class="label">المركز/الحي</label>
+                <select id="pCenter"></select>
+              </div>
+            </div>
+            <div class="form-row" style="margin-top:10px">
+              <label class="label">نوع المركبة</label>
+              <div id="pVehicles" class="vehicle-grid"></div>
+            </div>
+          </div>
+
+          <div class="form-row" style="margin-top:10px">
+            <label class="label">مكان القيام</label>
+            <div class="input-group">
+              <input id="pickupText" class="input" placeholder="ابحث عن المكان..." />
+              <button id="pickupPick" class="btn ghost small" type="button">من الخريطة</button>
+            </div>
+            <div id="pickupResults" class="search-results hidden"></div>
+          </div>
+
+          <div class="form-row">
+            <label class="label">مكان الوصول</label>
+            <div class="input-group">
+              <input id="dropText" class="input" placeholder="ابحث عن المكان..." />
+              <button id="dropPick" class="btn ghost small" type="button">من الخريطة</button>
+            </div>
+            <div id="dropResults" class="search-results hidden"></div>
+          </div>
+
+          <div class="card-lite">
+            <div class="row-between">
+              <div>
+                <div class="label-inline">السعر المقترح</div>
+                <div class="price" id="priceValue">—</div>
+              </div>
+              <div class="muted" id="distanceValue">—</div>
+            </div>
+
+            <div class="form-row">
+              <label class="label">السعر (15 → 3000) خطوة 5 جنيه</label>
+              <input id="priceSlider" class="slider" type="range" min="15" max="3000" step="5" value="50" />
+              <div class="row-between muted small">
+                <span>15</span><span>1500</span><span>3000</span>
+              </div>
+            </div>
+            <p class="hint" id="surgeHint">يتم تحسين السعر حسب المسافة وزمن الذروة تلقائيًا.</p>
+          </div>
+
+          <div class="actions">
+            <button id="btnRequest" class="btn primary" type="button">إرسال الطلب</button>
+            <button id="btnCancel" class="btn danger" type="button" disabled>إلغاء</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="card-lite">
+            <div class="panel-title">حالة الطلب / التفاوض</div>
+            <div class="ride-card" id="rideCard">
+              <div class="muted">لا يوجد طلب نشط.</div>
+            </div>
+            <div class="actions" style="margin-top:10px">
+              <button id="btnAcceptOffer" class="btn success" type="button" disabled>قبول سعر السائق</button>
+              <button id="btnRejectOffer" class="btn danger" type="button" disabled>رفض السعر</button>
+            </div>
+            <div class="actions" style="margin-top:10px">
+              <button id="btnTrack" class="btn ghost" type="button" disabled>تتبع الرحلة</button>
+              <button id="btnComplete" class="btn success" type="button" disabled>إنهاء الرحلة</button>
+            </div>
+
+            <div class="actions" style="margin-top:10px">
+              <button id="btnCall" class="btn ghost" type="button" disabled>اتصال بالسائق</button>
+              <button id="btnWhats" class="btn ghost" type="button" disabled>واتساب</button>
+            </div>
+
+          </div>
+
+          <div class="spacer"></div>
+        </div>
+      </section>
+    </main>
+
+    <div id="toastRoot"></div>
+
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="./js/passenger.js"></script>
+
+  <div id="rateModal" class="modal-backdrop">
+    <div class="modal">
+      <div class="row-between">
+        <div>
+          <div class="panel-title">تقييم الرحلة</div>
+          <div class="panel-sub">اختر عدد النجوم ثم اكتب تعليق (اختياري)</div>
+        </div>
+        <button id="rateClose" class="btn ghost small" type="button">✖</button>
+      </div>
+
+      <div style="margin-top:10px" class="stars" id="stars">
+        <span class="star" data-v="1">★</span>
+        <span class="star" data-v="2">★</span>
+        <span class="star" data-v="3">★</span>
+        <span class="star" data-v="4">★</span>
+        <span class="star" data-v="5">★</span>
+      </div>
+
+      <div class="form-row" style="margin-top:10px">
+        <label class="label">تعليق (اختياري)</label>
+        <textarea id="rateComment" class="input" placeholder="اكتب رأيك..."></textarea>
+      </div>
+
+      <div class="actions" style="margin-top:10px">
+        <button id="rateSend" class="btn success" type="button">إرسال التقييم</button>
+        <button id="rateSkip" class="btn ghost" type="button">تخطي</button>
+      </div>
+      <p class="hint" id="rateHint"></p>
+    </div>
+  </div>
+
+</body>
+</html>

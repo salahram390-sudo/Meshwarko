@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مشوارك - تسجيل</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <div class="app-shell auth-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <div class="brand-title">مشوارك</div>
+          <div class="brand-sub">تسجيل / دخول</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="badge">v2</span>
+      </div>
+    </header>
+
+    <main class="auth-container">
+      <section class="card">
+        <div class="segmented">
+          <button id="tabLogin" class="seg-btn active" type="button">تسجيل الدخول</button>
+          <button id="tabRegister" class="seg-btn" type="button">تسجيل جديد</button>
+        </div>
+
+        <div class="form-row" style="margin-top:12px">
+          <label class="label">نوع الحساب</label>
+          <div class="segmented">
+            <button id="rolePassenger" class="seg-btn active" type="button">راكب</button>
+            <button id="roleDriver" class="seg-btn" type="button">سائق</button>
+          </div>
+          <p class="hint" id="roleHint">اختر راكب أو سائق.</p>
+        </div>
+
+        <form id="loginForm" class="form">
+          <div class="form-row">
+            <label class="label" for="loginEmail">البريد الإلكتروني</label>
+            <input id="loginEmail" class="input" type="email" required autocomplete="email" />
+          </div>
+          <div class="form-row">
+            <label class="label" for="loginPass">كلمة المرور</label>
+            <input id="loginPass" class="input" type="password" required autocomplete="current-password" />
+          </div>
+          <button class="btn primary" type="submit">دخول</button>
+          <p class="hint" id="loginHint"></p>
+        </form>
+
+        <form id="registerForm" class="form hidden">
+          <div class="grid2">
+            <div class="form-row">
+              <label class="label" for="regName">الاسم</label>
+              <input id="regName" class="input" type="text" required />
+            </div>
+            <div class="form-row">
+              <label class="label" for="regPhone">رقم الهاتف</label>
+              <input id="regPhone" class="input" type="tel" required placeholder="01xxxxxxxxx" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="regEmail">البريد الإلكتروني</label>
+            <input id="regEmail" class="input" type="email" required autocomplete="email" />
+          </div>
+
+          <div class="form-row">
+            <label class="label" for="regPass">كلمة المرور</label>
+            <input id="regPass" class="input" type="password" required minlength="6" autocomplete="new-password" />
+          </div>
+
+          <!-- Passenger extra: governorate/center + vehicle filter -->
+          <div id="passengerExtras" class="card-lite">
+            <div class="panel-title">اختيارات الراكب</div>
+            <div class="grid2" style="margin-top:10px">
+              <div class="form-row">
+                <label class="label">المحافظة</label>
+                <select id="pGov"></select>
+              </div>
+              <div class="form-row">
+                <label class="label">المركز/الحي</label>
+                <select id="pCenter"></select>
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top:10px">
+              <label class="label">نوع المركبة المطلوب</label>
+              <div id="pVehicles" class="vehicle-grid"></div>
+              <p class="hint">اختر نوع واحد (يمكن تغييره داخل صفحة الراكب).</p>
+            </div>
+          </div>
+
+          <!-- Driver extra -->
+          <div id="driverExtras" class="card-lite hidden">
+            <div class="panel-title">بيانات السائق</div>
+            <div class="grid2" style="margin-top:10px">
+              <div class="form-row">
+                <label class="label">المحافظة</label>
+                <select id="dGov"></select>
+              </div>
+              <div class="form-row">
+                <label class="label">المركز/الحي</label>
+                <select id="dCenter"></select>
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top:10px">
+              <label class="label">نوع المركبة</label>
+              <div id="dVehicles" class="vehicle-grid"></div>
+            </div>
+
+            <div class="grid2" style="margin-top:10px">
+              <div class="form-row">
+                <label class="label" for="dAddress">العنوان</label>
+                <input id="dAddress" class="input" type="text" placeholder="مثال: شارع..." />
+              </div>
+              <div class="form-row">
+                <label class="label" for="dVehicleCode">كود المركبة</label>
+                <input id="dVehicleCode" class="input" type="text" placeholder="مثال: 1234" />
+              </div>
+            </div>
+            <p class="hint">سيظهر اسمك ورقمك فقط بعد قبول الطلب.</p>
+          </div>
+
+          <button class="btn primary" type="submit">إنشاء الحساب</button>
+          <p class="hint" id="regHint"></p>
+        </form>
+
+        <div class="divider"></div>
+        <button id="btnLogout" class="btn ghost hidden" type="button">تسجيل خروج</button>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="./js/auth.js"></script>
+</body>
+</html>

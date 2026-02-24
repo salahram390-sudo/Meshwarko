@@ -1,0 +1,110 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function userDoc(uid) { return get(/databases/$(database)/documents/users/$(uid)); }
+    function myRole() { return signedIn() ? userDoc(request.auth.uid).data.role : null; }
+    function isDriver() { return myRole() == "driver"; }
+    function isPassenger() { return myRole() == "passenger"; }
+
+    match /users/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow create: if signedIn() && request.auth.uid == uid;
+
+      // update own profile only. prevent role change.
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.role == resource.data.role;
+
+      allow delete: if false;
+    }
+
+    match /rides/{rideId} {
+      // Passenger reads own rides; driver reads open rides and his accepted rides
+      allow read: if signedIn() && (
+        resource.data.passengerId == request.auth.uid
+        || (isDriver() && (resource.data.status in ["requested","offered"] || resource.data.driverId == request.auth.uid))
+      );
+
+      // Passenger creates
+      allow create: if signedIn() && isPassenger()
+        && request.resource.data.passengerId == request.auth.uid
+        && request.resource.data.status == "requested"
+        && request.resource.data.driverId == null
+        && request.resource.data.price >= 15
+        && request.resource.data.price <= 3000;
+
+      allow update: if signedIn() && (
+        // Passenger cancels
+        (isPassenger()
+          && resource.data.passengerId == request.auth.uid
+          && resource.data.status in ["requested","offered"]
+          && request.resource.data.status == "canceled"
+        )
+        ||
+        // Passenger accepts offer -> accepted, price becomes offerPrice
+        (isPassenger()
+          && resource.data.passengerId == request.auth.uid
+          && resource.data.status == "offered"
+          && request.resource.data.status == "accepted"
+          && resource.data.driverId == request.resource.data.driverId
+          && request.resource.data.price == resource.data.offerPrice
+        )
+        ||
+        // Passenger rejects offer -> back to requested
+        (isPassenger()
+          && resource.data.passengerId == request.auth.uid
+          && resource.data.status == "offered"
+          && request.resource.data.status == "requested"
+          && request.resource.data.driverId == resource.data.driverId
+        )
+        ||
+        // Passenger rates after completion (one time)
+        (isPassenger()
+          && resource.data.passengerId == request.auth.uid
+          && resource.data.status == "completed"
+          && !( "passengerRating" in resource.data )
+          && ("passengerRating" in request.resource.data)
+          && request.resource.data.passengerRating is int
+          && request.resource.data.passengerRating >= 1
+          && request.resource.data.passengerRating <= 5
+          && request.resource.data.status == resource.data.status
+        )
+        ||
+        // Driver sends offer
+        (isDriver()
+          && resource.data.status == "requested"
+          && request.resource.data.status == "offered"
+          && request.resource.data.driverId == request.auth.uid
+          && request.resource.data.offerPrice >= 15
+          && request.resource.data.offerPrice <= 3000
+        )
+        ||
+        // Driver accepts at request price
+        (isDriver()
+          && resource.data.status == "requested"
+          && request.resource.data.status == "accepted"
+          && request.resource.data.driverId == request.auth.uid
+        )
+        ||
+        // Driver live location updates on accepted ride (only his ride)
+        (isDriver()
+          && resource.data.status == "accepted"
+          && resource.data.driverId == request.auth.uid
+          && request.resource.data.status == resource.data.status
+          && ("driverLoc" in request.resource.data)
+        )
+        ||
+        // Driver completes/cancels accepted ride
+        (isDriver()
+          && resource.data.driverId == request.auth.uid
+          && resource.data.status == "accepted"
+          && request.resource.data.status in ["completed","canceled"]
+        )
+      );
+
+      allow delete: if false;
+    }
+  }
+}
