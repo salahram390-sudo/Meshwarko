@@ -561,7 +561,6 @@ starsRoot?.addEventListener("click", (e) => {
 // ===== Switch to Driver Modal =====
 let sdSelectedVehicle = null;
 
-function $(sel) { return document.querySelector(sel); }
 
 async function openSwitchDriverModal() {
   const modal = $("#switchDriverModal");
