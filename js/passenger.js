@@ -601,9 +601,12 @@ $("#switchDriverCancel")?.addEventListener("click", closeSwitchDriverModal);
 $("#switchDriverBackdrop")?.addEventListener("click", closeSwitchDriverModal);
 
 $("#switchDriverSave")?.addEventListener("click", async () => {
+
+  alert("clicked");
+
   const hint = $("#switchDriverHint");
   hint.textContent = "جارٍ التحويل...";
-
+  
   const gov = $("#sdGov").value;
   const center = $("#sdCenter").value;
   const vehicleType = sdSelectedVehicle;
