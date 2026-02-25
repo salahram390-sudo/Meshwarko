@@ -153,38 +153,28 @@ function watchRidesForDriver() {
   );
 
   onSnapshot(qR, (snap) => {
-    ridesList.innerHTML = "";
-    let shown = 0;
-    if (snap.empty) {
-      ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
-      return;
-    }
-    snap.docs.forEach((d) => {
-      const r = d.data();
-      // filter by vehicle type: if driver has vehicleType, only show matching
-      if (myUser.vehicleType && r.vehicleType && myUser.vehicleType !== r.vehicleType) return;
-      shown++;
-      const item = document.createElement("div");
-      item.className = "list-item" + (selectedRideId === d.id ? " active" : "");
-      item.innerHTML = `
-        <div class="row-between">
-          <b>طلب</b>
-          <span class="muted small">${moneyEGP(r.price)}</span>
-        </div>
-        <div class="muted small">مركبة: ${escapeHtml(r.vehicleType || "—")} • انتهاء: ${r.expiresAt?.toDate ? r.expiresAt.toDate().toLocaleTimeString("ar-EG",{hour:"2-digit",minute:"2-digit"}) : ""}</div>
-        <div class="muted small">قيام: ${escapeHtml(r.pickupText || "—")}</div>
-        <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "—")}</div>
-      `;
-      item.onclick = () => selectRide(d.id, r);
-      ridesList.appendChild(item);
-    });
-  });
-  if (shown === 0) {
-  ridesList.innerHTML =
-    `<div class="muted small">لا توجد طلبات مناسبة لنوع مركبتك الآن.</div>`;
-}
-}
+    console.log("watchRidesForDriver: got snapshot, docs:", snap.docs.length);
+  ridesList.innerHTML = "";
+  let shown = 0;
 
+  if (snap.empty) {
+    console.log("snapshot empty");
+    ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
+    return;
+  }
+
+  snap.docs.forEach((d) => {
+    const r = d.data();
+    console.log("ride doc:", d.id, r);
+    // existing logic...
+  });
+
+  console.log("shown after loop:", shown);
+  if (shown === 0) {
+    ridesList.innerHTML = `<div class="muted small">لا توجد طلبات مناسبة لنوع مركبتك الآن.</div>`;
+  }
+});
+  
 async function selectRide(id, ride) {
   selectedRideId = id;
   selectedRideData = ride;
