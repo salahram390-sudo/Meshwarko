@@ -638,7 +638,8 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
       address,
       updatedAt: serverTimestamp(),
     });
-
+location.href = "./driver.html?ts=" + Date.now();
+return;
   } catch (e) {
   console.error("SWITCH DRIVER ERROR:", e);
   hint.textContent = (e?.message || "حدث خطأ أثناء التحويل");
