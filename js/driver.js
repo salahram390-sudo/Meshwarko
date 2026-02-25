@@ -353,10 +353,12 @@ editProfileBtn.addEventListener("click", async () => {
   const vType = prompt("نوع المركبة (tuktuk/sedan/tricycle/truck/microbus/tmanya/delivery_bike)", myUser.vehicleType || "sedan");
   const address = prompt("العنوان", myUser.address || "");
   const vehicleCode = prompt("كود المركبة", myUser.vehicleCode || "");
+  const phone = prompt("رقم الهاتف", myUser.phone || "");
 
   setDriverStatus("يحفظ...");
   try {
     await updateDoc(doc(db, "users", myUser.uid), {
+      phone: phone || "",
       governorate: gov,
       center: center || "",
       vehicleType: vType || "sedan",
@@ -365,6 +367,7 @@ editProfileBtn.addEventListener("click", async () => {
       updatedAt: serverTimestamp(),
     });
     myUser = { ...myUser, governorate: gov, center, vehicleType: vType, address, vehicleCode };
+    myUser = { ...myUser, governorate: gov, center, vehicleType: vType, address, vehicleCode, phone };
     notify({ title: "تم تحديث البيانات", body: "تم حفظ بيانات السائق.", tag: "profile-updated" });
     setDriverStatus("متصل");
     // Restart watcher by reloading (simple & robust)
