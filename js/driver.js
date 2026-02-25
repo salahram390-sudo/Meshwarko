@@ -179,6 +179,10 @@ function watchRidesForDriver() {
       ridesList.appendChild(item);
     });
   });
+  if (shown === 0) {
+  ridesList.innerHTML =
+    `<div class="muted small">لا توجد طلبات مناسبة لنوع مركبتك الآن.</div>`;
+}
 }
 
 async function selectRide(id, ride) {
