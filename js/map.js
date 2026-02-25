@@ -35,6 +35,17 @@ export async function geocodeNominatim(query) {
   })).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 }
 
+export async function geocodeEG(query){
+  const url =
+    "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=eg&q=" +
+    encodeURIComponent(query);
+
+  const res = await fetch(url, { headers: { "Accept-Language": "ar" }});
+  const data = await res.json();
+  if (!data?.length) return null;
+  return { lat: +data[0].lat, lon: +data[0].lon, display: data[0].display_name };
+}
+
 export function bindSearch(inputEl, resultsEl, onPick) {
   const render = (items) => {
     resultsEl.innerHTML = "";
