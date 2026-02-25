@@ -163,7 +163,7 @@ function watchRidesForDriver() {
       const r = d.data();
       // filter by vehicle type: if driver has vehicleType, only show matching
       if (myUser.vehicleType && r.vehicleType && myUser.vehicleType !== r.vehicleType) return;
-
+      shown++;
       const item = document.createElement("div");
       item.className = "list-item" + (selectedRideId === d.id ? " active" : "");
       item.innerHTML = `
