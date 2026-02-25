@@ -374,7 +374,10 @@ console.log("ME role =", me.data()?.role);
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
   setDriverStatus("متصل");
 
-  locateOnce(map, (loc) => { myLocation = loc; });
+  locateOnce(map, (loc) => {
+  myLocation = loc;
+  showMyLocation(map, loc);
+});
 
   // watch available rides
   watchRidesForDriver();
