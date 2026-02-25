@@ -154,6 +154,7 @@ function watchRidesForDriver() {
 
   onSnapshot(qR, (snap) => {
     ridesList.innerHTML = "";
+    let shown = 0;
     if (snap.empty) {
       ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
       return;
