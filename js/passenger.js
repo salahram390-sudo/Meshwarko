@@ -46,6 +46,30 @@ const btnCall = $("#btnCall");
 const btnWhats = $("#btnWhats");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
+pickupText.addEventListener("input", async () => {
+  const q = pickupText.value.trim();
+  if (q.length < 3) {
+    pickupResults.classList.add("hidden");
+    pickupResults.innerHTML = "";
+    return;
+  }
+
+  const r = await geocodeEG(q);
+  if (!r) {
+    pickupResults.classList.add("hidden");
+    return;
+  }
+
+  pickupResults.innerHTML = `<div class="result-item">${r.display}</div>`;
+  pickupResults.classList.remove("hidden");
+
+  pickupResults.onclick = () => {
+    setPickup({ lat: r.lat, lon: r.lon, text: r.display });
+    map.setView([r.lat, r.lon], 16);
+    pickupText.value = r.display;
+    pickupResults.classList.add("hidden");
+  };
+});
 const routeLayerRef = { current: null };
 
 // Rating modal
