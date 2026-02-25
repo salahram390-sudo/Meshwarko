@@ -42,11 +42,19 @@ body{
   border-radius:999px; color:var(--muted); font-size:12px;
 }
 .map-layout{ flex:1; display:flex; flex-direction:column; }
-.map-area{ height:55vh; position:relative; border-bottom:1px solid var(--line); }
-.map{ height:100%; width:100%; }
+.map-area { position: relative; }
+
 .map-fabs{
-  position:absolute; top:12px; left:12px; display:flex; flex-direction:column; gap:10px; z-index:500;
+  position:absolute;
+  left:12px;
+  top:140px;   /* نزّلها شوية كمان */
+  z-index: 5000;  /* أعلى من leaflet */
 }
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.map{ height:100%; width:100%; }
 .fab{
   width:42px;height:42px;border-radius:14px; border:1px solid var(--line);
   background: rgba(15,22,32,.75); color:var(--text); cursor:pointer; box-shadow: var(--shadow);
