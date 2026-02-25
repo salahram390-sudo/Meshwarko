@@ -128,8 +128,11 @@ function setTrackBtn() {
 
 
 
+function normalizeDigits(v){
+  return String(v || "").replace(/[٠-٩]/g, d => "0123456789"["٠١٢٣٤٥٦٧٨٩".indexOf(d)]);
+}
 function clampPrice(v){
-  const n = Number(v);
+  const n = Number(normalizeDigits(v));
   if (!Number.isFinite(n)) return null;
   const clamped = Math.min(3000, Math.max(15, Math.round(n/5)*5));
   return clamped;
