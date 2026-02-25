@@ -205,3 +205,27 @@ textarea.input{ padding:10px 12px; height:auto; min-height:92px; }
 }
 .modal-head { display:flex; justify-content:space-between; align-items:center; gap:10px; }
 .modal-title { font-weight: 700; }
+html, body { height: 100%; }
+body { margin: 0; }
+
+.map-layout{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-area{
+  position: relative;
+  flex: 0 0 45vh;
+  min-height: 220px;
+}
+
+.panel{
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.map{
+  height: 100%;
+  width: 100%;
+}
