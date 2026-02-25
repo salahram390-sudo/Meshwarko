@@ -202,7 +202,7 @@ ridesList.appendChild(item);
 async function selectRide(id, ride) {
   selectedRideId = id;
   selectedRideData = ride;
-
+  syncOfferBtn();
   btnSendOffer.disabled = false;
   btnAccept.disabled = false;
   btnTrackToggle.disabled = true;
