@@ -359,6 +359,14 @@ onAuthStateChanged(auth, async (user) => {
   await initAdmin().catch(()=>{});
 
   const me = await getDoc(doc(db, "users", user.uid));
+  console.log("AUTH UID =", user.uid);
+
+const meRef = doc(db, "users", user.uid);
+const me = await getDoc(meRef);
+
+console.log("ME exists =", me.exists());
+console.log("ME data =", me.data());
+console.log("ME role =", me.data()?.role);
   if (!me.exists() || me.data().role !== "driver") {
     location.href = "./passenger.html";
     return;
