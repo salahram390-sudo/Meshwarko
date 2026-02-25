@@ -166,7 +166,24 @@ function watchRidesForDriver() {
   snap.docs.forEach((d) => {
     const r = d.data();
     console.log("ride doc:", d.id, r);
-    // existing logic...
+    // filter by vehicle type: if driver has vehicleType, only show matching
+if (myUser.vehicleType && r.vehicleType && myUser.vehicleType !== r.vehicleType) return;
+
+shown++;
+
+const item = document.createElement("div");
+item.className = "list-item" + (selectedRideId === d.id ? " active" : "");
+item.innerHTML = `
+  <div class="row-between">
+    <b>طلب</b>
+    <span class="muted small">${moneyEGP(r.price)}</span>
+  </div>
+  <div class="muted small">مركبة: ${escapeHtml(r.vehicleType || "-")}</div>
+  <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
+  <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
+`;
+item.onclick = () => selectRide(d.id, r);
+ridesList.appendChild(item);
   });
 
   console.log("shown after loop:", shown);
