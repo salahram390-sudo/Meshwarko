@@ -254,11 +254,13 @@ async function showAcceptedDetails(rideId) {
 
 btnSendOffer.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
+
   const offer = clampPrice(offerInput.value);
   if (!offer) {
     notify({ title: "سعر غير صحيح", body: "اكتب سعر بين 15 و 3000 بخطوة 5.", tag: "bad-offer" });
     return;
   }
+
   setDriverStatus("يرسل عرض...");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), {
@@ -267,9 +269,14 @@ btnSendOffer.addEventListener("click", async () => {
       offerPrice: offer,
       offeredAt: serverTimestamp(),
     });
+
+    // متقفلهاش للأبد — خليه يقفل لحظياً بس
     btnSendOffer.disabled = true;
-    btnAccept.disabled = false; // can still accept later
+    setTimeout(() => { btnSendOffer.disabled = false; }, 800);
+
+    btnAccept.disabled = false;
     btnCancel.disabled = true;
+
     notify({ title: "تم إرسال العرض", body: `عرض سعر: ${offer} ج`, tag: "offer-sent" });
     setDriverStatus("بانتظار رد الراكب");
   } catch {
