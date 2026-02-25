@@ -105,6 +105,23 @@ export function drawRoute(map, geojson, layerRef) {
   if (latlngs.length) map.fitBounds(L.latLngBounds(latlngs).pad(0.15));
 }
 
+let myLocMarker = null;
+export function showMyLocation(map, loc) {
+  if (!loc) return;
+
+  const latlng = [loc.lat, loc.lon];
+
+  if (!myLocMarker) {
+    myLocMarker = L.circleMarker(latlng, {
+      radius: 8,
+      color: "#2e7df6",
+      fillColor: "#2e7df6",
+      fillOpacity: 0.9
+    }).addTo(map);
+  } else {
+    myLocMarker.setLatLng(latlng);
+  }
+}
 export function locateOnce(map, onLocated) {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition((pos) => {
