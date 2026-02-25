@@ -335,7 +335,10 @@ onAuthStateChanged(auth, async (user) => {
   if (myData.vehicleType) passengerVehicle = myData.vehicleType;
 
   // auto-locate
-  locateOnce(map, (loc) => { myLocation = loc; });
+  locateOnce(map, (loc) => {
+  myLocation = loc;
+  showMyLocation(map, loc);
+});
 
   // watch active ride (requested/offered/accepted)
   const ridesQ = query(
