@@ -70,6 +70,30 @@ pickupText.addEventListener("input", async () => {
     pickupResults.classList.add("hidden");
   };
 });
+dropText.addEventListener("input", async () => {
+  const q = dropText.value.trim();
+  if (q.length < 3) {
+    dropResults.classList.add("hidden");
+    dropResults.innerHTML = "";
+    return;
+  }
+
+  const r = await geocodeEG(q);
+  if (!r) {
+    dropResults.classList.add("hidden");
+    return;
+  }
+
+  dropResults.innerHTML = `<div class="result-item">${r.display}</div>`;
+  dropResults.classList.remove("hidden");
+
+  dropResults.onclick = () => {
+    setDropoff({ lat: r.lat, lon: r.lon, text: r.display });
+    map.setView([r.lat, r.lon], 16);
+    dropText.value = r.display;
+    dropResults.classList.add("hidden");
+  };
+});
 const routeLayerRef = { current: null };
 
 // Rating modal
