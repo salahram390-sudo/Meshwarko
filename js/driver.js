@@ -358,7 +358,6 @@ onAuthStateChanged(auth, async (user) => {
 
   await initAdmin().catch(()=>{});
 
-  const me = await getDoc(doc(db, "users", user.uid));
   console.log("AUTH UID =", user.uid);
 
 const meRef = doc(db, "users", user.uid);
