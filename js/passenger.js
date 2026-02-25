@@ -27,6 +27,7 @@ const pickupResults = $("#pickupResults");
 const dropResults = $("#dropResults");
 const pickupPick = $("#pickupPick");
 const dropPick = $("#dropPick");
+const dropSearch = $("#dropSearch");
 
 const priceValue = $("#priceValue");
 const distanceValue = $("#distanceValue");
