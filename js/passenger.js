@@ -323,7 +323,7 @@ onAuthStateChanged(auth, async (user) => {
 
   const me = await getDoc(doc(db, "users", user.uid));
   const myData = me.exists() ? me.data() : {};
-  if (myData.role !== "passenger") { location.href = "./driver.html"; return; }
+// if (myData.role !== "passenger") { location.href = "./driver.html"; return; }
 
   setText(meBadge, `${myData.name || "مستخدم"} • راكب`);
 
