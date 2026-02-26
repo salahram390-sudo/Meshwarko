@@ -106,6 +106,8 @@ background:
   display:flex;
   flex-direction:column;
   transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease;
+  flex: 1 1 auto;
+min-height: 0;
 }
 
 /* لمسة hover خفيفة (على الموبايل مش هتظهر غالباً بس تمام) */
@@ -552,11 +554,6 @@ body { margin: 0; }
   position: relative;
   flex: 0 0 45vh;
   min-height: 220px;
-}
-
-.panel{
-  flex: 1 1 auto;
-  min-height: 0;
 }
 
 .map{
