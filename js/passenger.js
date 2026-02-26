@@ -501,7 +501,9 @@ console.log("dropoff", dropoff);
     setText(routeMeta, "تم إرسال الطلب. في انتظار سائق...");
     setStatus("قيد الانتظار");
     notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
-  } catch {
+  } catch (e) {
+    console.error("ADD DOC ERROR:", e);
+alert("FIRESTORE ERROR: " + (e?.message || e));
     setStatus("خطأ");
     setText(routeMeta, "تعذر إرسال الطلب. جرّب مرة أخرى.");
   }
