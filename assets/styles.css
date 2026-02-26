@@ -289,10 +289,6 @@ min-height: 0;
 }
 .input-group{ display:flex; gap:8px; }
 .input-group .input{ flex:1; }
-.btn{
-  height:42px; border-radius: 12px; border:1px solid var(--line);
-  background: rgba(255,255,255,.06); color:var(--text); padding:0 12px; cursor:pointer;
-}
 
 /* =========================
    Premium Buttons (Global)
