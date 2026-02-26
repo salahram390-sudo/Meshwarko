@@ -372,7 +372,8 @@ onAuthStateChanged(auth, async (user) => {
     unsubRideWatcher = onSnapshot(doc(db, "rides", currentRideId), async (rideSnap) => {
       if (!rideSnap.exists()) return;
       const ride = rideSnap.data();
-
+      console.log("PASSENGER currentRideId =", currentRideId);
+      console.log("PASSENGER status =", ride.status);
       // auto-expire UI
       const expired = ride.expiresAt && ride.expiresAt.toMillis && ride.expiresAt.toMillis() < Date.now();
 
