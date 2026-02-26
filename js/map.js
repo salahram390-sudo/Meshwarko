@@ -19,43 +19,50 @@ export function addMarker(map, latlng, opts = {}) {
   return m;
 }
 
+function normGov(s) {
+  return (s || "")
+    .toString()
+    .replace(/محافظة\s*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export async function geocodeNominatim(query, userLat, userLon) {
+  query = (query || "").trim();
+  if (!query) return [];
+
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "json");
-  url.searchParams.set("limit", "8");
-  url.searchParams.set("countrycodes", "eg");
   url.searchParams.set("q", query);
-url.searchParams.set("limit", "15");
+  url.searchParams.set("countrycodes", "eg");
+  url.searchParams.set("limit", "20");
+  url.searchParams.set("addressdetails", "1"); // ✅ مهم
 
-if (userLat && userLon) {
-  const delta = 0.3; // تقريباً 30 كم
-  const left = userLon - delta;
-  const right = userLon + delta;
-  const top = userLat + delta;
-  const bottom = userLat - delta;
-
-  url.searchParams.set("viewbox", `${left},${top},${right},${bottom}`);
-  url.searchParams.set("bounded", "1");
-}
-  const res = await fetch(url.toString(), {
-    headers: { "Accept-Language": "ar" }
-  });
-
+  const res = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
   if (!res.ok) return [];
 
   const data = await res.json();
 
-  const results = (data || []).map(x => ({
+  let results = (data || []).map(x => ({
     display: x.display_name,
     lat: Number(x.lat),
-    lon: Number(x.lon)
+    lon: Number(x.lon),
+    gov: x?.address?.state || x?.address?.county || null
   })).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 
-  // ترتيب حسب المسافة من المستخدم
+  // ✅ فلترة نفس المحافظة
+  if (userGov) {
+    const ug = normGov(userGov);
+    const filtered = results.filter(r => normGov(r.gov) === ug);
+
+    // لو مفيش ولا نتيجة في نفس المحافظة: نرجّع النتائج الأصلية (اختياري)
+    if (filtered.length) results = filtered;
+  }
+
+  // (اختياري) ترتيب أقرب داخل نفس المحافظة
   if (userLat && userLon) {
     results.sort((a, b) =>
-      haversine(userLat, userLon, a.lat, a.lon) -
-      haversine(userLat, userLon, b.lat, b.lon)
+      haversine(userLat, userLon, a.lat, a.lon) - haversine(userLat, userLon, b.lat, b.lon)
     );
   }
 
