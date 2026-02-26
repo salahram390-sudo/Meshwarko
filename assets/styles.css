@@ -111,6 +111,7 @@ background:
   -webkit-text-fill-color:transparent;
   letter-spacing:.5px;
   position:relative;
+  padding-bottom:6px; /* مساحة صغيرة للخط */
 }
 
 .panel-title::after{
