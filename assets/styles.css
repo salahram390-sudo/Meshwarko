@@ -101,7 +101,7 @@ background:
     0 0 30px rgba(255,215,0,.06);
 
   /* خففنا البلور عشان الأداء */
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(6px);
 
   display:flex;
   flex-direction:column;
