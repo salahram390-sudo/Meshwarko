@@ -330,7 +330,7 @@ onAuthStateChanged(auth, async (user) => {
   await ensureNotificationPermission(true);
 
   const me = await getDoc(doc(db, "users", user.uid));
-  const myData = me.exists() ? me.data() : {};
+  myData = me.exists() ? me.data() : {};
 // if (myData.role !== "passenger") { location.href = "./driver.html"; return; }
 
   setText(meBadge, `${myData.name || "مستخدم"} • راكب`);
