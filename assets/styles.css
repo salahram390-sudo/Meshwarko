@@ -83,20 +83,37 @@ background:
 
 .panel{
   height:45vh;
-  margin-top:-12px;
-  border-top-left-radius:24px;
-  border-top-right-radius:24px;
 
+  /* الشكل */
   background: linear-gradient(180deg, rgba(10,16,26,.96), rgba(8,12,20,.98));
   border-top: 1px solid rgba(255,215,0,.18);
 
+  /* Floating (خفيف) */
+  margin-top:-12px;
+  border-top-left-radius:24px;
+  border-top-right-radius:24px;
+  transform: translateZ(0);
+
+  /* ظل فاخر لكن خفيف */
+  box-shadow:
+    0 -10px 40px rgba(0,0,0,.55),
+    0 0 30px rgba(255,215,0,.06);
+
+  /* خففنا البلور عشان الأداء */
+  backdrop-filter: blur(10px);
+
   display:flex;
   flex-direction:column;
-  backdrop-filter: blur(14px);
+  transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease;
+}
 
+/* لمسة hover خفيفة (على الموبايل مش هتظهر غالباً بس تمام) */
+.panel:hover{
+  transform: translateY(-2px);
+  border-top-color: rgba(255,215,0,.28);
   box-shadow:
-    0 -10px 40px rgba(0,0,0,.6),
-    0 0 30px rgba(255,215,0,.06);
+    0 -14px 52px rgba(0,0,0,.6),
+    0 0 38px rgba(255,215,0,.08);
 }
 
 .panel-head{
