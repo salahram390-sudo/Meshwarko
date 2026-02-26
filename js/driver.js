@@ -319,9 +319,11 @@ btnAccept.addEventListener("click", async () => {
     await showAcceptedDetails(selectedRideId);
     notify({ title: "تم قبول الطلب", body: "الآن يمكنك إنهاء الرحلة بعد الوصول.", tag: "ride-accepted" });
     setDriverStatus("على الطريق");
-  } catch {
-    setDriverStatus("خطأ");
-  }
+    } catch (e) {
+  console.error("DRIVER ACCEPT ERROR:", e);
+  alert("ACCEPT ERROR: " + (e?.message || e));
+  setDriverStatus("خطأ");
+}
 });
 
 btnComplete.addEventListener("click", async () => {
