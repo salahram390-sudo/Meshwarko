@@ -50,7 +50,52 @@ const btnWhats = $("#btnWhats");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
+async function manualSearch(type) {
+  const isPickup = type === "pickup";
+  const inputEl = isPickup ? pickupText : dropText;
+  const q = (inputEl.value || "").trim();
 
+  if (!q) {
+    alert("اكتب اسم المكان");
+    return;
+  }
+
+  try {
+    const result = await geocodeEG(q);
+    const it = Array.isArray(result) ? result[0] : result;
+
+    if (!it) {
+      alert("المكان غير موجود");
+      return;
+    }
+
+    const obj = {
+      lat: Number(it.lat),
+      lon: Number(it.lon),
+      text: it.text || q
+    };
+
+    if (isPickup) {
+      setPickup(obj);
+    } else {
+      setDropoff(obj);
+    }
+
+    // لو الاتنين اتحددوا ارسم المسار
+    if (pickup && dropoff) {
+      const route = await routeOSRM(
+        [pickup.lat, pickup.lon],
+        [dropoff.lat, dropoff.lon]
+      );
+
+      drawRoute(map, route);
+    }
+
+  } catch (e) {
+    console.error("SEARCH ERROR:", e);
+    alert("خطأ في البحث");
+  }
+}
 // Rating modal
 const rateModal = $("#rateModal");
 const rateClose = $("#rateClose");
