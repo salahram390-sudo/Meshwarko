@@ -250,10 +250,10 @@ const passengerCenter = ride.center || "";
   lines.push(`<div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>`);
   if (p) {
     lines.push(`<div class="divider"></div>`);
-    lines.push(`<div><b>الراكب</b></div>`);
-    lines.push(`<div class="muted small">الاسم: ${escapeHtml(p.name || "—")}</div>`);
-    lines.push(`<div class="muted small">الهاتف: ${escapeHtml(p.phone || "—")}</div>`);
-    lines.push(`<div class="muted small">المحافظة/المركز: ${escapeHtml(p.governorate || ride.governorate)} / ${escapeHtml(p.center || ride.center)}</div>`);
+lines.push(`<div><b>الراكب</b></div>`);
+lines.push(`<div class="muted small">الاسم: ${escapeHtml(rName)}</div>`);
+lines.push(`<div class="muted small">الهاتف: ${escapeHtml(rPhone)}</div>`);
+lines.push(`<div class="muted small">المنطقة: ${escapeHtml(rGovernorate)} / ${escapeHtml(rCenter)}</div>`);
   }
   selectedRideEl.innerHTML = lines.join("");
 }
