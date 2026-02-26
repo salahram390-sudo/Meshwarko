@@ -634,10 +634,6 @@ body { margin: 0; }
     backdrop-filter: none !important;
   }
 
-  /* خفّف الظلال الكبيرة */
-  .btn{
-    box-shadow: 0 10px 22px rgba(0,0,0,.35) !important;
-  }
   .card, .card-lite{
     box-shadow: 0 10px 22px rgba(0,0,0,.45) !important;
   }
