@@ -95,7 +95,7 @@ export function bindSearch(inputEl, resultsEl, onPick) {
   };
 
   const doSearch = debounce(async () => {
-    const items = await geocodeNominatim(inputEl.value);
+    const items = await geocodeNominatim(inputEl.value, userLat, userLon);
     render(items);
   }, 350);
 
@@ -104,7 +104,7 @@ export function bindSearch(inputEl, resultsEl, onPick) {
   inputEl.addEventListener("keydown", async (e) => {
     if (e.key !== "Enter") return;
     e.preventDefault();
-    const items = await geocodeNominatim(inputEl.value);
+    const items = await geocodeNominatim(inputEl.value, userLat, userLon);
     if (items && items[0]) {
       resultsEl.classList.add("hidden");
       resultsEl.innerHTML = "";
