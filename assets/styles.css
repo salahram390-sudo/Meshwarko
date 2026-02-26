@@ -838,9 +838,27 @@ input:focus, select:focus, textarea:focus{
   box-shadow: 0 0 0 3px rgba(255,215,0,.14), 0 14px 30px rgba(0,0,0,.45);
 }
 
-.input-group{ display:flex; gap:10px; align-items:center; }
+.input-group{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:14px;
+}
 .input-group .input{ flex:1; }
+.map-btn{
+  min-width:70px;
+  font-size:13px;
+  border-radius:14px;
+  border:1px solid rgba(255,215,0,.25);
+  background:rgba(255,255,255,.04);
+  box-shadow:0 10px 20px rgba(0,0,0,.35);
+  transition:.2s ease;
+}
 
+.map-btn:hover{
+  border-color:rgba(255,215,0,.6);
+  background:rgba(255,255,255,.06);
+}
 /* =========================================================
    CARDS (Gold + shimmer moving)
    ========================================================= */
