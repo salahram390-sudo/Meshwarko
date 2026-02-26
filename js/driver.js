@@ -248,12 +248,11 @@ const passengerCenter = ride.center || "";
   lines.push(`<div class="row-between"><b>السعر النهائي</b><span>${moneyEGP(ride.price)}</span></div>`);
   lines.push(`<div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>`);
   lines.push(`<div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>`);
-  if (p) {
-    lines.push(`<div class="divider"></div>`);
+  lines.push(`<div class="divider"></div>`);
 lines.push(`<div><b>الراكب</b></div>`);
-lines.push(`<div class="muted small">الاسم: ${escapeHtml(rName)}</div>`);
-lines.push(`<div class="muted small">الهاتف: ${escapeHtml(rPhone)}</div>`);
-lines.push(`<div class="muted small">المنطقة: ${escapeHtml(rGovernorate)} / ${escapeHtml(rCenter)}</div>`);
+lines.push(`<div class="muted small">الاسم: ${escapeHtml(passengerName || "-")}</div>`);
+lines.push(`<div class="muted small">الهاتف: ${escapeHtml(passengerPhone || "-")}</div>`);
+lines.push(`<div class="muted small">المنطقة: ${escapeHtml(passengerGovernorate || "-")} / ${escapeHtml(passengerCenter || "-")}</div>`);
   }
   selectedRideEl.innerHTML = lines.join("");
 }
