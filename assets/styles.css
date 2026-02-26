@@ -83,12 +83,17 @@ background:
 
 .panel{
   height:45vh;
-  background:
-    linear-gradient(180deg, rgba(10,16,26,.96), rgba(8,12,20,.98));
+  margin-top:-12px;
+  border-top-left-radius:24px;
+  border-top-right-radius:24px;
+
+  background: linear-gradient(180deg, rgba(10,16,26,.96), rgba(8,12,20,.98));
   border-top: 1px solid rgba(255,215,0,.18);
+
   display:flex;
   flex-direction:column;
   backdrop-filter: blur(14px);
+
   box-shadow:
     0 -10px 40px rgba(0,0,0,.6),
     0 0 30px rgba(255,215,0,.06);
