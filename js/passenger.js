@@ -1,4 +1,5 @@
 import { auth, db } from "./firebase.js";
+let myData = {};
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
   doc, getDoc, updateDoc, setDoc,
