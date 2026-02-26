@@ -471,7 +471,8 @@ btnRequest.addEventListener("click", async () => {
       vehicleType: passengerVehicle,
       updatedAt: serverTimestamp(),
     }).catch(()=>{});
-
+    console.log("pickup", pickup);
+console.log("dropoff", dropoff);
     await addDoc(collection(db, "rides"), {
       passengerId: user.uid,
       passengerName: myData.name || "",
