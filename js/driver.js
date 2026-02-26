@@ -268,11 +268,15 @@ btnSendOffer.addEventListener("click", async () => {
   setDriverStatus("يرسل عرض...");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), {
-      status: "offered",
-      driverId: myUser.uid,
-      offerPrice: offer,
-      offeredAt: serverTimestamp(),
-    });
+  status: "offered",
+  driverId: myUser.uid,
+  offerPrice: offer,
+  driverName: myUser.name || "",
+  driverPhone: myUser.phone || "",
+  driverVehicleType: myUser.vehicleType || "",
+  driverVehicleCode: myUser.vehicleCode || "",
+  offeredAt: serverTimestamp(),
+});
 
     // متقفلهاش للأبد — خليه يقفل لحظياً بس
     btnSendOffer.disabled = true;
@@ -293,11 +297,14 @@ btnAccept.addEventListener("click", async () => {
   setDriverStatus("يقبل...");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), {
-      status: "accepted",
-      driverId: myUser.uid,
-      acceptedAt: serverTimestamp(),
-      // keep existing price (passenger-set) unless offered accepted by passenger
-    });
+  status: "accepted",
+  driverId: myUser.uid,
+  driverName: myUser.name || "",
+  driverPhone: myUser.phone || "",
+  driverVehicleType: myUser.vehicleType || "",
+  driverVehicleCode: myUser.vehicleCode || "",
+  acceptedAt: serverTimestamp(),
+});
 
     btnAccept.disabled = true;
     btnSendOffer.disabled = true;
