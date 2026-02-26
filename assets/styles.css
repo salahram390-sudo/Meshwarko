@@ -634,26 +634,32 @@ body { margin: 0; }
 }
 .hidden{ display:none !important; }
 /* ============================= */
-/*     LUXURY INPUTS (GOLD)      */
+/*     LUXURY INPUTS PRO         */
 /* ============================= */
 
 input, select, textarea{
-  background: rgba(10,16,26,.75);
-  border: 1px solid rgba(255,215,0,.18);
+  background: linear-gradient(145deg, rgba(14,22,34,.95), rgba(8,14,22,.95));
+  border: 1px solid rgba(255,215,0,.22);
   color: var(--text);
-  border-radius: 16px;
-  padding: 12px 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,.35);
-}
-
-input::placeholder, textarea::placeholder{
-  color: rgba(255,255,255,.45);
-}
-
-input:focus, select:focus, textarea:focus{
-  outline: none;
-  border-color: rgba(255,215,0,.55);
+  border-radius: 18px;
+  padding: 14px 14px;
   box-shadow:
-    0 0 0 3px rgba(255,215,0,.18),
-    0 14px 30px rgba(0,0,0,.45);
+    inset 0 1px 0 rgba(255,255,255,.03),
+    0 12px 28px rgba(0,0,0,.45);
+  transition: all .2s ease;
+}
+
+input::placeholder,
+textarea::placeholder{
+  color: rgba(255,255,255,.4);
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  outline: none;
+  border-color: rgba(255,215,0,.6);
+  box-shadow:
+    0 0 0 3px rgba(255,215,0,.15),
+    0 18px 35px rgba(0,0,0,.55);
 }
