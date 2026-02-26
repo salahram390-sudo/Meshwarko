@@ -271,8 +271,13 @@ function setDropoff(point) {
   updateRouteIfReady();
 }
 
-bindSearch(pickupText, pickupResults, (it) => setPickup({ lat: it.lat, lon: it.lon, text: it.display }));
-bindSearch(dropText, dropResults, (it) => setDropoff({ lat: it.lat, lon: it.lon, text: it.display }));
+bindSearch(pickupText, pickupResults, (it) =>
+  setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" })
+);
+
+bindSearch(dropText, dropResults, (it) =>
+  setDropoff({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" })
+);
 
 priceSlider.addEventListener("input", () => {
   priceSlider.dataset.touched = "1";
