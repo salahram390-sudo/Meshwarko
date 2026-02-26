@@ -307,12 +307,12 @@ function renderRideCard(ride, driverProfile) {
   }
 
   if (ride.status === "accepted") {
-    lines.push(`<div class="divider"></div>`);
-    lines.push(`<div><b>السائق</b></div>`);
-    lines.push(`<div class="muted small">الاسم: ${escapeHtml(driverProfile.name || "—")}</div>`);
-    lines.push(`<div class="muted small">الهاتف: ${escapeHtml(driverProfile.phone || "—")}</div>`);
-    if (driverProfile.vehicleCode) lines.push(`<div class="muted small">كود المركبة: ${escapeHtml(driverProfile.vehicleCode)}</div>`);
-    lines.push(`<div class="muted small">نوع المركبة: ${escapeHtml(driverProfile.vehicleType || "—")}</div>`);
+  lines.push(`<div class="divider"></div>`);
+  lines.push(`<div><b>السائق</b></div>`);
+  lines.push(`<div class="muted small">الاسم: ${escapeHtml(ride.driverName || "-")}</div>`);
+  lines.push(`<div class="muted small">الهاتف: ${escapeHtml(ride.driverPhone || "-")}</div>`);
+  lines.push(`<div class="muted small">نوع المركبة: ${escapeHtml(ride.driverVehicleType || "-")}</div>`);
+}
   } else if (ride.status !== "accepted") {
     lines.push(`<div class="muted small">بيانات السائق تظهر بعد القبول.</div>`);
   }
