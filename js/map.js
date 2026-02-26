@@ -25,7 +25,18 @@ export async function geocodeNominatim(query, userLat, userLon) {
   url.searchParams.set("limit", "8");
   url.searchParams.set("countrycodes", "eg");
   url.searchParams.set("q", query);
+url.searchParams.set("limit", "15");
 
+if (userLat && userLon) {
+  const delta = 0.3; // تقريباً 30 كم
+  const left = userLon - delta;
+  const right = userLon + delta;
+  const top = userLat + delta;
+  const bottom = userLat - delta;
+
+  url.searchParams.set("viewbox", `${left},${top},${right},${bottom}`);
+  url.searchParams.set("bounded", "1");
+}
   const res = await fetch(url.toString(), {
     headers: { "Accept-Language": "ar" }
   });
@@ -169,16 +180,36 @@ if (!myLocMarker) {
     myLocMarker.setLatLng(latlng);
   }
 }
+let userGov = null;
+
+async function reverseGov(lat, lon) {
+  const url = new URL("https://nominatim.openstreetmap.org/reverse");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("lat", lat);
+  url.searchParams.set("lon", lon);
+  url.searchParams.set("zoom", "10"); // مستوى محافظة
+  url.searchParams.set("addressdetails", "1");
+
+  const res = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
+  if (!res.ok) return null;
+
+  const data = await res.json();
+  const a = data?.address || {};
+  return a.state || a.county || null; // غالباً state = المحافظة في مصر
+}
+
 export function locateOnce(map, onLocated) {
   if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition((pos) => {
-const lat = pos.coords.latitude;
-const lon = pos.coords.longitude;
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
 
-userLat = lat;
-userLon = lon;
+    userLat = lat;
+    userLon = lon;
 
-map.setView([lat, lon], 15);
-onLocated?.({ lat, lon });
+    userGov = await reverseGov(lat, lon);   // ✅ هنا بنحفظ المحافظة
+
+    map.setView([lat, lon], 15);
+    onLocated?.({ lat, lon });
   }, () => {}, { enableHighAccuracy: true, timeout: 8000 });
 }
