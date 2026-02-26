@@ -238,8 +238,10 @@ async function showAcceptedDetails(rideId) {
   const rideSnap = await getDoc(doc(db, "rides", rideId));
   if (!rideSnap.exists()) return;
   const ride = rideSnap.data();
-  const pSnap = await getDoc(doc(db, "users", ride.passengerId));
-  const p = pSnap.exists() ? pSnap.data() : null;
+  const passengerName = ride.passengerName || "";
+const passengerPhone = ride.passengerPhone || "";
+const passengerGovernorate = ride.governorate || "";
+const passengerCenter = ride.center || "";
 
   const lines = [];
   lines.push(`<div class="row-between"><b>الحالة</b><span class="muted">accepted</span></div>`);
