@@ -875,7 +875,6 @@ input:focus, select:focus, textarea:focus{
     rgba(255,215,0,0)
   );
   filter: blur(1px);
-  animation: goldSweep 3.8s ease-in-out infinite;
   pointer-events:none;
   opacity:.9;
 }
@@ -888,13 +887,6 @@ input:focus, select:focus, textarea:focus{
   border-radius: 20px;
   box-shadow: inset 0 0 0 1px rgba(255,215,0,.10), inset 0 0 22px rgba(255,215,0,.05);
   pointer-events:none;
-}
-
-@keyframes goldSweep{
-  0%{ transform: translateX(-140%) rotate(18deg); opacity:.0; }
-  12%{ opacity:.9; }
-  55%{ opacity:.45; }
-  100%{ transform: translateX(260%) rotate(18deg); opacity:0; }
 }
 
 /* =========================================================
