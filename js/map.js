@@ -17,22 +17,49 @@ export function addMarker(map, latlng, opts = {}) {
   return m;
 }
 
-export async function geocodeNominatim(query) {
-  const q = (query || "").trim();
-  if (!q) return [];
+export async function geocodeNominatim(query, userLat, userLon) {
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "json");
-  url.searchParams.set("limit", "6");
-  url.searchParams.set("q", q);
+  url.searchParams.set("limit", "8");
+  url.searchParams.set("countrycodes", "eg");
+  url.searchParams.set("q", query);
 
-  const res = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
+  const res = await fetch(url.toString(), {
+    headers: { "Accept-Language": "ar" }
+  });
+
   if (!res.ok) return [];
+
   const data = await res.json();
-  return (data || []).map(x => ({
+
+  const results = (data || []).map(x => ({
     display: x.display_name,
     lat: Number(x.lat),
-    lon: Number(x.lon),
+    lon: Number(x.lon)
   })).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+
+  // ترتيب حسب المسافة من المستخدم
+  if (userLat && userLon) {
+    results.sort((a, b) =>
+      haversine(userLat, userLon, a.lat, a.lon) -
+      haversine(userLat, userLon, b.lat, b.lon)
+    );
+  }
+
+  return results;
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat/2) ** 2 +
+    Math.cos(toRad(lat1)) *
+    Math.cos(toRad(lat2)) *
+    Math.sin(dLon/2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
 }
 
 export async function geocodeEG(query){
