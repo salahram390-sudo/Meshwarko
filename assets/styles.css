@@ -89,7 +89,7 @@ background:
   border-top: 1px solid rgba(255,215,0,.18);
 
   /* Floating (خفيف) */
-  margin-top:-12px;
+  margin-top:-18px;
   border-top-left-radius:24px;
   border-top-right-radius:24px;
   transform: translateZ(0);
