@@ -213,31 +213,6 @@ min-height: 0;
   pointer-events:none;
 }
 
-/* لمعة ذهبية تمشي (لو أنت حاطط كود الـ shimmer قبل كده سيبه، ده متوافق) */
-.card::before,
-.card-lite::before{
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    120deg,
-    transparent 42%,
-    rgba(255,215,0,.09) 50%,
-    transparent 58%
-  );
-  transform: rotate(25deg);
-  animation: goldShimmer 7s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes goldShimmer{
-  0%{ transform: translateX(-65%) rotate(25deg); }
-  100%{ transform: translateX(65%) rotate(25deg); }
-}
-
 /* ============================= */
 /*        GOLD SHIMMER FX       */
 /* ============================= */
