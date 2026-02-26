@@ -156,14 +156,20 @@ body{
 }
 
 .btn.primary{
-  background: linear-gradient(180deg, rgba(255,215,0,.28), rgba(255,215,0,.10));
-  border-color: rgba(255,215,0,.45);
-  box-shadow: 0 14px 30px rgba(255,215,0,.10), 0 10px 26px rgba(0,0,0,.32);
+  background: linear-gradient(145deg, #FFD700, #FFB800);
+  color: #111;
+  border: 1px solid #FFD700;
+  box-shadow:
+    0 0 20px rgba(255,215,0,.45),
+    0 12px 30px rgba(0,0,0,.45);
 }
 
 .btn.primary:hover{
-  background: linear-gradient(180deg, rgba(255,215,0,.34), rgba(255,215,0,.12));
-  border-color: rgba(255,215,0,.60);
+  background: linear-gradient(145deg, #FFE14D, #FFC400);
+  box-shadow:
+    0 0 30px rgba(255,215,0,.75),
+    0 18px 40px rgba(0,0,0,.55);
+  transform: translateY(-1px);
 }
 
 .btn.success{
