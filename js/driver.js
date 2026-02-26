@@ -253,7 +253,7 @@ lines.push(`<div><b>الراكب</b></div>`);
 lines.push(`<div class="muted small">الاسم: ${escapeHtml(passengerName || "-")}</div>`);
 lines.push(`<div class="muted small">الهاتف: ${escapeHtml(passengerPhone || "-")}</div>`);
 lines.push(`<div class="muted small">المنطقة: ${escapeHtml(passengerGovernorate || "-")} / ${escapeHtml(passengerCenter || "-")}</div>`);
-  }
+  
   selectedRideEl.innerHTML = lines.join("");
 }
 
