@@ -297,6 +297,7 @@ btnAccept.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
   setDriverStatus("يقبل...");
   try {
+    console.log("DRIVER selectedRideId =", selectedRideId);
     await updateDoc(doc(db, "rides", selectedRideId), {
   status: "accepted",
   driverId: myUser.uid,
