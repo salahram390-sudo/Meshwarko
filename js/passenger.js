@@ -28,7 +28,8 @@ const pickupResults = $("#pickupResults");
 const dropResults = $("#dropResults");
 const pickupPick = $("#pickupPick");
 const dropPick = $("#dropPick");
-const dropSearch = $("#dropSearch");
+const pickupSearchBtn = $("#pickupSearchBtn");
+const dropSearchBtn   = $("#dropSearchBtn");
 
 const priceValue = $("#priceValue");
 const distanceValue = $("#distanceValue");
@@ -48,8 +49,6 @@ const btnCall = $("#btnCall");
 const btnWhats = $("#btnWhats");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
-bindSearch(pickupText, pickupResults, (it) => setPickup(it));
-bindSearch(dropText, dropResults, (it) => setDropoff(it));
 const routeLayerRef = { current: null };
 
 // Rating modal
