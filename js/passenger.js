@@ -312,8 +312,8 @@ function renderRideCard(ride, driverProfile) {
 if (ride.status === "accepted") {
   lines.push(`<div class="divider"></div>`);
   lines.push(`<div><b>السائق</b></div>`);
-  lines.push(`<div class="muted small">الاسم: ${escapeHtml(ride.driverName || "—")}</div>`);
-  lines.push(`<div class="muted small">الهاتف: ${escapeHtml(ride.driverPhone || "—")}</div>`);
+  lines.push(`<div class="muted small">الاسم: ${escapeHtml(driverProfile?.name || ride.driverName || "-")}</div>`);
+  lines.push(`<div class="muted small">الهاتف: ${escapeHtml(driverProfile?.phone || ride.driverPhone || "-")}</div>`);
   lines.push(`<div class="muted small">نوع المركبة: ${escapeHtml(ride.driverVehicleType || "—")}</div>`);
   if (ride.driverVehicleCode) {
     lines.push(`<div class="muted small">كود المركبة: ${escapeHtml(ride.driverVehicleCode)}</div>`);
