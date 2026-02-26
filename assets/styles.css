@@ -591,3 +591,44 @@ body { margin: 0; }
   background: linear-gradient(90deg,#FFD700,transparent);
   box-shadow:0 0 8px rgba(255,215,0,.6);
 }
+
+/* ===========================
+   PERFORMANCE PATCH (MOBILE)
+   =========================== */
+
+/* قلّل تأثيرات مكلفة على الموبايل */
+@media (max-width: 520px){
+  /* قلّل الـ blur لأنه أغلى حاجة */
+  .topbar,
+  .panel,
+  .card,
+  .card-lite{
+    backdrop-filter: none !important;
+  }
+
+  /* خفّف الظلال الكبيرة */
+  .btn{
+    box-shadow: 0 10px 22px rgba(0,0,0,.35) !important;
+  }
+  .card, .card-lite{
+    box-shadow: 0 10px 22px rgba(0,0,0,.45) !important;
+  }
+
+  /* اقفل أي shimmer/لمعة متحركة على الموبايل */
+  .card::before,
+  .card-lite::before,
+  .panel::before{
+    animation: none !important;
+    opacity: .18 !important; /* لو موجودة، تخليها ثابتة خفيفة */
+  }
+
+  /* تقليل transitions الكتير */
+  *{
+    transition: none !important;
+  }
+}
+
+/* احترام وضع تقليل الحركة */
+@media (prefers-reduced-motion: reduce){
+  *{ animation: none !important; transition: none !important; }
+}
