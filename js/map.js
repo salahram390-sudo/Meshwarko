@@ -172,9 +172,13 @@ if (!myLocMarker) {
 export function locateOnce(map, onLocated) {
   if (!navigator.geolocation) return;
   navigator.geolocation.getCurrentPosition((pos) => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    map.setView([lat, lon], 15);
-    onLocated?.({ lat, lon });
+const lat = pos.coords.latitude;
+const lon = pos.coords.longitude;
+
+userLat = lat;
+userLon = lon;
+
+map.setView([lat, lon], 15);
+onLocated?.({ lat, lon });
   }, () => {}, { enableHighAccuracy: true, timeout: 8000 });
 }
