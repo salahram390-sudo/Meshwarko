@@ -47,7 +47,12 @@ export async function geocodeNominatim(query, userLat, userLon) {
     display: x.display_name,
     lat: Number(x.lat),
     lon: Number(x.lon),
-    gov: x?.address?.state || x?.address?.county || null
+    gov:
+  x?.address?.state ||
+  x?.address?.governorate ||
+  x?.address?.county ||
+  x?.address?.region ||
+  null
   })).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 
   // ✅ فلترة نفس المحافظة
