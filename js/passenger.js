@@ -31,6 +31,9 @@ const dropPick = $("#dropPick");
 const pickupSearchBtn = $("#pickupSearchBtn");
 const dropSearchBtn   = $("#dropSearchBtn");
 
+pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
+dropSearchBtn.addEventListener("click", () => manualSearch("dropoff"));
+
 const priceValue = $("#priceValue");
 const distanceValue = $("#distanceValue");
 const routeMeta = $("#routeMeta");
