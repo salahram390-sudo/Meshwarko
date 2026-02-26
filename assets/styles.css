@@ -313,7 +313,6 @@ min-height: 0;
   font-weight: 700;
   letter-spacing: .3px;
   cursor: pointer;
-  backdrop-filter: blur(10px);
   transition: all .25s ease;
   box-shadow:
     0 0 0 rgba(255,215,0,0),
