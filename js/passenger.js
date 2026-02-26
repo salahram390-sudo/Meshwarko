@@ -470,6 +470,8 @@ btnRequest.addEventListener("click", async () => {
 
     await addDoc(collection(db, "rides"), {
       passengerId: user.uid,
+      passengerName: myData.name || "",
+      passengerPhone: myData.phone || "",
       driverId: null,
       status: "requested",
       createdAt: serverTimestamp(),
