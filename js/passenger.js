@@ -309,13 +309,16 @@ function renderRideCard(ride, driverProfile) {
   if (ride.status === "accepted") {
   lines.push(`<div class="divider"></div>`);
   lines.push(`<div><b>السائق</b></div>`);
-  lines.push(`<div class="muted small">الاسم: ${escapeHtml(ride.driverName || "-")}</div>`);
-  lines.push(`<div class="muted small">الهاتف: ${escapeHtml(ride.driverPhone || "-")}</div>`);
-  lines.push(`<div class="muted small">نوع المركبة: ${escapeHtml(ride.driverVehicleType || "-")}</div>`);
-}
-  } else if (ride.status !== "accepted") {
-    lines.push(`<div class="muted small">بيانات السائق تظهر بعد القبول.</div>`);
+  lines.push(`<div class="muted small">الاسم: ${escapeHtml(ride.driverName || "—")}</div>`);
+  lines.push(`<div class="muted small">الهاتف: ${escapeHtml(ride.driverPhone || "—")}</div>`);
+  lines.push(`<div class="muted small">نوع المركبة: ${escapeHtml(ride.driverVehicleType || "—")}</div>`);
+
+  if (ride.driverVehicleCode) {
+    lines.push(`<div class="muted small">كود المركبة: ${escapeHtml(ride.driverVehicleCode)}</div>`);
   }
+} else {
+  lines.push(`<div class="muted small">بيانات السائق تظهر بعد القبول.</div>`);
+}
 
   rideCard.innerHTML = lines.join("");
 }
