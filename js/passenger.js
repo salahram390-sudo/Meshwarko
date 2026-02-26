@@ -306,7 +306,7 @@ function renderRideCard(ride, driverProfile) {
     lines.push(`<div class="muted small">يمكنك قبول العرض أو رفضه.</div>`);
   }
 
-  if (ride.status === "accepted" && ride.driverId && driverProfile) {
+  if (ride.status === "accepted") {
     lines.push(`<div class="divider"></div>`);
     lines.push(`<div><b>السائق</b></div>`);
     lines.push(`<div class="muted small">الاسم: ${escapeHtml(driverProfile.name || "—")}</div>`);
