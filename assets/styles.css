@@ -35,7 +35,12 @@ body{
   background: rgba(10,14,20,.75);
   backdrop-filter: blur(10px);
 }
-.brand{ display:flex; align-items:center; gap:10px; }
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:1;
+}
 .logo{
   width:34px; height:34px; border-radius:10px; display:grid; place-items:center;
   background: linear-gradient(135deg, rgba(59,130,246,.95), rgba(34,197,94,.65));
