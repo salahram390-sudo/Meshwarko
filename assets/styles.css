@@ -97,110 +97,82 @@ body{
   height:42px; border-radius: 12px; border:1px solid var(--line);
   background: rgba(255,255,255,.06); color:var(--text); padding:0 12px; cursor:pointer;
 }
-/* ===== Buttons (Pro) ===== */
+
+/* =========================
+   Premium Buttons (Global)
+   ========================= */
+
+:root{
+  --gold: #FFD700;
+  --gold2: #FFC400;
+  --btnRadius: 16px;
+}
+
 .btn{
   height: 44px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,.06);
-  color: var(--text);
   padding: 0 14px;
+  border-radius: var(--btnRadius);
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: .2px;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(0,0,0,.28);
-  transition: transform .12s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, opacity .2s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  user-select: none;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease, filter .12s ease;
+  box-shadow: 0 10px 26px rgba(0,0,0,.32);
+  backdrop-filter: blur(10px);
   -webkit-tap-highlight-color: transparent;
 }
 
-.btn:hover{
-  background: rgba(255,255,255,.10);
-  border-color: rgba(255,255,255,.16);
-  box-shadow: 0 14px 30px rgba(0,0,0,.35);
-}
-
-.btn:active{
-  transform: translateY(1px) scale(.99);
-  box-shadow: 0 10px 22px rgba(0,0,0,.30);
-}
-
-.btn:focus-visible{
-  outline: none;
-  box-shadow:
-    0 0 0 3px rgba(255,215,0,.22),
-    0 12px 28px rgba(0,0,0,.35);
-  border-color: rgba(255,215,0,.35);
-}
+.btn:active{ transform: scale(.99); }
 
 .btn.small{
-  height: 38px;
-  border-radius: 12px;
-  padding: 0 12px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 14px;
   font-size: 13px;
 }
 
-/* زرار أيقونة (زي 🔍) — نفس الأيقونة زي ما هي */
-.btn.small:has(:only-child){
-  width: 40px;
-  padding: 0;
-}
-@supports not selector(:has(*)){
-  /* fallback: خلي الأزرار الصغيرة المخصصة للأيقونات شكلها مربع لو انت مستخدمها كده */
-  #pickupSearchBtn.btn.small,
-  #dropSearchBtn.btn.small{
-    width: 40px;
-    padding: 0;
-  }
-}
-
-/* Primary (دهب محترم) */
 .btn.primary{
-  background: linear-gradient(180deg, rgba(255,215,0,.22), rgba(255,215,0,.10));
-  border-color: rgba(255,215,0,.35);
-  box-shadow:
-    0 10px 26px rgba(0,0,0,.32),
-    0 0 22px rgba(255,215,0,.12);
-}
-.btn.primary:hover{
-  background: linear-gradient(180deg, rgba(255,215,0,.28), rgba(255,215,0,.12));
-  border-color: rgba(255,215,0,.50);
+  background: linear-gradient(180deg, rgba(255,215,0,.28), rgba(255,215,0,.10));
+  border-color: rgba(255,215,0,.45);
+  box-shadow: 0 14px 30px rgba(255,215,0,.10), 0 10px 26px rgba(0,0,0,.32);
 }
 
-/* Success */
+.btn.primary:hover{
+  background: linear-gradient(180deg, rgba(255,215,0,.34), rgba(255,215,0,.12));
+  border-color: rgba(255,215,0,.60);
+}
+
 .btn.success{
   background: linear-gradient(180deg, rgba(34,197,94,.22), rgba(34,197,94,.10));
   border-color: rgba(34,197,94,.35);
 }
+
 .btn.success:hover{
-  border-color: rgba(34,197,94,.50);
+  border-color: rgba(34,197,94,.55);
 }
 
-/* Danger */
 .btn.danger{
   background: linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.10));
   border-color: rgba(239,68,68,.35);
 }
+
 .btn.danger:hover{
-  border-color: rgba(239,68,68,.50);
+  border-color: rgba(239,68,68,.55);
 }
 
-/* Ghost - Premium Top Buttons */
+/* Ghost => يخلي (تحويل سائق / خروج / أزرار شبيهة) شكلها Premium */
 .btn.ghost{
   background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,215,0,.18);
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  backdrop-filter: blur(8px);
+  border-color: rgba(255,215,0,.18);
+  box-shadow: 0 10px 26px rgba(0,0,0,.32);
 }
 
 .btn.ghost:hover{
   background: rgba(255,215,0,.08);
   border-color: rgba(255,215,0,.35);
-  box-shadow: 0 8px 22px rgba(255,215,0,.12);
 }
-
 
 /* Disabled */
 .btn:disabled,
@@ -209,6 +181,25 @@ body{
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  filter: grayscale(.2);
+}
+
+/* =========================
+   EXCEPTION: Search icon buttons (keep old/simple)
+   only the 🔍 next to pickup/dropoff
+   ========================= */
+.btn.search-btn{
+  width: 42px;
+  padding: 0;
+  background: transparent !important;
+  border: 1px solid rgba(255,255,255,.14) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.btn.search-btn:hover{
+  background: rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.22) !important;
 }
 
 .actions{ display:flex; gap:10px; margin-top:8px; flex-wrap:wrap; }
