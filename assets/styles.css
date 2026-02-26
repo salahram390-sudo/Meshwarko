@@ -632,3 +632,4 @@ body { margin: 0; }
 @media (prefers-reduced-motion: reduce){
   *{ animation: none !important; transition: none !important; }
 }
+.hidden{ display:none !important; }
