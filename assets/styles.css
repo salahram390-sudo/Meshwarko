@@ -229,3 +229,19 @@ body { margin: 0; }
   height: 100%;
   width: 100%;
 }
+.gps-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gps-dot {
+  width: 14px;
+  height: 14px;
+  background: #FFD700;
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 6px rgba(255,215,0,.25),
+    0 0 18px rgba(255,215,0,.9);
+}
+
