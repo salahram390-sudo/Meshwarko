@@ -123,12 +123,19 @@ export function showMyLocation(map, loc) {
   const latlng = [loc.lat, loc.lon];
 
   if (!myLocMarker) {
-    myLocMarker = L.circleMarker(latlng, {
-      radius: 8,
-      color: "#2e7df6",
-      fillColor: "#2e7df6",
-      fillOpacity: 0.9
-    }).addTo(map);
+   const myLocIcon = L.divIcon({
+  className: "gps-marker",
+  html: "<div class='gps-dot'></div>",
+  iconSize: [30, 30],
+  iconAnchor: [15, 15]
+});
+
+if (!myLocMarker) {
+  myLocMarker = L.marker(latlng, { icon: myLocIcon }).addTo(map);
+} else {
+  myLocMarker.setLatLng(latlng);
+}
+    
   } else {
     myLocMarker.setLatLng(latlng);
   }
