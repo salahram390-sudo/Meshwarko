@@ -570,3 +570,28 @@ body { margin: 0; }
   }
 }
 
+/* ============================= */
+/*      GOLD TITLES GLOBAL      */
+/* ============================= */
+
+.panel-title,
+.modal-title,
+.brand-title{
+  font-weight:800;
+  letter-spacing:.5px;
+  background: linear-gradient(90deg,#FFD700,#FFC400,#FFF1A8);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  position:relative;
+}
+
+.panel-title::after,
+.modal-title::after{
+  content:"";
+  display:block;
+  width:40px;
+  height:2px;
+  margin-top:6px;
+  background: linear-gradient(90deg,#FFD700,transparent);
+  box-shadow:0 0 8px rgba(255,215,0,.6);
+}
