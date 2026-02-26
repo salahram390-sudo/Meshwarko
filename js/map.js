@@ -1,3 +1,5 @@
+let userLat = null;
+let userLon = null;
 import { debounce } from "./utils.js";
 
 export function createMap(mapElId, options = {}) {
