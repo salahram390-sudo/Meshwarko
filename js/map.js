@@ -23,6 +23,7 @@ function normGov(s) {
   return (s || "")
     .toString()
     .replace(/محافظة\s*/g, "")
+    .replace(/Governorate/gi, "")
     .replace(/\s+/g, " ")
     .trim();
 }
