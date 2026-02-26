@@ -859,6 +859,15 @@ input:focus, select:focus, textarea:focus{
   border-color:rgba(255,215,0,.6);
   background:rgba(255,255,255,.06);
 }
+.search-btn{
+  width:42px;
+  height:42px;
+  min-width:42px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 /* =========================================================
    CARDS (Gold + shimmer moving)
    ========================================================= */
