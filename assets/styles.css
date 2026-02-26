@@ -195,7 +195,9 @@ body{
   background: rgba(255,215,0,.08);
   border-color: rgba(255,215,0,.35);
 }
-
+.top-actions .btn.ghost{
+  opacity:.8;
+}
 /* Disabled */
 .btn:disabled,
 .btn.disabled{
