@@ -81,28 +81,75 @@ body{
   width:42px;height:42px;border-radius:14px; border:1px solid var(--line);
   background: rgba(15,22,32,.75); color:var(--text); cursor:pointer; box-shadow: var(--shadow);
 }
+/* ============================= */
+/*      LUXURY GOLD PANELS      */
+/* ============================= */
+
 .panel{
-  height:45vh; background: linear-gradient(180deg, rgba(18,28,40,.95), rgba(15,22,32,.98));
-  border-top:1px solid var(--line); display:flex; flex-direction:column;
+  height:45vh;
+  background:
+    linear-gradient(180deg, rgba(10,16,26,.96), rgba(8,12,20,.98));
+  border-top: 1px solid rgba(255,215,0,.18);
+  display:flex;
+  flex-direction:column;
+  backdrop-filter: blur(14px);
+  box-shadow:
+    0 -10px 40px rgba(0,0,0,.6),
+    0 0 30px rgba(255,215,0,.06);
 }
+
 .panel-head{
-  padding:14px 14px 10px; display:flex; justify-content:space-between; align-items:flex-start;
-  border-bottom:1px solid var(--line); gap:12px;
+  padding:16px 16px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  border-bottom:1px solid rgba(255,215,0,.15);
+  gap:12px;
 }
-.panel-title{ font-weight:800; }
-.panel-sub{ color:var(--muted); font-size:12px; margin-top:4px; }
-.pill-status{
-  padding:6px 10px; border-radius:999px; border:1px solid var(--line);
-  background: rgba(255,255,255,.05); color: var(--muted); font-size:12px;
-  white-space:nowrap;
+
+.panel-body{
+  padding:14px 16px 18px;
+  overflow:auto;
 }
-.panel-body{ padding:12px 14px 16px; overflow:auto; }
-.card, .card-lite{
-  border:1px solid var(--line); background: rgba(18,28,40,.72);
-  border-radius: var(--r); box-shadow: var(--shadow);
+
+
+/* ============================= */
+/*           GOLD CARDS         */
+/* ============================= */
+
+.card,
+.card-lite{
+  border:1px solid rgba(255,215,0,.22);
+  background:
+    linear-gradient(160deg,
+      rgba(25,35,50,.88),
+      rgba(15,22,32,.92)
+    );
+  border-radius:18px;
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.55),
+    0 0 18px rgba(255,215,0,.08);
+  backdrop-filter: blur(12px);
+  transition: all .25s ease;
 }
-.card{ padding:14px; }
-.card-lite{ padding:12px; background: rgba(15,24,35,.65); }
+
+/* Hover فاخر خفيف */
+.card:hover,
+.card-lite:hover{
+  border-color: rgba(255,215,0,.45);
+  box-shadow:
+    0 16px 45px rgba(0,0,0,.65),
+    0 0 25px rgba(255,215,0,.18);
+  transform: translateY(-2px);
+}
+
+.card{
+  padding:16px;
+}
+
+.card-lite{
+  padding:14px;
+}
 .form{ margin-top:12px; display:flex; flex-direction:column; gap:10px; }
 .form-row{ display:flex; flex-direction:column; gap:6px; }
 .label{ color:var(--muted); font-size:13px; }
