@@ -84,16 +84,6 @@ async function manualSearch(type) {
       setDropoff(obj);
     }
 
-    // لو الاتنين اتحددوا ارسم المسار
-    if (pickup && dropoff) {
-      const route = await routeOSRM(
-        [pickup.lat, pickup.lon],
-        [dropoff.lat, dropoff.lon]
-      );
-
-      drawRoute(map, route);
-    }
-
   } catch (e) {
     console.error("SEARCH ERROR:", e);
     alert("خطأ في البحث");
