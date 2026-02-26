@@ -889,7 +889,10 @@ input:focus, select:focus, textarea:focus{
   border-color: rgba(255,215,0,.35);
   box-shadow: 0 20px 52px rgba(0,0,0,.60), 0 0 26px rgba(255,215,0,.10);
 }
-
+.card h3,
+.card-lite h3{
+  text-shadow: 0 0 8px rgba(255,215,0,.25);
+}
 /* Shimmer layer */
 .card::before, .card-lite::before{
   content:"";
