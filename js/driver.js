@@ -29,6 +29,7 @@ const btnAccept = $("#btnAccept");
 const btnComplete = $("#btnComplete");
 const btnCancel = $("#btnCancel");
 const btnTrackToggle = $("#btnTrackToggle");
+const btnArrived = $("#btnArrived");
 function syncOfferBtn(){
   const v = Number((offerInput.value || "").trim());
   btnSendOffer.disabled = !selectedRideId || !Number.isFinite(v) || v <= 0;
