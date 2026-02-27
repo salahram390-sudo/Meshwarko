@@ -109,11 +109,11 @@ loginForm.addEventListener("submit", async (e) => {
     const email = $("#loginEmail").value.trim();
     const pass = $("#loginPass").value;
   if (role === "driver") {
-  const gov = document.querySelector("#dGov").value.trim();
-  const center = document.querySelector("#dCenter").value.trim();
-  const vehicleCode = document.querySelector("#dVehicleCode").value.trim();
+  const gov = dGovLogin.value.trim();
+  const center = dCenterLogin.value.trim();
+  const vehicleCode = dVehicleCodeLogin.value.trim();
 
-  if (!gov || !center || !vehicleCode) {
+  if (!gov || !center || !driverVehicleLogin || !vehicleCode) {
     alert("اكمل بيانات السائق قبل الدخول");
     return;
   }
