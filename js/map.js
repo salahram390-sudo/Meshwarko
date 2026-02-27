@@ -47,17 +47,23 @@ export async function geocodeNominatim(query, userLat, userLon) {
   const data = await res.json();
 
   let results = (data || []).map(x => ({
-    display: x.display_name,
-    lat: Number(x.lat),
-    lon: Number(x.lon),
-    gov:
-  x?.address?.state ||
-  x?.address?.governorate ||
-  x?.address?.county ||
-  x?.address?.region ||
-  null
-  })).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-
+  display: x.display_name,
+  lat: Number(x.lat),
+  lon: Number(x.lon),
+  gov:
+    x?.address?.state ||
+    x?.address?.governorate ||
+    x?.address?.county ||
+    x?.address?.region ||
+    null,
+  center:
+    x?.address?.city ||
+    x?.address?.town ||
+    x?.address?.village ||
+    x?.address?.suburb ||
+    x?.address?.hamlet ||
+    null
+})).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
   // ✅ فلترة نفس المحافظة
   if (userGov) {
     const ug = normGov(userGov);
