@@ -1045,3 +1045,38 @@ body{
 .app-shell{
   background: transparent !important;
 }
+/* ===============================
+   MINIMAL BLACK + GOLD (override)
+   paste at VERY END of styles.css
+================================ */
+/* Page background */
+html, body{
+  background: radial-gradient(1200px 600px at 50% 0%,
+      rgba(255,215,0,.06) 0%,
+      rgba(11,15,20,1) 45%,
+      rgba(7,9,12,1) 100%
+    ) !important;
+  color: rgba(255,255,255,.92);
+}
+
+/* لو عندك wrapper بيعمل خلفية */
+.app-shell{
+  background: transparent !important;
+}
+:root{
+  --gold: #FFD700;
+  --gold2:#FFC400;
+  --bg: #0b0f14;
+  --panel: rgba(12,18,28,.78);
+  --line: rgba(255,215,0,.12);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.68);
+}
+.topbar{
+  background: rgba(0,0,0,.28) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,215,0,.08) !important;
+}
+
+.brand-title{ font-weight: 800; letter-spacing: .4px; }
+.brand-sub{ color: rgba(255,255,255,.72) !important; }
