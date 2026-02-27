@@ -790,13 +790,21 @@ textarea:focus{
 input, select, textarea{
   background: linear-gradient(145deg, rgba(14,22,34,.95), rgba(8,14,22,.95));
   border: 1px solid rgba(255,215,0,.18);
-  color: var(--text);
-  border-radius: var(--r);
-  padding: 14px 14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 10px 24px rgba(0,0,0,.35);
+  color: #ffffff;
+
+  height: 48px;              /* حل القص */
+  line-height: 48px;         /* حل النص اللي مش باين */
+  padding: 0 14px;
+
+  font-size: 15px;
+  border-radius: 16px;
+  box-sizing: border-box;
+
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03),
+              0 8px 18px rgba(0,0,0,.35);
+
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-
 input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.40); }
 
 input:focus, select:focus, textarea:focus{
