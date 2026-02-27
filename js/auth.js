@@ -93,7 +93,8 @@ async function initAdmin() {
   
   pGov.addEventListener("change", () => setCenters(pGov.value, pCenter));
   dGov.addEventListener("change", () => setCenters(dGov.value, dCenter));
-
+dGovLogin.addEventListener("change", () => setCenters(dGovLogin.value, dCenterLogin));
+  
   const vehicles = admin.vehicleTypes;
 const render = () => {
   renderVehicleGrid(dVehicles, vehicles, driverVehicle, (id) => {
