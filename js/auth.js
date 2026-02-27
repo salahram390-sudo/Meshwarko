@@ -80,7 +80,8 @@ async function initAdmin() {
   const govs = admin.governorates.map(g => g.name);
   fillSelect(pGov, govs);
   fillSelect(dGov, govs);
-
+  fillSelect(dGovLogin, govs);
+  
   const setCenters = (govName, centerSelect) => {
     const g = admin.governorates.find(x => x.name === govName);
     fillSelect(centerSelect, (g?.centers || ["—"]));
@@ -88,7 +89,8 @@ async function initAdmin() {
 
   setCenters(pGov.value, pCenter);
   setCenters(dGov.value, dCenter);
-
+  setCenters(dGovLogin.value, dCenterLogin);
+  
   pGov.addEventListener("change", () => setCenters(pGov.value, pCenter));
   dGov.addEventListener("change", () => setCenters(dGov.value, dCenter));
 
