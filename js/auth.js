@@ -114,6 +114,7 @@ const render = () => {
 };
 
 render();
+}
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
