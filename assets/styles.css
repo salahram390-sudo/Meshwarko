@@ -1061,3 +1061,15 @@ color: rgba(255,255,255,.92);
 
 .brand-title{ font-weight: 800; letter-spacing: .4px; }
 .brand-sub{ color: rgba(255,255,255,.72) !important; }
+/* subtle stone/noise effect */
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 30% 10%, rgba(255,255,255,.04), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(255,255,255,.03), transparent 60%);
+  mix-blend-mode: overlay;
+  opacity: .22;
+}
