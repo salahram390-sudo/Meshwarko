@@ -313,7 +313,8 @@ btnAccept.addEventListener("click", async () => {
     btnSendOffer.disabled = true;
     btnComplete.disabled = false;
     btnCancel.disabled = false;
-
+    btnArrived.disabled = false;
+    
     btnTrackToggle.disabled = false;
     trackingEnabled = false;
     setTrackBtn();
