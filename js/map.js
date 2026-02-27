@@ -245,3 +245,22 @@ export function locateOnce(map, onLocated) {
     onLocated?.({ lat, lon });
   }, () => {}, { enableHighAccuracy: true, timeout: 8000 });
 }
+async function reverseCenter(lat, lon) {
+  const url = new URL("https://nominatim.openstreetmap.org/reverse");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("lat", lat);
+  url.searchParams.set("lon", lon);
+  url.searchParams.set("zoom", "10");
+  url.searchParams.set("addressdetails", "1");
+
+  const res = await fetch(url.toString(), {
+    headers: { "Accept-Language": "ar" }
+  });
+
+  if (!res.ok) return null;
+
+  const data = await res.json();
+  const a = data?.address || {};
+
+  return a.state || a.county || a.region || null;
+}
