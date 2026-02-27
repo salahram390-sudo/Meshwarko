@@ -64,21 +64,33 @@ export async function geocodeNominatim(query, userLat, userLon) {
     x?.address?.hamlet ||
     null
 })).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-  // ✅ فلترة نفس المحافظة
-  if (userGov) {
+// 1️⃣ حاول نفس المركز / القرية
+if (userCenter) {
+  const uc = normGov(userCenter);
+  const byCenter = results.filter(r => normGov(r.center) === uc);
+
+  if (byCenter.length) {
+    results = byCenter;
+  } else if (userGov) {
+    // 2️⃣ لو مفيش نفس المركز → جرب نفس المحافظة
     const ug = normGov(userGov);
-    const filtered = results.filter(r => normGov(r.gov) === ug);
-
-    // لو مفيش ولا نتيجة في نفس المحافظة: نرجّع النتائج الأصلية (اختياري)
-    if (filtered.length) results = filtered;
+    const byGov = results.filter(r => normGov(r.gov) === ug);
+    if (byGov.length) results = byGov;
   }
+}
+else if (userGov) {
+  const ug = normGov(userGov);
+  const byGov = results.filter(r => normGov(r.gov) === ug);
+  if (byGov.length) results = byGov;
+}
 
-  // (اختياري) ترتيب أقرب داخل نفس المحافظة
-  if (userLat && userLon) {
-    results.sort((a, b) =>
-      haversine(userLat, userLon, a.lat, a.lon) - haversine(userLat, userLon, b.lat, b.lon)
-    );
-  }
+// 3️⃣ دايمًا رتب حسب المسافة
+if (userLat && userLon) {
+  results.sort((a, b) =>
+    haversine(userLat, userLon, a.lat, a.lon) -
+    haversine(userLat, userLon, b.lat, b.lon)
+  );
+}
 
   return results;
 }
