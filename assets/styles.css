@@ -1087,3 +1087,41 @@ body:before{
   mix-blend-mode: overlay;
   opacity: .22;
 }
+/* =========================
+   LIVE DRIVERS (UBER STYLE)
+   ========================= */
+.car-marker{
+  width: 34px;
+  height: 34px;
+  border-radius: 18px;
+  background: rgba(10,14,20,.9);
+  border: 2px solid rgba(255,215,0,.85);
+  box-shadow: 0 10px 22px rgba(0,0,0,.35), 0 0 0 6px rgba(255,215,0,.10);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform-origin: 50% 50%;
+}
+
+.car-marker::after{
+  content:"";
+  position:absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,215,0,.14);
+  animation: carPulse 1.6s infinite;
+  z-index: -1;
+}
+
+@keyframes carPulse{
+  0%{ transform: scale(.7); opacity:.85; }
+  70%{ transform: scale(1.6); opacity:0; }
+  100%{ opacity:0; }
+}
+
+.car-marker svg{
+  width: 18px;
+  height: 18px;
+  display:block;
+}
