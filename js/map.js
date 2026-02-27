@@ -241,7 +241,7 @@ export function locateOnce(map, onLocated) {
     userLon = lon;
 
     userGov = await reverseGov(lat, lon);   // ✅ هنا بنحفظ المحافظة
-
+    userCenter = await reverseCenter(lat, lon);
     map.setView([lat, lon], 15);
     onLocated?.({ lat, lon });
   }, () => {}, { enableHighAccuracy: true, timeout: 8000 });
