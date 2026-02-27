@@ -209,3 +209,5 @@ function friendlyAuthError(err) {
   if (code.includes("auth/weak-password")) return "الباسورد ضعيف (6 أحرف على الأقل).";
   return "حدث خطأ. حاول مرة أخرى.";
 }
+
+console.log("AUTH LOADED OK");
