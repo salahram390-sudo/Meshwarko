@@ -993,3 +993,38 @@ input[type="range"]{
 .search-item{ padding: 12px; cursor:pointer; border-bottom: 1px solid rgba(255,255,255,.06); }
 .search-item:hover{ background: rgba(255,255,255,.04); }
 .search-item:last-child{ border-bottom:none; }
+/* FIX: make helper/status texts readable */
+.panel, .card, .card-lite{
+  color: rgba(255,255,255,.92);
+}
+
+.panel p, .card p, .card-lite p,
+.panel .muted, .card .muted, .card-lite .muted,
+.panel small, .card small, .card-lite small{
+  color: rgba(255,255,255,.78) !important;
+  opacity: 1 !important;
+}
+/* FIX: search suggestions readability */
+.search-results{
+  background: rgba(10,14,20,.92) !important;
+  border: 1px solid rgba(255,215,0,.18) !important;
+}
+
+.search-item{
+  color: rgba(255,255,255,.92) !important;
+  opacity: 1 !important;
+}
+
+.search-item:hover{
+  background: rgba(255,255,255,.08) !important;
+}
+/* FIX: price text color */
+.price, .fare, .amount, .value, .money{
+  color: #FFD700 !important;
+  text-shadow: 0 2px 10px rgba(255,215,0,.25);
+}
+
+/* fallback: any strong/bold number inside panels/cards */
+.panel strong, .card strong, .card-lite strong{
+  color: rgba(255,255,255,.95) !important;
+}
