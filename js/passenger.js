@@ -645,30 +645,37 @@ btnRequest.addEventListener("click", async () => {
     console.log("pickup", pickup);
 console.log("dropoff", dropoff);
     const rideRef = await addDoc(collection(db, "rides"), {
-      currentRideId = rideRef.id;
-      passengerId: user.uid,
-      passengerName: myData.name || "",
-      passengerPhone: myData.phone || "",
-      driverId: null,
-      status: "requested",
-      createdAt: serverTimestamp(),
-      expiresAt,
 
-      governorate: pGov.value,
-      center: pCenter.value,
-      vehicleType: passengerVehicle,
+  passengerId: user.uid,
+  passengerName: myData.name || "",
+  passengerPhone: myData.phone || "",
+  driverId: null,
+  status: "requested",
+  createdAt: serverTimestamp(),
+  expiresAt,
 
-      pickup: { lat: pickup.lat, lon: pickup.lon },
-      dropoff: { lat: dropoff.lat, lon: dropoff.lon },
-      pickupText: pickupText.value.trim(),
-      dropoffText: dropText.value.trim(),
+  governorate: pGov.value,
+  center: pCenter.value,
+  vehicleType: passengerVehicle,
 
-      distanceMeters: lastDistanceMeters,
-      durationSec: lastDurationSec,
-      price,
+  pickup: { lat: pickup.lat, lon: pickup.lon },
+  dropoff: { lat: dropoff.lat, lon: dropoff.lon },
 
-      passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
-    });
+  pickupText: pickupText.value.trim(),
+  dropoffText: dropText.value.trim(),
+
+  distanceMeters: lastDistanceMeters,
+  durationSec: lastDurationSec,
+  price,
+
+  passengerLoc: myLocation
+    ? { lat: myLocation.lat, lon: myLocation.lon }
+    : null
+
+});
+    const rideRef = await addDoc(collection(db, "rides"), { ... });
+
+currentRideId = rideRef.id;
 
     setText(routeMeta, "تم إرسال الطلب. في انتظار سائق...");
     setStatus("قيد الانتظار");
