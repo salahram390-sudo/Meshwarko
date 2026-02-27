@@ -98,7 +98,6 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     const email = $("#loginEmail").value.trim();
     const pass = $("#loginPass").value;
-    if(role === "driver"){
   if (role === "driver") {
   const gov = document.querySelector("#dGov").value.trim();
   const center = document.querySelector("#dCenter").value.trim();
