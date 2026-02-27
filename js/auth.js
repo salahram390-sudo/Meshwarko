@@ -35,7 +35,15 @@ let admin = null;
 const pGov = $("#pGov"), pCenter = $("#pCenter");
 const dGov = $("#dGov"), dCenter = $("#dCenter"), dVehicles = $("#dVehicles");
 const dAddress = $("#dAddress"), dVehicleCode = $("#dVehicleCode");
+// Driver login extras (NEW)
+const driverExtrasLogin = $("#driverExtrasLogin");
+const dGovLogin = $("#dGovLogin");
+const dCenterLogin = $("#dCenterLogin");
+const dAddressLogin = $("#dAddressLogin");
+const dVehicleCodeLogin = $("#dVehicleCodeLogin");
+const dVehiclesLogin = $("#dVehiclesLogin");
 
+let driverVehicleLogin = "sedan";
 let driverVehicle = "sedan";
 
 function setRole(next) {
