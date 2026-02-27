@@ -438,6 +438,19 @@ async function initAdmin() {
     });
   };
   render();
+  let liveUnsub = null;
+
+function startLive() {
+  if (liveUnsub) liveUnsub(); // يقفل الاشتراك القديم
+  liveUnsub = startLiveDriversLayer({
+    governorate: pGov.value,
+    center: pCenter.value
+  });
+}
+
+startLive();
+pGov.addEventListener("change", startLive);
+pCenter.addEventListener("change", startLive);
 }
 
 function rideUiNone() {
