@@ -98,6 +98,17 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     const email = $("#loginEmail").value.trim();
     const pass = $("#loginPass").value;
+    if(role === "driver"){
+  const gov = document.querySelector("#dGov").value.trim();
+  const center = document.querySelector("#dCenter").value.trim();
+  const address = document.querySelector("#dAddress").value.trim();
+  const vehicleCode = document.querySelector("#dVehicleCode").value.trim();
+
+  if(!gov || !center || !vehicleCode){
+    alert("اكمل بيانات السائق قبل الدخول");
+    return;
+  }
+}
     await signInWithEmailAndPassword(auth, email, pass);
 
     const u = auth.currentUser;
