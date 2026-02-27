@@ -805,7 +805,9 @@ input, select, textarea{
 
   transition: border-color .2s ease, box-shadow .2s ease;
 }
-input::placeholder, textarea::placeholder{ color: rgba(255,255,255,.40); }
+input::placeholder, textarea::placeholder{
+  color: rgba(255,255,255,.65);
+}
 
 input:focus, select:focus, textarea:focus{
   outline: none;
