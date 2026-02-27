@@ -130,7 +130,17 @@ if (role === "driver") {
 
 const snap = await getDoc(doc(db, "users", u.uid));
 const r = snap.exists() ? snap.data().role : "passenger";
+await ensureNotificationPermission(true);
 
+location.href = r === "driver"
+  ? "./driver.html"
+  : "./passenger.html";
+
+} catch (err) {
+  setText(loginHint, friendlyAuthError(err));
+}
+
+});
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   setText(regHint, "جارٍ إنشاء الحساب...");
