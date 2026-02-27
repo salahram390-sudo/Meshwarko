@@ -55,6 +55,121 @@ const btnCall = $("#btnCall");
 const btnWhats = $("#btnWhats");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
+// ============ UBER STYLE DRIVERS ============
+
+const driverMarkers = new Map(); // uid -> { marker, last }
+
+function carIconHTML() {
+  // SVG عربية بسيطة
+  return `
+    <div class="car-marker">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M5 13.5V11.2c0-.6.2-1.2.6-1.6l1.4-1.7c.4-.5 1-.8 1.7-.8h6.6c.7 0 1.3.3 1.7.8l1.4 1.7c.4.4.6 1 .6 1.6v2.3"
+              stroke="rgba(255,215,0,.95)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M7 13.5h10" stroke="rgba(255,215,0,.95)" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="8" cy="15.8" r="1.6" fill="rgba(255,215,0,.95)"/>
+        <circle cx="16" cy="15.8" r="1.6" fill="rgba(255,215,0,.95)"/>
+      </svg>
+    </div>
+  `;
+}
+
+function makeCarMarker(lat, lon, headingDeg = 0) {
+  const icon = L.divIcon({
+    className: "",
+    html: carIconHTML(),
+    iconSize: [34, 34],
+    iconAnchor: [17, 17],
+  });
+
+  const m = L.marker([lat, lon], { icon }).addTo(window.__mapRef || map);
+
+  // rotate
+  const el = m.getElement();
+  if (el) {
+    const inner = el.querySelector(".car-marker");
+    if (inner) inner.style.transform = `rotate(${headingDeg}deg)`;
+  }
+  return m;
+}
+
+function bearingDeg(fromLat, fromLon, toLat, toLon) {
+  const toRad = (x) => x * Math.PI / 180;
+  const toDeg = (x) => x * 180 / Math.PI;
+  const φ1 = toRad(fromLat), φ2 = toRad(toLat);
+  const Δλ = toRad(toLon - fromLon);
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  let θ = toDeg(Math.atan2(y, x));
+  if (θ < 0) θ += 360;
+  return θ;
+}
+
+// حركة ناعمة (Smooth move)
+function animateMarker(marker, from, to, ms = 900) {
+  const start = performance.now();
+  function step(t) {
+    const p = Math.min(1, (t - start) / ms);
+    const lat = from.lat + (to.lat - from.lat) * p;
+    const lon = from.lon + (to.lon - from.lon) * p;
+    marker.setLatLng([lat, lon]);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function setMarkerHeading(marker, deg) {
+  const el = marker.getElement();
+  if (!el) return;
+  const inner = el.querySelector(".car-marker");
+  if (!inner) return;
+  inner.style.transform = `rotate(${deg}deg)`;
+}
+
+function startLiveDriversLayer({ governorate, center }) {
+  // فلترة حسب نفس المحافظة/المركز + اونلاين آخر دقيقتين
+  const cut = Date.now() - (2 * 60 * 1000);
+
+  let q = query(
+    collection(db, "driversOnline"),
+    where("governorate", "==", governorate),
+    where("center", "==", center),
+    where("lastSeenMs", ">", cut),
+  );
+
+  return onSnapshot(q, (snap) => {
+    const seen = new Set();
+
+    snap.forEach((doc) => {
+      const d = doc.data();
+      const uid = doc.id;
+      if (!d?.lat || !d?.lon) return;
+
+      seen.add(uid);
+
+      const prev = driverMarkers.get(uid);
+      if (!prev) {
+        const m = makeCarMarker(d.lat, d.lon, 0);
+        driverMarkers.set(uid, { marker: m, last: { lat: d.lat, lon: d.lon } });
+      } else {
+        const from = prev.last;
+        const to = { lat: d.lat, lon: d.lon };
+        const deg = bearingDeg(from.lat, from.lon, to.lat, to.lon);
+        setMarkerHeading(prev.marker, deg);
+        animateMarker(prev.marker, from, to, 900);
+        prev.last = to;
+      }
+    });
+
+    // امسح اللي مش موجودين دلوقتي
+    for (const [uid, obj] of driverMarkers.entries()) {
+      if (!seen.has(uid)) {
+        obj.marker.remove();
+        driverMarkers.delete(uid);
+      }
+    }
+  });
+}
 const routeLayerRef = { current: null };
 async function manualSearch(type) {
   const isPickup = type === "pickup";
