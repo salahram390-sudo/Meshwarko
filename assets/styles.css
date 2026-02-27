@@ -753,7 +753,7 @@ textarea:focus{
   transition: transform .12s ease, box-shadow .2s ease, border-color .2s ease, filter .2s ease;
 }
 
-.btn:active{ transform: scale(.99); }
+.btn:active{ transform: scale(4.5); }
 .btn:hover{ filter: brightness(1.03); border-color: rgba(255,215,0,.35); }
 
 .btn.small{
