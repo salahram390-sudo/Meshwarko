@@ -361,6 +361,7 @@ btnComplete.addEventListener("click", async () => {
     btnComplete.disabled = true;
     btnCancel.disabled = true;
     btnTrackToggle.disabled = true;
+    btnArrived.disabled = true;
     selectedRideId = null;
     selectedRideData = null;
     selectedRideEl.innerHTML = `<div class="muted">تم إنهاء الرحلة.</div>`;
@@ -378,6 +379,7 @@ btnCancel.addEventListener("click", async () => {
     btnComplete.disabled = true;
     btnCancel.disabled = true;
     btnTrackToggle.disabled = true;
+    btnArrived.disabled = true; 
     notify({ title: "تم إلغاء الطلب", body: "تم الإلغاء.", tag: "ride-cancel" });
   } catch { setDriverStatus("خطأ"); }
 });
