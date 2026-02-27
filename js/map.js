@@ -8,7 +8,7 @@ export function createMap(mapElId, options = {}) {
   const map = L.map(mapElId, { zoomControl: true, preferCanvas: true })
     .setView(options.center ?? [26.56, 31.70], options.zoom ?? 13);
 
-  L.tileLayer("https://tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
   maxZoom: 20,
   attribution: "© OpenStreetMap"
 }).addTo(map);
