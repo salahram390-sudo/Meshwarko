@@ -46,6 +46,45 @@
             <label class="label" for="loginPass">كلمة المرور</label>
             <input id="loginPass" class="input" type="password" required autocomplete="current-password" />
           </div>
+          <!-- Driver data for login -->
+<div id="driverExtrasLogin" class="card-lite hidden">
+
+<div class="panel-title">بيانات السائق</div>
+
+<div class="grid2" style="margin-top:10px">
+
+<div class="form-row">
+<label class="label">المحافظة</label>
+<select id="dGovLogin"></select>
+</div>
+
+<div class="form-row">
+<label class="label">المركز/الحي</label>
+<select id="dCenterLogin"></select>
+</div>
+
+</div>
+
+<div class="form-row" style="margin-top:10px">
+<label class="label">نوع المركبة</label>
+<div id="dVehiclesLogin" class="vehicle-grid"></div>
+</div>
+
+<div class="grid2" style="margin-top:10px">
+
+<div class="form-row">
+<label class="label">العنوان</label>
+<input id="dAddressLogin" class="input" type="text" placeholder="مثال: شارع..." />
+</div>
+
+<div class="form-row">
+<label class="label">كود المركبة</label>
+<input id="dVehicleCodeLogin" class="input" type="text" placeholder="مثال: 1234" />
+</div>
+
+</div>
+
+</div>
           <button class="btn primary" type="submit">دخول</button>
           <p class="hint" id="loginHint"></p>
         </form>
