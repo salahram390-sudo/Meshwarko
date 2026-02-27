@@ -53,8 +53,10 @@ function setRole(next) {
   setText(roleHint, role === "passenger" ? "التسجيل كـ راكب." : "التسجيل كـ سائق.");
 
   driverExtras.classList.toggle("hidden", role !== "driver");
-  passengerExtras.classList.toggle("hidden", role !== "passenger");
-}
+passengerExtras.classList.toggle("hidden", role !== "passenger");
+
+// اظهار بيانات السائق في تسجيل الدخول
+driverExtrasLogin.classList.toggle("hidden", role !== "driver");
 
 function showTab(tab) {
   const isLogin = tab === "login";
