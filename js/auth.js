@@ -96,14 +96,24 @@ async function initAdmin() {
 dGovLogin.addEventListener("change", () => setCenters(dGovLogin.value, dCenterLogin));
   
   const vehicles = admin.vehicleTypes;
+
 const render = () => {
+
+  // مركبات التسجيل (Register)
   renderVehicleGrid(dVehicles, vehicles, driverVehicle, (id) => {
     driverVehicle = id;
     render();
   });
+
+  // مركبات تسجيل الدخول (Login)
+  renderVehicleGrid(dVehiclesLogin, vehicles, driverVehicleLogin, (id) => {
+    driverVehicleLogin = id;
+    render();
+  });
+
 };
+
 render();
-}
 
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
