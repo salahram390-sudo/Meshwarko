@@ -309,6 +309,29 @@ btnAccept.addEventListener("click", async () => {
   acceptedAt: serverTimestamp(),
 });
 
+btnArrived.addEventListener("click", async () => {
+  if (!selectedRideId || !myUser) return;
+
+  btnArrived.disabled = true;
+  setDriverStatus("وصلت لمكان الراكب...");
+
+  try {
+    await updateDoc(doc(db, "rides", selectedRideId), {
+      arrivedAtPickup: true,
+      arrivedAt: serverTimestamp(),
+      statusText: "arrived"
+    });
+
+    notify({ title: "تم", body: "تم إرسال إشعار (وصلت) للراكب", tag: "arrived" });
+    setDriverStatus("تم إرسال وصلت ✅");
+  } catch (e) {
+    console.error("ARRIVED ERROR:", e);
+    btnArrived.disabled = false;
+    setDriverStatus("خطأ");
+    alert("ARRIVED ERROR: " + (e?.message || e));
+  }
+});
+    
     btnAccept.disabled = true;
     btnSendOffer.disabled = true;
     btnComplete.disabled = false;
