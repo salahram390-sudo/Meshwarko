@@ -529,11 +529,17 @@ onAuthStateChanged(auth, async (user) => {
 
   onSnapshot(ridesQ, (snap) => {
     if (snap.empty) {
-      currentRideId = null;
-      if (unsubRideWatcher) { unsubRideWatcher(); unsubRideWatcher = null; }
-      rideUiNone();
-      return;
-    }
+  currentRideId = null;
+  arrivedToastShownFor = null;
+
+  if (unsubRideWatcher) { 
+    unsubRideWatcher(); 
+    unsubRideWatcher = null; 
+  }
+
+  rideUiNone();
+  return;
+}
 
     const docSnap = snap.docs[0];
     currentRideId = docSnap.id;
