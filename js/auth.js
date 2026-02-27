@@ -99,12 +99,12 @@ loginForm.addEventListener("submit", async (e) => {
     const email = $("#loginEmail").value.trim();
     const pass = $("#loginPass").value;
     if(role === "driver"){
+  if (role === "driver") {
   const gov = document.querySelector("#dGov").value.trim();
   const center = document.querySelector("#dCenter").value.trim();
-  const address = document.querySelector("#dAddress").value.trim();
   const vehicleCode = document.querySelector("#dVehicleCode").value.trim();
 
-  if(!gov || !center || !vehicleCode){
+  if (!gov || !center || !vehicleCode) {
     alert("اكمل بيانات السائق قبل الدخول");
     return;
   }
