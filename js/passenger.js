@@ -822,8 +822,3 @@ return;
   hint.textContent = (e?.message || "حدث خطأ أثناء التحويل");
 }
 });
-
-startLiveDriversLayer({
-  governorate: pGov.value,
-  center: pCenter.value
-});
