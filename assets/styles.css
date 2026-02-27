@@ -524,7 +524,14 @@ height:22px;
 background:#FFD700;
 border-radius:50%;
 position:relative;
-box-shadow:0 0 10px rgba(255,215,0,.9);
+
+/* حدود سوداء واضحة */
+border:3px solid #000;
+
+/* توهج خفيف */
+box-shadow:
+0 0 0 3px rgba(0,0,0,.35),
+0 0 14px rgba(255,215,0,.9);
 }
 
 /* دائرة الوميض */
