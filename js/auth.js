@@ -111,15 +111,26 @@ loginForm.addEventListener("submit", async (e) => {
 }
     await signInWithEmailAndPassword(auth, email, pass);
 
-    const u = auth.currentUser;
-    const snap = await getDoc(doc(db, "users", u.uid));
-    const r = snap.exists() ? snap.data().role : "passenger";
-    await ensureNotificationPermission(true);
-    location.href = r === "driver" ? "./driver.html" : "./passenger.html";
-  } catch (err) {
-    setText(loginHint, friendlyAuthError(err));
-  }
-});
+const u = auth.currentUser;
+
+// حفظ بيانات السائق عند الدخول
+if (role === "driver") {
+  const gov = document.querySelector("#dGov").value.trim();
+  const center = document.querySelector("#dCenter").value.trim();
+  const address = document.querySelector("#dAddress").value.trim();
+  const vehicleCode = document.querySelector("#dVehicleCode").value.trim();
+
+  await updateDoc(doc(db, "users", u.uid), {
+    governorate: gov,
+    center,
+    address,
+    vehicleCode,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+const snap = await getDoc(doc(db, "users", u.uid));
+const r = snap.exists() ? snap.data().role : "passenger";
 
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
