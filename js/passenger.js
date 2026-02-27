@@ -673,8 +673,6 @@ console.log("dropoff", dropoff);
     : null
 
 });
-    const rideRef = await addDoc(collection(db, "rides"), { ... });
-
 currentRideId = rideRef.id;
 
     setText(routeMeta, "تم إرسال الطلب. في انتظار سائق...");
