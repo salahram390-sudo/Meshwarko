@@ -418,7 +418,41 @@ console.log("ME role =", me.data()?.role);
   myLocation = loc;
   showMyLocation(map, loc);
 });
+let liveTimer = null;
 
+function startLiveDriverLocation() {
+  if (liveTimer) return;
+
+  const u = auth.currentUser;
+  if (!u || !myUser) return;
+
+  const ref = doc(db, "driversOnline", u.uid);
+
+  const push = () => {
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(async (pos) => {
+      const lat = pos.coords.latitude;
+      const lon = pos.coords.longitude;
+
+      await setDoc(ref, {
+        uid: u.uid,
+        name: myUser.name || "",
+        governorate: myUser.governorate || "",
+        center: myUser.center || "",
+        vehicleType: myUser.vehicleType || "",
+        lat,
+        lon,
+        lastSeenMs: Date.now(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    });
+  };
+
+  push();
+  liveTimer = setInterval(push, 4000);
+}
+  startLiveDriverLocation();
   // watch available rides
   watchRidesForDriver();
 });
