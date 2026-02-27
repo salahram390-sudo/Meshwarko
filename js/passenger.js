@@ -644,7 +644,8 @@ btnRequest.addEventListener("click", async () => {
     }).catch(()=>{});
     console.log("pickup", pickup);
 console.log("dropoff", dropoff);
-    await addDoc(collection(db, "rides"), {
+    const rideRef = await addDoc(collection(db, "rides"), {
+      currentRideId = rideRef.id;
       passengerId: user.uid,
       passengerName: myData.name || "",
       passengerPhone: myData.phone || "",
