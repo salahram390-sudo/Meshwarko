@@ -542,6 +542,19 @@ onAuthStateChanged(auth, async (user) => {
     unsubRideWatcher = onSnapshot(doc(db, "rides", currentRideId), async (rideSnap) => {
       if (!rideSnap.exists()) return;
       const ride = rideSnap.data();
+      // ============ DRIVER ARRIVED ============
+if (ride?.arrivedAtPickup === true) {
+  // اعرضها مرة واحدة لكل رحلة
+  if (arrivedToastShownFor !== currentRideId) {
+    arrivedToastShownFor = currentRideId;
+
+    notify({
+      title: "السائق وصل",
+      body: "السائق وصل لمكان القيام ✅",
+      tag: "driver-arrived"
+    });
+  }
+}
       console.log("PASSENGER currentRideId =", currentRideId);
       console.log("PASSENGER status =", ride.status);
       // auto-expire UI
