@@ -1025,3 +1025,23 @@ input[type="range"]{
 .search-item:hover{
   background: rgba(255,255,255,.08) !important;
 }
+/* ===================== */
+/* AUTH BACKGROUND FIX */
+/* ===================== */
+
+body{
+  background: linear-gradient(180deg, #0e1621, #070a10) !important;
+  margin: 0;
+}
+
+.auth-shell{
+  background: transparent !important;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-shell{
+  background: transparent !important;
+}
