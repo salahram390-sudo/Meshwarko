@@ -805,6 +805,16 @@ input, select, textarea{
 
   transition: border-color .2s ease, box-shadow .2s ease;
 }
+/* FIX: dropdown text visibility */
+select{
+  height: 48px;
+  line-height: 48px;
+  padding: 0 40px 0 14px;
+  font-size: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
 input::placeholder, textarea::placeholder{
   color: rgba(255,255,255,.65);
 }
