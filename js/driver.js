@@ -351,6 +351,33 @@ btnArrived.addEventListener("click", async () => {
 }
 });
 
+btnArrived.addEventListener("click", async () => {
+
+if (!selectedRideId) return;
+
+setDriverStatus("وصل لموقع الراكب");
+
+try {
+
+await updateDoc(doc(db, "rides", selectedRideId), {
+arrivedAtPickup: true,
+arrivedAt: serverTimestamp()
+});
+
+btnArrived.disabled = true;
+
+notify({
+title: "وصلت",
+body: "تم إشعار الراكب أنك وصلت"
+});
+
+} catch (e) {
+console.error(e);
+setDriverStatus("خطأ");
+}
+
+});
+
 btnComplete.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("ينهي...");
