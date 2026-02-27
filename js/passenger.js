@@ -12,7 +12,10 @@ import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
 import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, geocodeEG, bindSearch } from "./map.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
-
+import { db } from "./firebase.js";
+import {
+  collection, query, where, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
