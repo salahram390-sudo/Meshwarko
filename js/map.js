@@ -213,7 +213,6 @@ if (!myLocMarker) {
     myLocMarker.setLatLng(latlng);
   }
 }
-let userGov = null;
 
 async function reverseGov(lat, lon) {
   const url = new URL("https://nominatim.openstreetmap.org/reverse");
