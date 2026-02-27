@@ -511,42 +511,49 @@ body { margin: 0; }
   height: 100%;
   width: 100%;
 }
-.gps-marker {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.gps-marker{
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
-.gps-dot {
-  width: 14px;
-  height: 14px;
-  background: #FFD700;
-  border-radius: 50%;
-  position: relative;
+/* النقطة الأساسية */
+.gps-dot{
+width:22px;
+height:22px;
+background:#FFD700;
+border-radius:50%;
+position:relative;
+box-shadow:0 0 10px rgba(255,215,0,.9);
 }
 
-.gps-dot::after {
-  content: "";
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  background: rgba(255,215,0,.4);
-  border-radius: 50%;
-  animation: pulse 1.8s infinite;
+/* دائرة الوميض */
+.gps-dot::after{
+content:"";
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:22px;
+height:22px;
+background:rgba(255,215,0,.45);
+border-radius:50%;
+animation:gpsPulse 1.6s infinite;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: .8;
-  }
-  70% {
-    transform: scale(3);
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
+/* الانيميشن */
+@keyframes gpsPulse{
+0%{
+transform:translate(-50%,-50%) scale(1);
+opacity:.9;
+}
+70%{
+transform:translate(-50%,-50%) scale(4);
+opacity:0;
+}
+100%{
+opacity:0;
+}
 }
 
 /* ============================= */
