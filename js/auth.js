@@ -124,14 +124,15 @@ const u = auth.currentUser;
 
 // حفظ بيانات السائق عند الدخول
 if (role === "driver") {
-  const gov = document.querySelector("#dGov").value.trim();
-  const center = document.querySelector("#dCenter").value.trim();
-  const address = document.querySelector("#dAddress").value.trim();
-  const vehicleCode = document.querySelector("#dVehicleCode").value.trim();
+  const gov = dGovLogin.value.trim();
+  const center = dCenterLogin.value.trim();
+  const address = dAddressLogin.value.trim();
+  const vehicleCode = dVehicleCodeLogin.value.trim();
 
   await updateDoc(doc(db, "users", u.uid), {
     governorate: gov,
     center,
+    vehicleType: driverVehicleLogin,
     address,
     vehicleCode,
     updatedAt: serverTimestamp(),
