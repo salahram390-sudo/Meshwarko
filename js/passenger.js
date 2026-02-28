@@ -773,6 +773,10 @@ btnAcceptOffer.addEventListener("click", async () => {
 const rideAfter = await getDoc(rideRef);
 const rideData = rideAfter.data();
 
+if (rideData.driverId) {
+  startDriverTracking(rideData.driverId);
+}
+    
 // تشغيل تتبع السائق
 if (rideData.driverId) {
   startDriverTracking(rideData.driverId);
