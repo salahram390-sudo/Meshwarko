@@ -251,37 +251,50 @@ async function showAcceptedDetails(rideId) {
   const ride = rideSnap.data();
 
 // رسم المسار من موقع الراكب إلى وجهته
+// ===== ROUTE DRAW (DEBUG + FIX) =====
 try {
+  const p = ride.pickup || {};
+  const d = ride.dropoff || {};
 
-  if (ride.pickup?.lat && ride.pickup?.lon && ride.dropoff?.lat && ride.dropoff?.lon) {
+  const start = { lat: Number(p.lat), lon: Number(p.lon) };
+  const end   = { lat: Number(d.lat), lon: Number(d.lon) };
 
-    const start = {
-      lat: ride.pickup.lat,
-      lon: ride.pickup.lon
-    };
+  console.log("ROUTE start/end:", start, end);
 
-    const end = {
-      lat: ride.dropoff.lat,
-      lon: ride.dropoff.lon
-    };
-
-    console.log("ROUTE DATA:", start, end);
-
-    const routeData = await routeOSRM(start, end);
-
-    drawRoute(map, routeData.geojson, routeLayerRef);
-
+  if (!Number.isFinite(start.lat) || !Number.isFinite(start.lon) ||
+      !Number.isFinite(end.lat)   || !Number.isFinite(end.lon)) {
+    console.warn("ROUTE: invalid coords", { p, d });
+    setDriverStatus("خطأ: إحداثيات غير صحيحة");
   } else {
 
-    console.warn("Pickup or Dropoff missing:", ride);
+    // امسح المسار القديم (لو الدالة عندك بتستخدم routeLayerRef.current)
+    try {
+      if (routeLayerRef?.current) {
+        map.removeLayer(routeLayerRef.current);
+        routeLayerRef.current = null;
+      } else if (routeLayerRef) {
+        // لو عندك ref مش current
+        map.removeLayer(routeLayerRef);
+      }
+    } catch (_) {}
 
+    const r = await routeOSRM(start, end);
+    console.log("OSRM response:", r);
+
+    if (!r || !r.geojson) {
+      console.warn("ROUTE: no geojson returned", r);
+      setDriverStatus("تعذر رسم المسار (OSRM)");
+    } else {
+      drawRoute(map, r.geojson, routeLayerRef);
+      setDriverStatus("تم رسم المسار ✅");
+    }
   }
-
 } catch (e) {
-
   console.error("ROUTE ERROR:", e);
-
+  alert("ROUTE ERROR: " + (e?.message || e));
+  setDriverStatus("خطأ في رسم المسار");
 }
+// ===== END ROUTE =====
   
   const passengerName = ride.passengerName || "";
 const passengerPhone = ride.passengerPhone || "";
