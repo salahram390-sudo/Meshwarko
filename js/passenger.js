@@ -678,9 +678,9 @@ console.log("dropoff", dropoff);
   center: pCenter.value,
   vehicleType: passengerVehicle,
 
-  pickup: { lat: pickup.lat, lon: pickup.lon },
-  dropoff: { lat: dropoff.lat, lon: dropoff.lon },
-
+  pickup: { lat: pickup.lat, lng: pickup.lon },
+dropoff: { lat: dropoff.lat, lng: dropoff.lon },
+      
   pickupText: pickupText.value.trim(),
   dropoffText: dropText.value.trim(),
 
