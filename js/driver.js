@@ -244,7 +244,7 @@ async function selectRide(id, ride) {
 } catch (e) {
   console.error("ROUTE ERROR:", e);
 }
-
+}
 async function showAcceptedDetails(rideId) {
   const rideSnap = await getDoc(doc(db, "rides", rideId));
   if (!rideSnap.exists()) return;
