@@ -156,8 +156,11 @@ function watchRidesForDriver() {
   where("governorate", "==", myUser.governorate || ""),
   where("center", "==", myUser.center || ""),
   where("expiresAt", ">", now),
-  orderBy("createdAt", "desc"),
+
+  // لازم expiresAt أولاً لأنه inequality
   orderBy("expiresAt", "asc"),
+  orderBy("createdAt", "desc"),
+
   limit(30)
 );
 
