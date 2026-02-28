@@ -689,8 +689,8 @@ dropoff: { lat: dropoff.lat, lng: dropoff.lon },
   price,
 
   passengerLoc: myLocation
-    ? { lat: myLocation.lat, lon: myLocation.lon }
-    : null
+  ? { lat: myLocation.lat, lng: myLocation.lon }
+  : null
 
 });
 currentRideId = rideRef.id;
