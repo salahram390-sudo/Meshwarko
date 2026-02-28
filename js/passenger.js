@@ -819,7 +819,14 @@ btnAcceptOffer.addEventListener("click", async () => {
 const rideAfter = await getDoc(rideRef);
 const rideData = rideAfter.data();
 
-if (rideData.driverId) {
+if (rideData?.pickup?.lat && rideData?.pickup?.lon) {
+  currentPickup = {
+    lat: Number(rideData.pickup.lat),
+    lon: Number(rideData.pickup.lon)
+  };
+}
+
+if (rideData?.driverId) {
   startDriverTracking(rideData.driverId);
 }
     
