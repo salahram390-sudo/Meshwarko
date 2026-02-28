@@ -227,6 +227,45 @@ let currentPickup = null; // { lat, lon }
 let currentRideId = null;
 let unsubRideWatcher = null;
 
+function watchRide(rideId) {
+
+  if (unsubRideWatcher) unsubRideWatcher();
+
+  const ref = doc(db, "rides", rideId);
+
+  unsubRideWatcher = onSnapshot(ref, (snap) => {
+
+    if (!snap.exists()) return;
+
+    const ride = snap.data();
+
+    console.log("RIDE UPDATE:", ride.status);
+
+    if (ride.status === "accepted") {
+
+      setStatus("السائق في الطريق إليك");
+
+      btnAcceptOffer.style.display = "none";
+      btnRejectOffer.style.display = "none";
+
+      if (ride.driverId) {
+        startDriverTracking(ride.driverId);
+      }
+
+    }
+
+    if (ride.status === "arrived") {
+      setStatus("السائق وصل");
+    }
+
+    if (ride.status === "completed") {
+      setStatus("تم إنهاء الرحلة");
+    }
+
+  });
+
+}
+
 let lastDistanceMeters = null;
 let lastDurationSec = null;
 
