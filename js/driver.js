@@ -151,14 +151,15 @@ function watchRidesForDriver() {
   // Match passenger's governorate+center+vehicleType (optional by vehicleType)
   const now = Timestamp.fromMillis(Date.now());
   const qR = query(
-    collection(db, "rides"),
-    where("status", "in", ["requested", "offered"]),
-    where("governorate", "==", myUser.governorate || ""),
-    where("center", "==", myUser.center || ""),
-    where("expiresAt", ">", now),
-    orderBy("expiresAt", "asc"),
-    limit(30)
-  );
+  collection(db, "rides"),
+  where("status", "in", ["requested", "offered"]),
+  where("governorate", "==", myUser.governorate || ""),
+  where("center", "==", myUser.center || ""),
+  where("expiresAt", ">", now),
+  orderBy("createdAt", "desc"),
+  orderBy("expiresAt", "asc"),
+  limit(30)
+);
 
   onSnapshot(qR, (snap) => {
     console.log("watchRidesForDriver: got snapshot, docs:", snap.docs.length);
