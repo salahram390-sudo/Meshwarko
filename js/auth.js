@@ -230,7 +230,3 @@ console.log("AUTH LOADED OK");
 window.addEventListener("error", (e) => {
   alert(`JS Error: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`);
 });
-
-window.addEventListener("unhandledrejection", (e) => {
-  alert(`Promise Error: ${e.reason?.message || e.reason}`);
-});
