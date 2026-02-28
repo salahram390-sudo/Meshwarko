@@ -449,14 +449,15 @@ let driverRouteLayerRef = { current: null };
 
   const ref = doc(db, "driversOnline", driverId);
 
-  driverTrackUnsub = onSnapshot(ref, (snap) => {
+  driverTrackUnsub = onSnapshot(ref, async (snap) => {
 
     if (!snap.exists()) return;
 
     const d = snap.data();
 
+    // ✅ لأن عندك لخبطة بين lon / lng في المشروع
     const lat = Number(d.lat);
-    const lon = Number(d.lon);
+    const lon = Number(d.lon ?? d.lng);
 
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
 
@@ -464,9 +465,18 @@ let driverRouteLayerRef = { current: null };
 
     if (!driverMarker) {
       driverMarker = L.marker(pos).addTo(map);
-      map.setView(pos, 15);
     } else {
       driverMarker.setLatLng(pos);
+    }
+
+    // ✅ ارسم طريق السائق -> مكان قيام الراكب
+    // لازم pickup تكون موجودة عند الراكب
+    // عندك غالباً pickup = {lat, lon} أو {lat, lng}
+    const pLat = Number(pickup?.lat);
+    const pLon = Number(pickup?.lon ?? pickup?.lng);
+
+    if (Number.isFinite(pLat) && Number.isFinite(pLon)) {
+      await drawDriverToPickupRoute(lat, lon, pLat, pLon);
     }
 
   });
