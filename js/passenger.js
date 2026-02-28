@@ -1,5 +1,5 @@
 import { auth, db } from "./firebase.js";
-console.log("driver.js loaded ✅");
+console.log("passenger.js loaded ✅");
 let arrivedToastShownFor = null; // علشان ما تكررش الرسالة كل تحديث
 let myData = {};
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
