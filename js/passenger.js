@@ -52,6 +52,8 @@ const btnCall = $("#btnCall");
 const btnWhats = $("#btnWhats");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
+let driverMarker = null;
+let driverTrackUnsub = null;
 // ============ UBER STYLE DRIVERS ============
 
 const driverMarkers = new Map(); // uid -> { marker, last }
