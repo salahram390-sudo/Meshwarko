@@ -228,8 +228,18 @@ async function selectRide(id, ride) {
 
   try {
     const r = await routeOSRM(
-      { lat: ride.pickup.lat, lon: ride.pickup.lon },
-      { lat: ride.dropoff.lat, lon: ride.dropoff.lon }
+      const start = {
+  lat: ride.pickup.lat,
+  lon: ride.pickup.lon
+};
+
+const end = {
+  lat: ride.dropoff.lat,
+  lon: ride.dropoff.lon
+};
+
+const r = await routeOSRM(start, end);
+drawRoute(map, r.geojson, routeLayerRef);
     );
     drawRoute(map, r.geojson, routeLayerRef);
   } catch {}
