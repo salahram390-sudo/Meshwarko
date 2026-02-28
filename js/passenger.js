@@ -667,7 +667,7 @@ onAuthStateChanged(auth, async (user) => {
 
     const docSnap = snap.docs[0];
     currentRideId = docSnap.id;
-
+watchRide(currentRideId);
     if (unsubRideWatcher) unsubRideWatcher();
     unsubRideWatcher = onSnapshot(doc(db, "rides", currentRideId), async (rideSnap) => {
       if (!rideSnap.exists()) return;
