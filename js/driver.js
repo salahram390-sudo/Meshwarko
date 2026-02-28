@@ -561,3 +561,9 @@ function startLiveDriverLocation() {
   // watch available rides
   watchRidesForDriver();
 });
+window.addEventListener("error", (e) => {
+  alert(`JS ERROR: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`);
+});
+window.addEventListener("unhandledrejection", (e) => {
+  alert(`PROMISE ERROR: ${e.reason?.message || e.reason}`);
+});
