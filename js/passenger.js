@@ -473,7 +473,42 @@ let driverRouteLayerRef = { current: null };
 
 }
   
+async function drawDriverToPickupRoute(driverLat, driverLon, pickupLat, pickupLon) {
+  try {
+    const start = { lat: Number(driverLat), lon: Number(driverLon) };
+    const end   = { lat: Number(pickupLat), lon: Number(pickupLon) };
 
+    if (!Number.isFinite(start.lat) || !Number.isFinite(start.lon) ||
+        !Number.isFinite(end.lat)   || !Number.isFinite(end.lon)) {
+      console.warn("ETA/ROUTE invalid coords", { start, end });
+      return;
+    }
+
+    // امسح مسار قديم
+    try {
+      if (driverRouteLayerRef?.current) {
+        map.removeLayer(driverRouteLayerRef.current);
+        driverRouteLayerRef.current = null;
+      }
+    } catch (_) {}
+
+    const r = await routeOSRM(start, end); // لازم ترجع { geojson, durationSec, distanceMeters } زي عندك
+    if (!r?.geojson) {
+      console.warn("No geojson from OSRM", r);
+      return;
+    }
+
+    drawRoute(map, r.geojson, driverRouteLayerRef);
+
+    // ETA
+    const mins = Math.max(1, Math.round((Number(r.durationSec) || 0) / 60));
+    // غيّر ده حسب مكان عرضك (مثلاً routeMeta أو status)
+    setText(routeMeta, `وقت وصول السائق: حوالي ${mins} دقيقة`);
+  } catch (e) {
+    console.error("drawDriverToPickupRoute ERROR", e);
+  }
+}
+  
 function startLive() {
   if (liveUnsub) liveUnsub(); // يقفل الاشتراك القديم
   liveUnsub = startLiveDriversLayer({
