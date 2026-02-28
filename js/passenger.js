@@ -223,7 +223,6 @@ let pickup = null;
 let dropoff = null;
 let pickupMarker = null;
 let dropMarker = null;
-let driverMarker = null;
 
 let currentPickup = null; // { lat, lon }
 let currentRideId = null;
