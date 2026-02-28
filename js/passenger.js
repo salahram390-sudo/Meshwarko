@@ -763,6 +763,15 @@ btnAcceptOffer.addEventListener("click", async () => {
       acceptedAt: serverTimestamp(),
     });
 
+    // جلب بيانات الرحلة بعد القبول
+const rideAfter = await getDoc(rideRef);
+const rideData = rideAfter.data();
+
+// تشغيل تتبع السائق
+if (rideData.driverId) {
+  startDriverTracking(rideData.driverId);
+}
+    
     notify({ title: "تم قبول عرض السائق", body: `السعر النهائي: ${Math.round(ride.offerPrice)} ج`, tag: "offer-accepted" });
   } catch { setStatus("خطأ"); }
 });
