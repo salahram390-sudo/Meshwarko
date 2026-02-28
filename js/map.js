@@ -9,8 +9,8 @@ export function createMap(mapElId, options = {}) {
     .setView(options.center ?? [26.56, 31.70], options.zoom ?? 13);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 20,
-  attribution: "© OpenStreetMap"
+  maxZoom: 19,
+  attribution: '© OpenStreetMap'
 }).addTo(map);
   return map;
 }
