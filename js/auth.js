@@ -162,7 +162,8 @@ location.href = r === "driver"
   : "./passenger.html";
 
 } catch (err) {
-  setText(loginHint, friendlyAuthError(err));
+  console.log("LOGIN ERROR:", err.code, err.message, err);
+  setText(loginHint, "خطأ: " + err.code);
 }
 
 });
