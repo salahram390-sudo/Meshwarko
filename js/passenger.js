@@ -470,6 +470,10 @@ let driverRouteLayerRef = { current: null };
       driverMarker.setLatLng(pos);
     }
 
+if (currentPickup) {
+  drawDriverToPickupRoute(lat, lon, currentPickup.lat, currentPickup.lon);
+}
+    
     // ✅ ارسم طريق السائق -> مكان قيام الراكب
     // لازم pickup تكون موجودة عند الراكب
     // عندك غالباً pickup = {lat, lon} أو {lat, lng}
