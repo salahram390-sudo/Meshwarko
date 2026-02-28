@@ -249,6 +249,40 @@ async function showAcceptedDetails(rideId) {
   const rideSnap = await getDoc(doc(db, "rides", rideId));
   if (!rideSnap.exists()) return;
   const ride = rideSnap.data();
+
+// رسم المسار من موقع الراكب إلى وجهته
+try {
+
+  if (ride.pickup?.lat && ride.pickup?.lon && ride.dropoff?.lat && ride.dropoff?.lon) {
+
+    const start = {
+      lat: ride.pickup.lat,
+      lon: ride.pickup.lon
+    };
+
+    const end = {
+      lat: ride.dropoff.lat,
+      lon: ride.dropoff.lon
+    };
+
+    console.log("ROUTE DATA:", start, end);
+
+    const routeData = await routeOSRM(start, end);
+
+    drawRoute(map, routeData.geojson, routeLayerRef);
+
+  } else {
+
+    console.warn("Pickup or Dropoff missing:", ride);
+
+  }
+
+} catch (e) {
+
+  console.error("ROUTE ERROR:", e);
+
+}
+  
   const passengerName = ride.passengerName || "";
 const passengerPhone = ride.passengerPhone || "";
 const passengerGovernorate = ride.governorate || "";
