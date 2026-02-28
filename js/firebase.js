@@ -1,9 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { initializeFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBY7Z25kEi6HX4R9fSYAQhnYCLVbPu-W4Ko",
+  apiKey: "AIzaSyBY7Z25KeI6HX4R9fSYAQhnYCLVbPu-W4Ko",
   authDomain: "meshwarkomm.firebaseapp.com",
   projectId: "meshwarkomm",
   storageBucket: "meshwarkomm.firebasestorage.app",
@@ -14,8 +14,4 @@ const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-
-export const db = initializeFirestore(app, {
-  experimentalForceLongPolling: true,
-  useFetchStreams: false,
-});
+export const db = getFirestore(app);
