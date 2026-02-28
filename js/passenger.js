@@ -437,6 +437,12 @@ async function initAdmin() {
     });
   };
   render();
+
+let driverMarker = null;
+let driverTrackUnsub = null;
+let driverRouteLayerRef = { current: null };
+  let liveUnsub = null;
+  
   function startDriverTracking(driverId) {
 
   if (driverTrackUnsub) driverTrackUnsub();
@@ -466,7 +472,7 @@ async function initAdmin() {
   });
 
 }
-  let liveUnsub = null;
+  
 
 function startLive() {
   if (liveUnsub) liveUnsub(); // يقفل الاشتراك القديم
