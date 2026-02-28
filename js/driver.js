@@ -11,13 +11,6 @@ import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation 
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
 
-window.addEventListener("error", (e) => {
-  alert("JS ERROR:\n" + (e?.message || e) + "\n" + (e?.filename || "") + ":" + (e?.lineno || ""));
-});
-window.addEventListener("unhandledrejection", (e) => {
-  alert("PROMISE ERROR:\n" + (e?.reason?.message || e?.reason || e));
-});
-
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
