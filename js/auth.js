@@ -57,7 +57,7 @@ passengerExtras.classList.toggle("hidden", role !== "passenger");
 
 // اظهار بيانات السائق في تسجيل الدخول
 driverExtrasLogin?.classList.toggle("hidden", role !== "driver");
-
+}
 function showTab(tab) {
   const isLogin = tab === "login";
   tabLogin.classList.toggle("active", isLogin);
