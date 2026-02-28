@@ -437,6 +437,35 @@ async function initAdmin() {
     });
   };
   render();
+  function startDriverTracking(driverId) {
+
+  if (driverTrackUnsub) driverTrackUnsub();
+
+  const ref = doc(db, "driversOnline", driverId);
+
+  driverTrackUnsub = onSnapshot(ref, (snap) => {
+
+    if (!snap.exists()) return;
+
+    const d = snap.data();
+
+    const lat = Number(d.lat);
+    const lon = Number(d.lon);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+
+    const pos = [lat, lon];
+
+    if (!driverMarker) {
+      driverMarker = L.marker(pos).addTo(map);
+      map.setView(pos, 15);
+    } else {
+      driverMarker.setLatLng(pos);
+    }
+
+  });
+
+}
   let liveUnsub = null;
 
 function startLive() {
