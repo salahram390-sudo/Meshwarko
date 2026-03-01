@@ -53,6 +53,22 @@ const btnCall = $("#btnCall");
 const btnWhats = $("#btnWhats");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
+let myLocation = null;
+
+navigator.geolocation.getCurrentPosition((pos) => {
+
+  const lat = pos.coords.latitude;
+  const lon = pos.coords.longitude;
+
+  myLocation = { lat, lon };
+
+  console.log("USER LOCATION:", lat, lon);
+
+  map.setView([lat, lon], 15);
+
+}, (err) => {
+  console.log("LOCATION ERROR:", err);
+});
 let driverTrackUnsub = null;
 // ============ UBER STYLE DRIVERS ============
 
