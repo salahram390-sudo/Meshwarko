@@ -9,10 +9,9 @@ const firebaseConfig = {
   storageBucket: "meshwarkomm.firebasestorage.app",
   messagingSenderId: "889669815551",
   appId: "1:889669815551:web:b47e9dcf775e4c1eff10ca",
-  measurementId: "G-SDWD0EMRRF"
+  measurementId: "G-SDWD0EMRRF",
 };
 
-const app = initializeApp(firebaseConfig);
-
+export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
