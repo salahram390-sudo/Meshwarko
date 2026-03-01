@@ -140,6 +140,7 @@ export function bindSearch(inputEl, resultsEl, onPick) {
   };
 
   const doSearch = debounce(async () => {
+    console.log("USER LOCATION:", userLat, userLon);
     const items = await geocodeNominatim(inputEl.value, userLat, userLon);
     render(items);
   }, 350);
