@@ -57,6 +57,7 @@ let myLocation = null; // {lat, lon}
 
 navigator.geolocation.getCurrentPosition(
   (pos) => {
+    console.log("GPS OK:", pos.coords.latitude, pos.coords.longitude, "acc:", pos.coords.accuracy);
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
 
