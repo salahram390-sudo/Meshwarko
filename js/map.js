@@ -29,81 +29,117 @@ function normGov(s) {
     .trim();
 }
 
-export async function geocodeNominatim(query, userLat, userLon) {
+export async function geocodeNominatim(query, userLat, userLon, userGov, userCenter) {
   query = (query || "").trim();
   if (!query) return [];
+
+  const lat = Number(userLat);
+  const lon = Number(userLon);
+  const hasUserLoc = Number.isFinite(lat) && Number.isFinite(lon);
 
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "json");
   url.searchParams.set("q", query);
   url.searchParams.set("countrycodes", "eg");
   url.searchParams.set("limit", "20");
-  url.searchParams.set("addressdetails", "1"); // ✅ مهم
+  url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("dedupe", "1");
 
-  const res = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
+  // ✅ اجبره يدوّر حوالين المستخدم
+  if (hasUserLoc) {
+    // حوالي 15 كم كبداية (ممكن تزودها)
+    const radiusKm = 15;
+
+    // تحويل km لدرجات (تقريب مناسب)
+    const dLat = radiusKm / 111; // 1 درجة لات ≈ 111 كم
+    const dLon = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
+
+    const left = lon - dLon;
+    const right = lon + dLon;
+    const top = lat + dLat;
+    const bottom = lat - dLat;
+
+    url.searchParams.set("viewbox", `${left},${top},${right},${bottom}`);
+    url.searchParams.set("bounded", "1");
+  }
+
+  // مهم: Nominatim بيحب User-Agent محترم + (يفضل email/Referer لو تقدر)
+  const res = await fetch(url.toString(), {
+    headers: {
+      "Accept-Language": "ar",
+      // "User-Agent": "Meshwark/1.0 (yourdomain.com)", // لو تقدر في السيرفر
+    },
+  });
+
   if (!res.ok) return [];
 
-  const data = await res.json();
+  let data = await res.json();
 
-  let results = (data || []).map(x => ({
-  display: x.display_name,
-  lat: Number(x.lat),
-  lon: Number(x.lon),
-  gov:
-    x?.address?.state ||
-    x?.address?.governorate ||
-    x?.address?.county ||
-    x?.address?.region ||
-    null,
-  center:
-    x?.address?.city ||
-    x?.address?.town ||
-    x?.address?.village ||
-    x?.address?.suburb ||
-    x?.address?.hamlet ||
-    null
-})).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-// 1️⃣ حاول نفس المركز / القرية
-if (userCenter) {
-  const uc = normGov(userCenter);
-  const byCenter = results.filter(r => normGov(r.center) === uc);
+  // ✅ fallback: لو bounded=1 رجّع صفر نتائج، جرّب تاني بدون bounded أو كبّر الراديوس
+  if (hasUserLoc && (!data || data.length === 0)) {
+    const url2 = new URL(url.toString());
+    url2.searchParams.delete("bounded");
+    url2.searchParams.delete("viewbox");
 
-  if (byCenter.length) {
-    results = byCenter;
+    const res2 = await fetch(url2.toString(), { headers: { "Accept-Language": "ar" } });
+    if (res2.ok) data = await res2.json();
+  }
+
+  let results = (data || [])
+    .map((x) => ({
+      display: x.display_name,
+      lat: Number(x.lat),
+      lon: Number(x.lon),
+      gov:
+        x?.address?.state ||
+        x?.address?.governorate ||
+        x?.address?.county ||
+        x?.address?.region ||
+        null,
+      center:
+        x?.address?.city ||
+        x?.address?.town ||
+        x?.address?.village ||
+        x?.address?.suburb ||
+        x?.address?.hamlet ||
+        null,
+    }))
+    .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+
+  // (اختياري) فلترة المحافظة/المركز بتاعتك زي ما كنت عامل
+  if (userCenter) {
+    const uc = normGov(userCenter);
+    const byCenter = results.filter((r) => normGov(r.center) === uc);
+    if (byCenter.length) results = byCenter;
+    else if (userGov) {
+      const ug = normGov(userGov);
+      const byGov = results.filter((r) => normGov(r.gov) === ug);
+      if (byGov.length) results = byGov;
+    }
   } else if (userGov) {
-    // 2️⃣ لو مفيش نفس المركز → جرب نفس المحافظة
     const ug = normGov(userGov);
-    const byGov = results.filter(r => normGov(r.gov) === ug);
+    const byGov = results.filter((r) => normGov(r.gov) === ug);
     if (byGov.length) results = byGov;
   }
-}
-else if (userGov) {
-  const ug = normGov(userGov);
-  const byGov = results.filter(r => normGov(r.gov) === ug);
-  if (byGov.length) results = byGov;
-}
 
-// 3️⃣ دايمًا رتب حسب المسافة
-if (userLat && userLon) {
-  results.sort((a, b) =>
-    haversine(userLat, userLon, a.lat, a.lon) -
-    haversine(userLat, userLon, b.lat, b.lon)
-  );
-}
+  // ✅ ترتيب بالمسافة (بعد ما ضمنّا إن النتائج قريبة أصلاً)
+  if (hasUserLoc) {
+    results.sort((a, b) => haversine(lat, lon, a.lat, a.lon) - haversine(lat, lon, b.lat, b.lon));
+  }
 
   return results;
 }
 
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
-  const toRad = x => x * Math.PI / 180;
+  const toRad = (d) => (d * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
+
   const a =
-    Math.sin(dLat/2) ** 2 +
-    Math.cos(toRad(lat1)) *
-    Math.cos(toRad(lat2)) *
-    Math.sin(dLon/2) ** 2;
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
