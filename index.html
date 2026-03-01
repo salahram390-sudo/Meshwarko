@@ -169,5 +169,13 @@
   </div>
 
   <script type="module" src="./js/auth.js"></script>
+  <script>
+  (function () {
+    var s = document.createElement('script');
+    s.src = "https://cdn.jsdelivr.net/npm/eruda";
+    s.onload = function () { eruda.init(); };
+    document.body.appendChild(s);
+  })();
+</script>
 </body>
 </html>
