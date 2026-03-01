@@ -286,8 +286,6 @@ function watchRide(rideId) {
 let lastDistanceMeters = null;
 let lastDurationSec = null;
 
-let myLocation = null; // {lat, lon}
-
 function setStatus(text) { setText(rideStatus, text); }
 
 
