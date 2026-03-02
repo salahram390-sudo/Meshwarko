@@ -14,6 +14,7 @@ import { notify, ensureNotificationPermission } from "./notify.js";
 console.log("passenger.js loaded ✅");
 let arrivedToastShownFor = null; // علشان ما تكررش الرسالة كل تحديث
 let myData = {};
+let driverMarker = null;
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
