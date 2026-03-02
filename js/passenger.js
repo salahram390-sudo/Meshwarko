@@ -102,8 +102,6 @@ navigator.geolocation.getCurrentPosition(
 
 // 👇 ضع الكود هنا مباشرة
 
-let pickupMarker = null;
-
 pickupMyLoc?.addEventListener("click", async () => {
   if (!myLocation?.lat || !myLocation?.lon) {
     alert("اضغط زر تحديد الموقع أولاً");
