@@ -1,8 +1,5 @@
 import "./map.js";
 import { auth, db } from "./firebase.js";
-console.log("passenger.js loaded ✅");
-let arrivedToastShownFor = null; // علشان ما تكررش الرسالة كل تحديث
-let myData = {};
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
   doc, getDoc, updateDoc, setDoc,
@@ -15,6 +12,9 @@ import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
 import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, geocodeEG, geocodeNominatim, bindSearch } from "./map.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
+console.log("passenger.js loaded ✅");
+let arrivedToastShownFor = null; // علشان ما تكررش الرسالة كل تحديث
+let myData = {};
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
