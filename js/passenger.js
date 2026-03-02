@@ -11,7 +11,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
-import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, geocodeEG, bindSearch } from "./map.js";
+import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, geocodeEG, geocodeNominatim, bindSearch } from "./map.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
 const meBadge = $("#meBadge");
