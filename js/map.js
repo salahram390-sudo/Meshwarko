@@ -80,7 +80,7 @@ let results = toResults(data);
 
 // ✅ لو مفيش نتائج جرّب صيغ تانية تلقائيًا
 if (results.length === 0) {
-  for (let i = 1; i < tries.length; i++) {
+  for (let i = 1; i < Math.min(tries.length, 5); i++) {
     url.searchParams.set("q", tries[i]);
     const r2 = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
     if (!r2.ok) continue;
