@@ -38,7 +38,7 @@ export async function geocodeNominatim(query, userLat, userLon) {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return [];
 
   // مربع بحث قريب (حوالي 15 كم)
-  const radiusKm = 15;
+  const radiusKm = 30;
   const dLat = radiusKm / 111;
   const dLon = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
 
