@@ -32,6 +32,7 @@ const pickupPick = $("#pickupPick");
 const dropPick = $("#dropPick");
 const pickupSearchBtn = $("#pickupSearchBtn");
 const dropSearchBtn   = $("#dropSearchBtn");
+const pickupMyLoc = $("#pickupMyLoc");
 
 pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
 dropSearchBtn.addEventListener("click", () => manualSearch("dropoff"));
@@ -55,7 +56,29 @@ const btnWhats = $("#btnWhats");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 let myLocation = null; // {lat, lon}
+async function reverseNameEG(lat, lon) {
+  const url = new URL("https://nominatim.openstreetmap.org/reverse");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("lat", lat);
+  url.searchParams.set("lon", lon);
+  url.searchParams.set("zoom", "18"); // شارع/حي
+  url.searchParams.set("addressdetails", "1");
 
+  const res = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
+  if (!res.ok) return null;
+
+  const data = await res.json();
+  const a = data?.address || {};
+
+  const road = a.road || a.pedestrian || a.neighbourhood || a.suburb || "";
+  const area = a.suburb || a.neighbourhood || a.city_district || a.village || "";
+  const city = a.city || a.town || a.village || a.county || "";
+  const state = a.state || "";
+
+  // اسم مرتب
+  const parts = [road || area, city, state].filter(Boolean);
+  return parts.join("، ") || data?.display_name || null;
+}
 navigator.geolocation.getCurrentPosition(
   (pos) => {
     console.log("GPS OK:", pos.coords.latitude, pos.coords.longitude, "acc:", pos.coords.accuracy);
