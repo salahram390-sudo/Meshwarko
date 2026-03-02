@@ -130,7 +130,7 @@ function buildQueryTries(q) {
 
   if (noAl.length > 4) push(noAl.slice(0, noAl.length - 1));
   if (noAl.length > 5) push(noAl.slice(0, noAl.length - 2));
-
+for (const v of smartVariants(raw)) push(v);
   return tries;
 }
 
