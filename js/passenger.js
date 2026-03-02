@@ -99,9 +99,6 @@ navigator.geolocation.getCurrentPosition(
     maximumAge: 0,
   }
 );
-maximumAge: 0,
-}
-);
 
 // 👇 ضع الكود هنا مباشرة
 
