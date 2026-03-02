@@ -58,7 +58,7 @@ url.searchParams.set("q", tries[0]);
 
   // ✅ أهم سطرين: يخليه يجيب القريب فقط
   url.searchParams.set("viewbox", `${left},${top},${right},${bottom}`);
-
+url.searchParams.set("bounded", "1");
   const res = await fetch(url.toString(), {
     headers: { "Accept-Language": "ar" },
   });
