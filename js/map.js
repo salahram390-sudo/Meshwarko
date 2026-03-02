@@ -63,22 +63,39 @@ url.searchParams.set("q", tries[0]);
   });
   if (!res.ok) return [];
 
-  const data = await res.json();
+  let data = await res.json();
 
-  // ✅ فلتر: امسح أي نتيجة أبعد من 30 كم
-  const maxKm = 80;
-  const results = (data || [])
+function toResults(arr) {
+  return (arr || [])
     .map((x) => ({
       display: x.display_name,
       lat: Number(x.lat),
       lon: Number(x.lon),
     }))
-    .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon))
-    .filter((x) => haversine(lat, lon, x.lat, x.lon) <= maxKm)
-    .sort((a, b) => haversine(lat, lon, a.lat, a.lon) - haversine(lat, lon, b.lat, b.lon));
-
-  return results;
+    .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 }
+
+let results = toResults(data);
+
+// ✅ لو مفيش نتائج جرّب صيغ تانية تلقائيًا
+if (results.length === 0) {
+  for (let i = 1; i < tries.length; i++) {
+    url.searchParams.set("q", tries[i]);
+    const r2 = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
+    if (!r2.ok) continue;
+    const d2 = await r2.json();
+    results = toResults(d2);
+    if (results.length) break;
+  }
+}
+
+// ✅ فلترة وترتيب حسب القرب
+const maxKm = 80;
+results = results
+  .filter((x) => haversine(lat, lon, x.lat, x.lon) <= maxKm)
+  .sort((a, b) => haversine(lat, lon, a.lat, a.lon) - haversine(lat, lon, b.lat, b.lon));
+
+return results;
 
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
