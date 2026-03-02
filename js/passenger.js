@@ -548,8 +548,6 @@ async function initAdmin() {
   };
   render();
 
-let driverMarker = null;
-let driverTrackUnsub = null;
 let driverRouteLayerRef = { current: null };
   let liveUnsub = null;
   
