@@ -1,8 +1,9 @@
+import { debounce } from "./utils.js";
+
 let userLat = null;
 let userLon = null;
 let userGov = null;
 let userCenter = null; // new
-import { debounce } from "./utils.js";
 
 export function createMap(mapElId, options = {}) {
   const map = L.map(mapElId, { zoomControl: true, preferCanvas: true })
