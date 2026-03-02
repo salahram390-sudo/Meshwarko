@@ -49,7 +49,8 @@ export async function geocodeNominatim(query, userLat, userLon) {
 
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "json");
-  url.searchParams.set("q", query);
+  const tries = buildQueryTries(query);
+url.searchParams.set("q", tries[0]);
   url.searchParams.set("countrycodes", "eg");
   url.searchParams.set("limit", "20");
   url.searchParams.set("addressdetails", "1");
