@@ -128,7 +128,6 @@ pickupMyLoc?.addEventListener("click", async () => {
 
 // ثم يكمل الكود الطبيعي
 let driverTrackUnsub = null;
-let driverTrackUnsub = null;
 // ============ UBER STYLE DRIVERS ============
 
 const driverMarkers = new Map(); // uid -> { marker, last }
