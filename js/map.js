@@ -149,6 +149,35 @@ function normalizeArabic(s) {
     .replace(/\s+/g, " ")
     .trim();
 }
+  function smartVariants(q) {
+  const base = normalizeArabic(q);
+  const noAl = base.replace(/\bال+/g, "").replace(/\s+/g, " ").trim();
+
+  // بدائل شائعة للحروف القريبة/المتشابهة
+  const variants = new Set([q, base, noAl]);
+
+  // تبديلات بسيطة (مش هتغطي كل حاجة، بس بتصلح كتير)
+  const swaps = [
+    [/ه/g, "ة"], [/ة/g, "ه"],
+    [/ي/g, "ى"], [/ى/g, "ي"],
+    [/ا/g, "أ"], [/ا/g, "إ"],
+    [/و/g, "ؤ"], [/ي/g, "ئ"],
+  ];
+
+  // جرّب تبديل واحد في كل مرة (خفيف ومفيد)
+  for (const [re, rep] of swaps) {
+    variants.add(noAl.replace(re, rep));
+  }
+
+  // لو كلمة طويلة، جرّب حذف حرف (يعالج غلطات typing بسيطة)
+  if (noAl.length >= 6) {
+    for (let i = 0; i < Math.min(3, noAl.length); i++) {
+      variants.add(noAl.slice(0, i) + noAl.slice(i + 1));
+    }
+  }
+
+  return [...variants].map(s => String(s).trim()).filter(Boolean);
+}
 export async function geocodeEG(query){
   const url =
     "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=eg&q=" +
