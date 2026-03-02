@@ -66,7 +66,7 @@ export async function geocodeNominatim(query, userLat, userLon) {
   const data = await res.json();
 
   // ✅ فلتر: امسح أي نتيجة أبعد من 30 كم
-  const maxKm = 30;
+  const maxKm = 80;
   const results = (data || [])
     .map((x) => ({
       display: x.display_name,
