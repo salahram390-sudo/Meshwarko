@@ -1,3 +1,4 @@
+import "./map.js";
 import { auth, db } from "./firebase.js";
 console.log("passenger.js loaded ✅");
 let arrivedToastShownFor = null; // علشان ما تكررش الرسالة كل تحديث
