@@ -107,7 +107,48 @@ function haversine(lat1, lon1, lat2, lon2) {
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(a));
 }
+function buildQueryTries(q) {
+  const raw = String(q || "").trim();
+  const n = normalizeArabic(raw);
+  const noAl = n.replace(/\bال+/g, "").replace(/\s+/g, " ").trim();
 
+  const tries = [];
+  const push = (s) => {
+    s = String(s || "").trim();
+    if (s && !tries.includes(s)) tries.push(s);
+  };
+
+  push(raw);
+  push(n);
+  push(noAl);
+
+  const parts = noAl.split(" ").filter(Boolean);
+  if (parts.length > 1) {
+    const longest = [...parts].sort((a, b) => b.length - a.length)[0];
+    push(longest);
+  }
+
+  if (noAl.length > 4) push(noAl.slice(0, noAl.length - 1));
+  if (noAl.length > 5) push(noAl.slice(0, noAl.length - 2));
+
+  return tries;
+}
+
+function normalizeArabic(s) {
+  s = String(s || "").trim();
+  if (!s) return s;
+
+  return s
+    .replace(/[إأآا]/g, "ا")
+    .replace(/ى/g, "ي")
+    .replace(/ؤ/g, "و")
+    .replace(/ئ/g, "ي")
+    .replace(/ة/g, "ه")
+    .replace(/ـ/g, "")
+    .replace(/[\u064B-\u0652]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 export async function geocodeEG(query){
   const url =
     "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=eg&q=" +
