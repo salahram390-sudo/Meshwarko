@@ -97,6 +97,7 @@ results = results
   .sort((a, b) => haversine(lat, lon, a.lat, a.lon) - haversine(lat, lon, b.lat, b.lon));
 
 return results;
+  }
 
 function haversine(lat1, lon1, lat2, lon2) {
   const R = 6371;
