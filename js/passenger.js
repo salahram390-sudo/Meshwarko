@@ -437,14 +437,6 @@ function setDropoff(point) {
   updateRouteIfReady();
 }
 
-bindSearch(pickupText, pickupResults, (it) =>
-  setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" })
-);
-
-bindSearch(dropText, dropResults, (it) =>
-  setDropoff({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" })
-);
-
 priceSlider.addEventListener("input", () => {
   priceSlider.dataset.touched = "1";
   updatePriceUI();
