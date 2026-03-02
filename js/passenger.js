@@ -203,9 +203,8 @@ async function manualSearch(type) {
   }
 
   try {
-    const result = await geocodeEG(q);
-    const it = Array.isArray(result) ? result[0] : result;
-
+    const items = await geocodeNominatim(q, myLocation?.lat, myLocation?.lon);
+const it = items?.[0];
     if (!it) {
       alert("المكان غير موجود");
       return;
