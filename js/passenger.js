@@ -816,6 +816,16 @@ if (ride?.arrivedAtPickup === true) {
         const dSnap = await getDoc(doc(db, "users", ride.driverId));
         driverProfile = dSnap.exists() ? dSnap.data() : null;
       }
+      // ✅ فعّل ETA + تتبع السائق من driversOnline (OSRM)
+if (ride.status === "accepted" && ride.driverId) {
+  // ثبّت مكان القيام عشان ETA يعرف يرسُم للسائق لحد القيام
+  if (ride.pickup?.lat && ride.pickup?.lon) {
+    currentPickup = { lat: Number(ride.pickup.lat), lon: Number(ride.pickup.lon) };
+  }
+
+  // شغّل التتبع اللي جوّه بيحسب ETA ويعرضه في routeMeta
+  startDriverTracking(ride.driverId);
+}
 
       renderRideCard(ride, driverProfile);
 
