@@ -580,16 +580,6 @@ let driverRouteLayerRef = { current: null };
 if (currentPickup) {
   drawDriverToPickupRoute(lat, lon, currentPickup.lat, currentPickup.lon);
 }
-    
-    // ✅ ارسم طريق السائق -> مكان قيام الراكب
-    // لازم pickup تكون موجودة عند الراكب
-    // عندك غالباً pickup = {lat, lon} أو {lat, lng}
-    const pLat = Number(pickup?.lat);
-    const pLon = Number(pickup?.lon ?? pickup?.lng);
-
-    if (Number.isFinite(pLat) && Number.isFinite(pLon)) {
-      await drawDriverToPickupRoute(lat, lon, pLat, pLon);
-    }
 
   });
 
