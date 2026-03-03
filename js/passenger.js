@@ -584,6 +584,30 @@ if (currentPickup) {
   });
 
 }
+
+async function reverseNameEG(lat, lon) {
+  const url = new URL("https://nominatim.openstreetmap.org/reverse");
+  url.searchParams.set("format", "json");
+  url.searchParams.set("lat", lat);
+  url.searchParams.set("lon", lon);
+  url.searchParams.set("zoom", "18");
+  url.searchParams.set("addressdetails", "1");
+
+  const res = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
+  if (!res.ok) return null;
+
+  const data = await res.json();
+  const a = data?.address || {};
+
+  // أفضل ترتيب اسم “حقيقي”
+  const road = a.road || a.pedestrian || a.footway || a.neighbourhood || a.suburb;
+  const area = a.neighbourhood || a.suburb || a.city_district;
+  const city = a.city || a.town || a.village;
+  const state = a.state;
+
+  const parts = [road || area, city, state].filter(Boolean);
+  return parts.join("، ") || data?.display_name || null;
+}
   
 async function drawDriverToPickupRoute(driverLat, driverLon, pickupLat, pickupLon) {
   try {
