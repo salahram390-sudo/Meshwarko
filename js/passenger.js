@@ -901,12 +901,48 @@ alert("FIRESTORE ERROR: " + (e?.message || e));
 });
 
 btnCancel.addEventListener("click", async () => {
-  if (!currentRideId) return;
-  setStatus("يلغي...");
+  if (!currentRideId) {
+    setStatus("جاهز");
+    setText(routeMeta, "اختر قيام/وصول لرسم المسار");
+    renderRideCard(null, null);
+    setDriverContactButtons(null);
+
+    if (driverMarker) {
+      map.removeLayer(driverMarker);
+      driverMarker = null;
+    }
+    return;
+  }
+
+  setStatus("...جاري الإلغاء");
+  const rideId = currentRideId; // احفظه قبل ما نصفر
+
   try {
-    await updateDoc(doc(db, "rides", currentRideId), { status: "canceled", canceledAt: serverTimestamp() });
-    setStatus("ملغي");
-  } catch { setStatus("خطأ"); }
+    await updateDoc(doc(db, "rides", rideId), {
+      status: "canceled",
+      canceledAt: serverTimestamp(),
+    });
+
+    // ✅ صفّر الطلب فورًا عشان الرسالة تختفي
+    currentRideId = null;
+
+    // ✅ Reset UI فورًا
+    setStatus("جاهز");
+    setText(routeMeta, "اختر قيام/وصول لرسم المسار");
+    renderRideCard(null, null);
+    setDriverContactButtons(null);
+
+    // ✅ شيل ماركر السائق لو موجود
+    if (driverMarker) {
+      map.removeLayer(driverMarker);
+      driverMarker = null;
+    }
+
+    notify({ title: "تم إلغاء الطلب", body: "تم إلغاء الطلب بنجاح", tag: "ride-canceled" });
+  } catch (e) {
+    console.error("CANCEL ERROR:", e);
+    setStatus("خطأ");
+  }
 });
 
 btnAcceptOffer.addEventListener("click", async () => {
