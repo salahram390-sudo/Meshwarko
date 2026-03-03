@@ -23,7 +23,33 @@ const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 const pickupMyLocBtn = $("#pickupMyLoc");
 const pGov = $("#pGov"), pCenter = $("#pCenter"), pVehicles = $("#pVehicles");
+pickupMyLocBtn?.addEventListener("click", async () => {
+  if (!myLocation?.lat || !myLocation?.lon) {
+    notify({ title: "الموقع", body: "حدد موقعك أولاً (زر 🎯)" });
+    return;
+  }
 
+  const lat = myLocation.lat;
+  const lon = myLocation.lon;
+
+  // خلي مكان القيام = نفس موقعي الحالي
+  pickup = { lat, lon };
+
+  // اسم حقيقي بدل “موقعي الحالي”
+  const name = await reverseNameEG(lat, lon);
+  pickupText.value = name || "موقعي الحالي";
+
+  // حدّث الماركر/الخريطة (حسب كودك الحالي: لو عندك pickupMarker استخدمه)
+  if (pickupMarker) pickupMarker.setLatLng([lat, lon]);
+  else pickupMarker = L.marker([lat, lon]).addTo(map);
+
+  map.setView([lat, lon], 16);
+
+  // لو عندك dropoff جاهز ارسم المسار/حدث السعر
+  if (dropoff?.lat && dropoff?.lon) {
+    await recalcRouteAndPrice(); // لو عندك دالة مشابهة
+  }
+});
 const pickupText = $("#pickupText");
 const dropText = $("#dropText");
 const pickupResults = $("#pickupResults");
