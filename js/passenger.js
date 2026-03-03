@@ -878,6 +878,35 @@ if (ride.status === "accepted" && ride.driverId) {
         setStatus("منتهي");
         notify({ title: "الطلب انتهى", body: "تم إخفاء الطلب بعد 15 دقيقة. أرسل طلبًا جديدًا.", tag: "ride-expired" });
       } else {
+        // بعد: const ride = rideSnap.data();
+
+if (ride?.pickup?.lat && ride?.pickup?.lon) {
+  currentPickup = {
+    lat: Number(ride.pickup.lat),
+    lon: Number(ride.pickup.lon),
+  };
+}
+
+if (ride.status === "requested") {
+  setText(routeMeta, "تم إرسال الطلب.. في انتظار سائق...");
+}
+
+if (ride.status === "offered") {
+  setText(routeMeta, "وصل عرض سعر من السائق. اختر قبول أو رفض.");
+}
+
+if (ride.status === "accepted") {
+  setText(routeMeta, "تم القبول ✅ السائق في الطريق إليك...");
+  if (ride.driverId) startDriverTracking(ride.driverId); // لتشغيل ETA وتتبع السائق
+}
+
+if (ride.status === "completed") {
+  setText(routeMeta, "تم إنهاء الرحلة ✅");
+}
+
+if (ride.status === "canceled") {
+  setText(routeMeta, "تم إلغاء الطلب.");
+}
         setStatus(ride.status === "accepted" ? "مقبول" : (ride.status === "offered" ? "عرض سعر" : "قيد الانتظار"));
       }
     });
