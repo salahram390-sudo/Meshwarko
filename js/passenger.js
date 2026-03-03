@@ -782,6 +782,20 @@ watchRide(currentRideId);
     unsubRideWatcher = onSnapshot(doc(db, "rides", currentRideId), async (rideSnap) => {
       if (!rideSnap.exists()) return;
       const ride = rideSnap.data();
+      // ✅ حدّث رسالة أعلى الكارت حسب حالة الرحلة (routeMeta)
+if (ride.status === "requested") {
+  setText(routeMeta, "تم إرسال الطلب.. في انتظار سائق...");
+} else if (ride.status === "offered") {
+  setText(routeMeta, "وصل عرض سعر من السائق. اختر قبول أو رفض.");
+} else if (ride.status === "accepted") {
+  setText(routeMeta, "تم القبول ✅ السائق في الطريق إليك...");
+  // startDriverTracking(ride.driverId) عندك أصلاً بيتنده بعد شوية تحت
+  // وهو اللي هيحط ETA ويحدّث routeMeta تلقائيًا
+} else if (ride.status === "completed") {
+  setText(routeMeta, "تم إنهاء الرحلة ✅");
+} else if (ride.status === "canceled") {
+  setText(routeMeta, "تم إلغاء الطلب.");
+}
       // ============ DRIVER ARRIVED ============
 if (ride?.arrivedAtPickup === true) {
   // اعرضها مرة واحدة لكل رحلة
