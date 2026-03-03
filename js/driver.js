@@ -399,6 +399,7 @@ setDriverStatus("وصل لموقع الراكب");
 try {
 
 await updateDoc(doc(db, "rides", selectedRideId), {
+status: "arrived",
 arrivedAtPickup: true,
 arrivedAt: serverTimestamp()
 });
