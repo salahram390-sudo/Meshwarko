@@ -208,11 +208,6 @@ item.innerHTML = `
 item.onclick = () => selectRide(d.id, r);
 ridesList.appendChild(item);
   });
-    onSnapshot(qMine, (snap) => {
-  snap.docs.forEach((d) => {
-    const r = d.data();
-    console.log("MY OFFER:", d.id, r);
-  });
       
   console.log("shown after loop:", shown);
   if (shown === 0) {
