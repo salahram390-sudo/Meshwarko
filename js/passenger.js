@@ -623,19 +623,6 @@ setText(distanceValue, `🚗 السائق يبعد ${distanceText} • يصل خ
     console.error("drawDriverToPickupRoute ERROR", e);
   }
 }
-  
-function startLive() {
-  if (liveUnsub) liveUnsub(); // يقفل الاشتراك القديم
-  liveUnsub = startLiveDriversLayer({
-    governorate: pGov.value,
-    center: pCenter.value
-  });
-}
-
-startLive();
-pGov.addEventListener("change", startLive);
-pCenter.addEventListener("change", startLive);
-}
 
 function rideUiNone() {
   btnCancel.disabled = true;
