@@ -77,7 +77,7 @@ async function reverseNameEG(lat, lon) {
 
   // اسم مرتب
   const parts = [road || area, city, state].filter(Boolean);
-  return parts.join("، ") || data?.display_name || null;
+  return parts.join("، ") || data?.display_name || null;}
 pickupMyLoc?.addEventListener("click", async () => {
   if (!myLocation?.lat || !myLocation?.lon) {
     notify({ title: "الموقع", body: "حدد موقعك أولاً (زر 🎯)" });
