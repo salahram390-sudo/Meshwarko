@@ -633,6 +633,17 @@ function rideUiNone() {
   btnComplete.disabled = true;
   btnCall.disabled = true;
   btnWhats.disabled = true;
+  btnAcceptOffer.style.display = "none";
+  btnRejectOffer.style.display = "none";
+  btnCancel.style.display = "none";
+  btnComplete.style.display = "none";
+  btnTrack.style.display = "none";
+  btnCall.style.display = "none";
+  btnWhats.style.display = "none";
+
+  rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
+  setStatus("جاهز");
+}
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
   setStatus("جاهز");
 }
