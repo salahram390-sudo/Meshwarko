@@ -33,7 +33,7 @@ const pickupPick = $("#pickupPick");
 const dropPick = $("#dropPick");
 const pickupSearchBtn = $("#pickupSearchBtn");
 const dropSearchBtn   = $("#dropSearchBtn");
-const pickupMyLoc = $("#pickupMyLoc");
+
 
 pickupMyLoc?.addEventListener("click", async () => {
   if (!myLocation?.lat || !myLocation?.lon) {
