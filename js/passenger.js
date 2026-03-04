@@ -1063,13 +1063,19 @@ btnTrack.addEventListener("click", async () => {
 
 btnComplete.addEventListener("click", async () => {
   if (!currentRideId) return;
-  setStatus("ينهي...");
+  setStatus("يرسل طلب إنهاء...");
   try {
-    await updateDoc(doc(db, "rides", currentRideId), { status: "completed", completedAt: serverTimestamp() });
-    notify({ title: "تم إنهاء الرحلة", body: "شكراً لاستخدام مشوارك.", tag: "ride-done" });
-  } catch { setStatus("خطأ"); }
+    await updateDoc(doc(db, "rides", currentRideId), {
+      passengerEndRequested: true,
+      passengerEndRequestedAt: serverTimestamp(),
+    });
+    notify({ title: "تم", body: "تم إرسال طلب إنهاء الرحلة للسائق.", tag: "end-requested" });
+    setStatus("تم إرسال طلب إنهاء ✅");
+  } catch (e) {
+    console.error(e);
+    setStatus("خطأ");
+  }
 });
-
 
 // Rating UI bindings
 rateClose?.addEventListener("click", hideRatingModal);
