@@ -1023,7 +1023,16 @@ btnRejectOffer.addEventListener("click", async () => {
   if (!currentRideId) return;
   setStatus("يرفض...");
   try {
-    await updateDoc(doc(db, "rides", currentRideId), { status: "requested", offerPrice: null, offeredAt: null });
+    await updateDoc(doc(db, "rides", currentRideId), {
+  status: "requested",
+  driverId: null,
+  offerPrice: null,
+  offeredAt: null,
+  driverName: null,
+  driverPhone: null,
+  driverVehicleType: null,
+  driverVehicleCode: null
+});
     notify({ title: "تم رفض العرض", body: "عاد الطلب لقائمة الطلبات.", tag: "offer-rejected" });
   } catch { setStatus("خطأ"); }
 });
