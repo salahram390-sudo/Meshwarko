@@ -15,8 +15,5 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-console.log("passenger.js loaded ✅");
-
-// للتجربة من Console (Eruda)
 window.__auth = auth;
 window.__db = db;
