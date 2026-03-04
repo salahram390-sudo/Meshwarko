@@ -733,6 +733,46 @@ watchRide(currentRideId);
     unsubRideWatcher = onSnapshot(doc(db, "rides", currentRideId), async (rideSnap) => {
       if (!rideSnap.exists()) return;
       const ride = rideSnap.data();
+      // ✅ افتراضي: اعرضها كلها (وبعدين نخفي حسب الحالة)
+btnAcceptOffer.style.display = "";
+btnRejectOffer.style.display = "";
+btnCancel.style.display = "";
+btnComplete.style.display = "";
+btnTrack.style.display = "";
+btnCall.style.display = "";
+btnWhats.style.display = "";
+
+// ✅ اخفاء/اظهار حسب الحالة
+if (ride.status === "requested") {
+  btnAcceptOffer.style.display = "none";
+  btnRejectOffer.style.display = "none";
+  btnTrack.style.display = "none";
+  btnComplete.style.display = "none";
+  btnCall.style.display = "none";
+  btnWhats.style.display = "none";
+}
+
+if (ride.status === "offered") {
+  btnTrack.style.display = "none";
+  btnComplete.style.display = "none";
+  btnCall.style.display = "none";
+  btnWhats.style.display = "none";
+}
+
+if (ride.status === "accepted") {
+  btnAcceptOffer.style.display = "none";
+  btnRejectOffer.style.display = "none";
+}
+
+if (ride.status === "completed" || ride.status === "canceled") {
+  btnAcceptOffer.style.display = "none";
+  btnRejectOffer.style.display = "none";
+  btnCancel.style.display = "none";
+  btnComplete.style.display = "none";
+  btnTrack.style.display = "none";
+  btnCall.style.display = "none";
+  btnWhats.style.display = "none";
+}
       // ✅ حدّث رسالة أعلى الكارت حسب حالة الرحلة (routeMeta)
 if (ride.status === "requested") {
   setText(routeMeta, "تم إرسال الطلب.. في انتظار سائق...");
