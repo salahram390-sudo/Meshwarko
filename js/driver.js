@@ -214,7 +214,12 @@ ridesList.appendChild(item);
     ridesList.innerHTML = `<div class="muted small">لا توجد طلبات مناسبة لنوع مركبتك الآن.</div>`;
   }
 });
-}
+  onSnapshot(qMine, (snap) => {
+  snap.docs.forEach((d) => {
+    const r = d.data();
+    console.log("MY OFFER:", d.id, r);
+  });
+});
 async function selectRide(id, ride) {
   selectedRideId = id;
   selectedRideData = ride;
