@@ -34,7 +34,17 @@ const dropPick = $("#dropPick");
 const pickupSearchBtn = $("#pickupSearchBtn");
 const dropSearchBtn   = $("#dropSearchBtn");
 const pickupMyLoc = $("#pickupMyLoc");
-
+pickupMyLoc?.addEventListener("click", async () => {
+  if (!myLocation?.lat || !myLocation?.lon) {
+    notify({ title: "الموقع", body: "حدد موقعك أولاً (زر 🎯)" });
+    return;
+  }
+  const lat = Number(myLocation.lat);
+  const lon = Number(myLocation.lon);
+  const name = (await reverseNameEG(lat, lon)) || "موقعي الحالي";
+  setPickup({ lat, lon, text: name });
+  map.setView([lat, lon], 16);
+});
 pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
 dropSearchBtn.addEventListener("click", () => manualSearch("dropoff"));
 
