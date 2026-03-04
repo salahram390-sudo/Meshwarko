@@ -630,7 +630,7 @@ async function drawDriverToPickupRoute(driverLat, driverLon, pickupLat, pickupLo
     // ETA
     const mins = Math.max(1, Math.round((Number(r.durationSec) || 0) / 60));
     // غيّر ده حسب مكان عرضك (مثلاً routeMeta أو status)
-    setText(routeMeta, `وقت وصول السائق: حوالي ${mins} دقيقة`);
+    setStatus(`السائق سيصل خلال ${mins} دقيقة`);
   } catch (e) {
     console.error("drawDriverToPickupRoute ERROR", e);
   }
