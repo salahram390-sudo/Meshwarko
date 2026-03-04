@@ -111,31 +111,6 @@ navigator.geolocation.getCurrentPosition(
   }
 );
 
-// 👇 ضع الكود هنا مباشرة
-
-pickupMyLoc?.addEventListener("click", async () => {
-  if (!myLocation?.lat || !myLocation?.lon) {
-    alert("اضغط زر تحديد الموقع أولاً");
-    return;
-  }
-
-  const lat = Number(myLocation.lat);
-  const lon = Number(myLocation.lon);
-
-  const placeName = (await reverseNameEG(lat, lon)) || "موقعي الحالي";
-
-  setPickup({ lat, lon, text: placeName });
-
-  pickupText.value = placeName;
-
-  if (!pickupMarker) {
-    pickupMarker = addMarker(map, [lat, lon], { draggable: true });
-  } else {
-    pickupMarker.setLatLng([lat, lon]);
-  }
-
-  map.setView([lat, lon], 16);
-});
 
 // ثم يكمل الكود الطبيعي
 let driverTrackUnsub = null;
