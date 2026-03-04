@@ -629,6 +629,17 @@ async function drawDriverToPickupRoute(driverLat, driverLon, pickupLat, pickupLo
 
     // ETA
     const mins = Math.max(1, Math.round((Number(r.durationSec) || 0) / 60));
+    const meters = Math.round(Number(r.distanceMeters) || 0);
+
+let distanceText = "";
+
+if (meters < 1000) {
+  distanceText = `${meters} متر`;
+} else {
+  distanceText = `${(meters / 1000).toFixed(1)} كم`;
+}
+
+setText(distanceValue, `🚗 السائق يبعد ${distanceText} • يصل خلال ${mins} دقيقة`);
     // غيّر ده حسب مكان عرضك (مثلاً routeMeta أو status)
     setStatus(`السائق سيصل خلال ${mins} دقيقة`);
   } catch (e) {
