@@ -268,6 +268,39 @@ async function selectRide(id, ride) {
   console.error("ROUTE ERROR:", e);
 }
 }
+let unsubAcceptedWatcher = null;
+
+function showButtonComplete() {
+  btnComplete.style.display = "";
+  btnComplete.disabled = false;
+}
+
+function hideButtonComplete() {
+  btnComplete.style.display = "";
+  btnComplete.disabled = true;
+}
+
+function watchPassengerEndRequest(rideId) {
+  if (unsubAcceptedWatcher) { unsubAcceptedWatcher(); unsubAcceptedWatcher = null; }
+
+  unsubAcceptedWatcher = onSnapshot(doc(db, "rides", rideId), (snap) => {
+    if (!snap.exists()) return;
+    const ride = snap.data();
+
+    // افتح زر الإنهاء فقط لما الراكب يطلب الإنهاء
+    if ((ride.status === "accepted" || ride.status === "arrived") && ride.passengerEndRequested === true) {
+      showButtonComplete();
+    } else {
+      hideButtonComplete();
+    }
+
+    // لو خلصت/اتلغت اقفل الواتشر
+    if (ride.status === "completed" || ride.status === "canceled") {
+      if (unsubAcceptedWatcher) { unsubAcceptedWatcher(); unsubAcceptedWatcher = null; }
+      hideButtonComplete();
+    }
+  });
+}
 async function showAcceptedDetails(rideId) {
   const rideSnap = await getDoc(doc(db, "rides", rideId));
   if (!rideSnap.exists()) return;
