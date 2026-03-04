@@ -852,9 +852,6 @@ if (ride.status === "accepted") {
 });
 
 // ✅ بعد نجاح التقييم مباشرة
-currentRideId = null;
-if (unsubRideWatcher) { unsubRideWatcher(); unsubRideWatcher = null; }
-rideUiNone(); // أو دالتك اللي بتصفر الكارت وترجع تفتح الأزرار
             hideRatingModal();
             // بعد نجاح إرسال التقييم
            currentRideId = null;
