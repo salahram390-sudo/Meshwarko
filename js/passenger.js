@@ -741,7 +741,13 @@ onAuthStateChanged(auth, async (user) => {
   orderBy("createdAt", "desc"),
   limit(1)
 );
-
+const ridesQ = query(
+  collection(db, "rides"),
+  where("passengerId", "==", user.uid),
+  where("status", "in", ["requested", "offered", "accepted", "completed"]),
+  orderBy("createdAt", "desc"),
+  limit(1)
+);
   onSnapshot(ridesQ, (snap) => {
     if (snap.empty) {
   currentRideId = null;
