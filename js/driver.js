@@ -222,6 +222,7 @@ ridesList.appendChild(item);
     console.log("MY OFFER:", d.id, r);
   });
 });
+}
 async function selectRide(id, ride) {
   selectedRideId = id;
   selectedRideData = ride;
