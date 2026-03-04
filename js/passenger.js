@@ -864,11 +864,14 @@ if (ride.status === "accepted") {
           if (!ratingValue) { setText(rateHint, "اختر عدد نجوم أولاً."); return; }
           setText(rateHint, "جارٍ الإرسال...");
           try{
-            await updateDoc(doc(db, "rides", currentRideId), {
-              passengerRating: ratingValue,
-              passengerComment: (rateComment?.value || "").trim(),
-              ratedAt: serverTimestamp(),
-            });
+
+
+           await updateDoc(doc(db, "rides", currentRideId), {
+           passengerRating: ratingValue,
+           passengerComment: (rateComment?.value || "").trim(),
+           ratedAt: serverTimestamp()
+           });
+            
             hideRatingModal();
             // بعد نجاح إرسال التقييم
            currentRideId = null;
