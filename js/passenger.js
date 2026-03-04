@@ -566,35 +566,15 @@ async function initAdmin() {
     });
   };
   render();
-  
-  try {
-    const url = new URL("https://nominatim.openstreetmap.org/reverse");
-    url.searchParams.set("format", "json");
-    url.searchParams.set("lat", String(lat));
-    url.searchParams.set("lon", String(lon));
-    url.searchParams.set("zoom", "18");
-    url.searchParams.set("addressdetails", "1");
 
-    const res = await fetch(url.toString(), {
-      headers: {
-        "Accept": "application/json",
-        "Accept-Language": "ar"
-      }
-    });
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    const a = data?.address || {};
-    const road = a.road || a.pedestrian || a.footway || a.neighbourhood || a.suburb || "";
-    const city = a.city || a.town || a.village || a.county || "";
-    const state = a.state || "";
-    const parts = [road, city, state].filter(Boolean);
-    return parts.join("، ") || data?.display_name || null;
-  } catch (e) {
-    console.warn("reverseNameEG fetch failed:", e);
-    return null; // ✅ مهم: ما تعملش throw
+  function startLive() {
+    if (liveUnsub) liveUnsub();
+    liveUnsub = startLiveDriversLayer({ governorate: pGov.value, center: pCenter.value });
   }
+
+  startLive();
+  pGov.addEventListener("change", startLive);
+  pCenter.addEventListener("change", startLive);
 }
   
 async function drawDriverToPickupRoute(driverLat, driverLon, pickupLat, pickupLon) {
