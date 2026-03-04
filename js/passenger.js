@@ -31,18 +31,10 @@ pickupMyLocBtn?.addEventListener("click", async () => {
   const lat = myLocation.lat;
   const lon = myLocation.lon;
 
-  // خلي مكان القيام = نفس موقعي الحالي
-  pickup = { lat, lon };
-
   const name = (await reverseNameEG(lat, lon)) || "موقعي الحالي";
-pickupText.value = name;
-setPickup({ lat, lon, text: name });
-
-  // حدّث الماركر/الخريطة (حسب كودك الحالي: لو عندك pickupMarker استخدمه)
-  if (pickupMarker) pickupMarker.setLatLng([lat, lon]);
-  else pickupMarker = L.marker([lat, lon]).addTo(map);
-
+  setPickup({ lat, lon, text: name });
   map.setView([lat, lon], 16);
+});
 
   // لو عندك dropoff جاهز ارسم المسار/حدث السعر
   if (dropoff?.lat && dropoff?.lon) {
