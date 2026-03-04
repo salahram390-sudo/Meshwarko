@@ -952,6 +952,7 @@ console.log("dropoff", dropoff);
   passengerPhone: myData.phone || "",
   driverId: null,
   status: "requested",
+  archived: false,
   createdAt: serverTimestamp(),
   expiresAt,
 
