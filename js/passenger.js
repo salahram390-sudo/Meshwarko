@@ -542,7 +542,7 @@ let driverRouteLayerRef = { current: null };
   (driverMarker.getLatLng().lng + lon) / 2
 ]);
     }
-
+map.panTo(pos);
 if (currentPickup) {
   drawDriverToPickupRoute(lat, lon, currentPickup.lat, currentPickup.lon);
 }
