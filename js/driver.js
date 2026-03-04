@@ -424,7 +424,7 @@ btnAccept.addEventListener("click", async () => {
 
     btnAccept.disabled = true;
     btnSendOffer.disabled = true;
-    btnComplete.disabled = false;
+    btnComplete.disabled = true;
     btnCancel.disabled = false;
     btnArrived.disabled = false;
     
