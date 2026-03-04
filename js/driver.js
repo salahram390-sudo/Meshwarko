@@ -475,6 +475,7 @@ btnComplete.addEventListener("click", async () => {
   setDriverStatus("ينهي...");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), { status: "completed", completedAt: serverTimestamp() });
+    if (unsubAcceptedWatcher) { unsubAcceptedWatcher(); unsubAcceptedWatcher = null; }
     stopLiveTracking();
     setDriverStatus("مكتمل");
     btnComplete.disabled = true;
