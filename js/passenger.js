@@ -34,9 +34,9 @@ pickupMyLocBtn?.addEventListener("click", async () => {
   // خلي مكان القيام = نفس موقعي الحالي
   pickup = { lat, lon };
 
-  // اسم حقيقي بدل “موقعي الحالي”
-  const name = await reverseNameEG(lat, lon);
-  pickupText.value = name || "موقعي الحالي";
+  const name = (await reverseNameEG(lat, lon)) || "موقعي الحالي";
+pickupText.value = name;
+setPickup({ lat, lon, text: name });
 
   // حدّث الماركر/الخريطة (حسب كودك الحالي: لو عندك pickupMarker استخدمه)
   if (pickupMarker) pickupMarker.setLatLng([lat, lon]);
