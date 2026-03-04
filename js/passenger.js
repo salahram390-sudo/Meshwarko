@@ -534,10 +534,6 @@ let driverRouteLayerRef = { current: null };
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
 
     const pos = [lat, lon];
-
-    if (!driverMarker) {
-      driverMarker = L.marker(pos).addTo(map);
-    } else {
       if (!driverMarker) {
   driverMarker = L.marker(pos).addTo(map);
 } else {
