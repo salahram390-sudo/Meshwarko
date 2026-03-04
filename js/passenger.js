@@ -732,7 +732,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
   // watch active ride (requested/offered/accepted)
-  const q = query(
+  const ridesQ = query(
   collection(db, "rides"),
   where("passengerId", "==", user.uid),
   where("status", "in", ["requested", "offered", "accepted", "arrived", "completed"]),
