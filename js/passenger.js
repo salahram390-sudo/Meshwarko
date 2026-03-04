@@ -516,13 +516,11 @@ let driverRouteLayerRef = { current: null };
   let liveUnsub = null;
   
   function startDriverTracking(driverId) {
-
   if (driverTrackUnsub) driverTrackUnsub();
 
   const ref = doc(db, "driversOnline", driverId);
 
   driverTrackUnsub = onSnapshot(ref, async (snap) => {
-
     if (!snap.exists()) return;
 
     const d = snap.data();
@@ -534,22 +532,20 @@ let driverRouteLayerRef = { current: null };
     if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
 
     const pos = [lat, lon];
-      if (!driverMarker) {
-  driverMarker = L.marker(pos).addTo(map);
-} else {
-  driverMarker.setLatLng(pos);
-}
-map.panTo(pos);
+
+    if (!driverMarker) {
+      driverMarker = L.marker(pos).addTo(map);
+    } else {
+      driverMarker.setLatLng(pos);
     }
-map.panTo(pos);
-if (currentPickup) {
-  drawDriverToPickupRoute(lat, lon, currentPickup.lat, currentPickup.lon);
-}
 
+    map.panTo(pos);
+
+    if (currentPickup) {
+      drawDriverToPickupRoute(lat, lon, currentPickup.lat, currentPickup.lon);
+    }
   });
-
 }
-
 async function initAdmin() {
   admin = await loadEgyptAdmin();
   const govs = admin.governorates.map(g => g.name);
