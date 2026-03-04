@@ -537,10 +537,12 @@ let driverRouteLayerRef = { current: null };
     if (!driverMarker) {
       driverMarker = L.marker(pos).addTo(map);
     } else {
-      driverMarker.setLatLng([
-  (driverMarker.getLatLng().lat + lat) / 2,
-  (driverMarker.getLatLng().lng + lon) / 2
-]);
+      if (!driverMarker) {
+  driverMarker = L.marker(pos).addTo(map);
+} else {
+  driverMarker.setLatLng(pos);
+}
+map.panTo(pos);
     }
 map.panTo(pos);
 if (currentPickup) {
