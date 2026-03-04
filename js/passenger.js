@@ -848,12 +848,17 @@ if (ride.status === "accepted") {
           setText(rateHint, "جارٍ الإرسال...");
           try{
 
-await updateDoc(doc(db, "rides", currentRideId), {
+            await updateDoc(doc(db, "rides", currentRideId), {
   passengerRating: ratingValue,
   passengerComment: (rateComment?.value || "").trim(),
   ratedAt: serverTimestamp(),
-  archived: true // ✅ هنا
+  archived: true
 });
+
+// ✅ بعد نجاح التقييم مباشرة
+currentRideId = null;
+if (unsubRideWatcher) { unsubRideWatcher(); unsubRideWatcher = null; }
+rideUiNone(); // أو دالتك اللي بتصفر الكارت وترجع تفتح الأزرار
             hideRatingModal();
             // بعد نجاح إرسال التقييم
            currentRideId = null;
