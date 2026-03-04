@@ -644,9 +644,6 @@ function rideUiNone() {
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
   setStatus("جاهز");
 }
-  rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
-  setStatus("جاهز");
-}
 
 function renderRideCard(ride, driverProfile) {
   const lines = [];
