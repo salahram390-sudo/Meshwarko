@@ -432,6 +432,7 @@ btnAccept.addEventListener("click", async () => {
     trackingEnabled = false;
     setTrackBtn();
     await showAcceptedDetails(selectedRideId);
+    watchPassengerEndRequest(selectedRideId);
     notify({ title: "تم قبول الطلب", body: "الآن يمكنك إنهاء الرحلة بعد الوصول.", tag: "ride-accepted" });
     setDriverStatus("على الطريق");
     } catch (e) {
