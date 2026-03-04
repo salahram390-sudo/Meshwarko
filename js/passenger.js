@@ -36,11 +36,7 @@ pickupMyLoc?.addEventListener("click", async () => {
   map.setView([lat, lon], 16);
 });
 
-  // لو عندك dropoff جاهز ارسم المسار/حدث السعر
-  if (dropoff?.lat && dropoff?.lon) {
-    await recalcRouteAndPrice(); // لو عندك دالة مشابهة
-  }
-});
+  
 const pickupText = $("#pickupText");
 const dropText = $("#dropText");
 const pickupResults = $("#pickupResults");
