@@ -857,6 +857,10 @@ if (ride.status === "accepted") {
               ratedAt: serverTimestamp(),
             });
             hideRatingModal();
+            // بعد نجاح إرسال التقييم
+           currentRideId = null;
+           if (unsubRideWatcher) { unsubRideWatcher(); unsubRideWatcher = null; }
+           rideUiNone(); // أو أي دالة عندك بتصفر الكارت
             notify({ title: "تم إرسال التقييم", body: "شكراً لمشاركتك رأيك.", tag: "rated" });
           } catch {
             setText(rateHint, "تعذر إرسال التقييم. جرّب مرة أخرى.");
