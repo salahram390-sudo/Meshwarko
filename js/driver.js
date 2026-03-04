@@ -153,15 +153,17 @@ function watchRidesForDriver() {
   const now = Timestamp.fromMillis(Date.now());
   const qR = query(
   collection(db, "rides"),
-  where("status", "in", ["requested", "offered"]),
+  const now = Timestamp.fromMillis(Date.now());
+
+const qOpen = query(
+  collection(db, "rides"),
+  where("status", "==", "requested"),
+  where("driverId", "==", null),
   where("governorate", "==", myUser.governorate || ""),
   where("center", "==", myUser.center || ""),
   where("expiresAt", ">", now),
-
-  // لازم expiresAt أولاً لأنه inequality
   orderBy("expiresAt", "asc"),
   orderBy("createdAt", "desc"),
-
   limit(30)
 );
 
