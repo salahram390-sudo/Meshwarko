@@ -858,7 +858,15 @@ if (ride.status === "accepted") {
 }
 
 if (ride.status === "completed") {
-  setText(routeMeta, "تم إنهاء الرحلة ✅");
+  setText(routeMeta, "✅ تم إنهاء الرحلة");
+
+  btnAcceptOffer.style.display = "none";
+  btnRejectOffer.style.display = "none";
+  btnCancel.style.display = "none";
+  btnComplete.style.display = "none";
+  btnTrack.style.display = "none";
+  btnCall.style.display = "none";
+  btnWhats.style.display = "none";
 }
 
 if (ride.status === "canceled") {
