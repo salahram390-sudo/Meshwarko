@@ -150,23 +150,24 @@ async function initAdmin() {
 
 function watchRidesForDriver() {
   // Match passenger's governorate+center+vehicleType (optional by vehicleType)
-  const now = Timestamp.fromMillis(Date.now());
-  const qR = query(
-  collection(db, "rides"),
-  const now = Timestamp.fromMillis(Date.now());
+  // ✅ مرة واحدة فقط
+const now = Timestamp.fromMillis(Date.now());
 
+// ✅ الطلبات المفتوحة (requested فقط)
 const qOpen = query(
   collection(db, "rides"),
   where("status", "==", "requested"),
   where("driverId", "==", null),
-  where("governorate", "==", myUser.governorate || ""),
-  where("center", "==", myUser.center || ""),
+  where("governorate", "==", (myUser?.governorate || "")),
+  where("center", "==", (myUser?.center || "")),
   where("expiresAt", ">", now),
   orderBy("expiresAt", "asc"),
   orderBy("createdAt", "desc"),
   limit(30)
 );
-  const qMine = query(
+
+// ✅ عروضي أنا فقط (offered)
+const qMine = query(
   collection(db, "rides"),
   where("status", "==", "offered"),
   where("driverId", "==", auth.currentUser.uid),
@@ -175,6 +176,7 @@ const qOpen = query(
   orderBy("createdAt", "desc"),
   limit(30)
 );
+  
   onSnapshot(qOpen, (snap) => {
     console.log("watchRidesForDriver: got snapshot, docs:", snap.docs.length);
   ridesList.innerHTML = "";
