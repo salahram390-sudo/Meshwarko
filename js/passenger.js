@@ -860,19 +860,18 @@ if (ride.status === "accepted") {
 if (ride.status === "completed") {
   setText(routeMeta, "✅ تم إنهاء الرحلة");
 
-  await updateDoc(doc(db,"rides",currentRideId),{archive:true});
-  currentRideId = null;
-  rideUiNone();
-}
+  // ✅ اقفل الريايد بشكل صحيح
+  await updateDoc(doc(db, "rides", currentRideId), { archived: true });
 
-  btnAcceptOffer.style.display = "none";
-  btnRejectOffer.style.display = "none";
-  btnCancel.style.display = "none";
-  btnComplete.style.display = "none";
-  btnTrack.style.display = "none";
-  btnCall.style.display = "none";
-  btnWhats.style.display = "none";
+  // ✅ افصل الـ watcher بتاع الوثيقة قبل ما تصفر الـ id
+  if (unsubRideWatcher) { unsubRideWatcher(); unsubRideWatcher = null; }
+
+  // ✅ صفّر الحالة والـ UI
   currentRideId = null;
+  arrivedToastShownFor = null;
+  rideUiNone();
+
+  return; // ✅ مهم عشان مايكملش كود تحت
 }
 
 if (ride.status === "canceled") {
