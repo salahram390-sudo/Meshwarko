@@ -34,6 +34,7 @@ const dropPick = $("#dropPick");
 const pickupSearchBtn = $("#pickupSearchBtn");
 const dropSearchBtn   = $("#dropSearchBtn");
 const pickupMyLoc = $("#pickupMyLoc");
+
 pickupMyLoc?.addEventListener("click", async () => {
   if (!myLocation?.lat || !myLocation?.lon) {
     notify({ title: "الموقع", body: "حدد موقعك أولاً (زر 🎯)" });
@@ -45,6 +46,7 @@ pickupMyLoc?.addEventListener("click", async () => {
   setPickup({ lat, lon, text: name });
   map.setView([lat, lon], 16);
 });
+
 pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
 dropSearchBtn.addEventListener("click", () => manualSearch("dropoff"));
 
