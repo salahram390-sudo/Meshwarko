@@ -925,6 +925,7 @@ btnRequest.addEventListener("click", async () => {
     }).catch(()=>{});
     console.log("pickup", pickup);
 console.log("dropoff", dropoff);
+    console.log("AUTH USER:", auth.currentUser);
     const rideRef = await addDoc(collection(db, "rides"), {
 
   passengerId: user.uid,
