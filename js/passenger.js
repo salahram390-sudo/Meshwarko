@@ -12,6 +12,8 @@ import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
 console.log("passenger.js loaded ✅");
+window.__auth = auth;
+window.__db = db;
 let arrivedToastShownFor = null; // علشان ما تكررش الرسالة كل تحديث
 let myData = {};
 let driverMarker = null;
