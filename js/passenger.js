@@ -551,29 +551,6 @@ logoutBtn.addEventListener("click", async () => {
   location.href = "./index.html";
 });
 
-
-
-async function initAdmin() {
-  admin = await loadEgyptAdmin();
-  const govs = admin.governorates.map(g => g.name);
-  fillSelect(pGov, govs);
-
-  const setCenters = (govName) => {
-    const g = admin.governorates.find(x => x.name === govName);
-    fillSelect(pCenter, (g?.centers || ["—"]));
-  };
-  setCenters(pGov.value);
-  pGov.addEventListener("change", () => setCenters(pGov.value));
-
-  const vehicles = admin.vehicleTypes;
-  const render = () => {
-    renderVehicleGrid(pVehicles, vehicles, passengerVehicle, (id) => {
-      passengerVehicle = id;
-      render();
-    });
-  };
-  render();
-
 let driverRouteLayerRef = { current: null };
   let liveUnsub = null;
   
@@ -610,6 +587,27 @@ if (currentPickup) {
   });
 
 }
+
+async function initAdmin() {
+  admin = await loadEgyptAdmin();
+  const govs = admin.governorates.map(g => g.name);
+  fillSelect(pGov, govs);
+
+  const setCenters = (govName) => {
+    const g = admin.governorates.find(x => x.name === govName);
+    fillSelect(pCenter, (g?.centers || ["—"]));
+  };
+  setCenters(pGov.value);
+  pGov.addEventListener("change", () => setCenters(pGov.value));
+
+  const vehicles = admin.vehicleTypes;
+  const render = () => {
+    renderVehicleGrid(pVehicles, vehicles, passengerVehicle, (id) => {
+      passengerVehicle = id;
+      render();
+    });
+  };
+  render();
 
 async function reverseNameEG(lat, lon) {
   const url = new URL("https://nominatim.openstreetmap.org/reverse");
