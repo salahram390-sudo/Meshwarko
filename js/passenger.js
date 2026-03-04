@@ -24,7 +24,7 @@ switchRoleBtn?.addEventListener("click", openSwitchDriverModal);
 const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 const pGov = $("#pGov"), pCenter = $("#pCenter"), pVehicles = $("#pVehicles");
-  
+const pickupMyLoc = $("#pickupMyLoc");
 const pickupText = $("#pickupText");
 const dropText = $("#dropText");
 const pickupResults = $("#pickupResults");
