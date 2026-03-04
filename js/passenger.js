@@ -860,6 +860,11 @@ if (ride.status === "accepted") {
 if (ride.status === "completed") {
   setText(routeMeta, "✅ تم إنهاء الرحلة");
 
+  await updateDoc(doc(db,"rides",currentRideId),{archive:true});
+  currentRideId = null;
+  rideUiNone();
+}
+
   btnAcceptOffer.style.display = "none";
   btnRejectOffer.style.display = "none";
   btnCancel.style.display = "none";
