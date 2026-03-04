@@ -566,8 +566,7 @@ async function initAdmin() {
     });
   };
   render();
-
-async function reverseNameEG(lat, lon) {
+  
   try {
     const url = new URL("https://nominatim.openstreetmap.org/reverse");
     url.searchParams.set("format", "json");
