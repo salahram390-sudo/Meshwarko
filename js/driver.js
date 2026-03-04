@@ -166,8 +166,16 @@ const qOpen = query(
   orderBy("createdAt", "desc"),
   limit(30)
 );
-
-  onSnapshot(qR, (snap) => {
+  const qMine = query(
+  collection(db, "rides"),
+  where("status", "==", "offered"),
+  where("driverId", "==", auth.currentUser.uid),
+  where("expiresAt", ">", now),
+  orderBy("expiresAt", "asc"),
+  orderBy("createdAt", "desc"),
+  limit(30)
+);
+  onSnapshot(qOpen, (snap) => {
     console.log("watchRidesForDriver: got snapshot, docs:", snap.docs.length);
   ridesList.innerHTML = "";
   let shown = 0;
@@ -200,7 +208,12 @@ item.innerHTML = `
 item.onclick = () => selectRide(d.id, r);
 ridesList.appendChild(item);
   });
-
+    onSnapshot(qMine, (snap) => {
+  snap.docs.forEach((d) => {
+    const r = d.data();
+    console.log("MY OFFER:", d.id, r);
+  });
+      
   console.log("shown after loop:", shown);
   if (shown === 0) {
     ridesList.innerHTML = `<div class="muted small">لا توجد طلبات مناسبة لنوع مركبتك الآن.</div>`;
