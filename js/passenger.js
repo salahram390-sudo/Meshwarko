@@ -735,7 +735,7 @@ onAuthStateChanged(auth, async (user) => {
   const ridesQ = query(
     collection(db, "rides"),
     where("passengerId", "==", user.uid),
-    where("status", "in", ["requested", "offered", "accepted"]),
+    where("status", "in", ["requested", "offered", "accepted", "completed"])
     orderBy("createdAt", "desc"),
     limit(1)
   );
