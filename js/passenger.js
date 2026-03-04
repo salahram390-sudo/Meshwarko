@@ -867,6 +867,7 @@ if (ride.status === "completed") {
   btnTrack.style.display = "none";
   btnCall.style.display = "none";
   btnWhats.style.display = "none";
+  currentRideId = null;
 }
 
 if (ride.status === "canceled") {
