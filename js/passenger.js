@@ -805,29 +805,24 @@ if (ride?.arrivedAtPickup === true) {
       btnWhats.disabled = ride.status !== "accepted";
 
       let driverProfile = null;
-      if (ride.status === "accepted" && ride.driverId) {
-        const dSnap = await getDoc(doc(db, "users", ride.driverId));
-        driverProfile = dSnap.exists() ? dSnap.data() : null;
-      }
-      // ✅ فعّل ETA + تتبع السائق من driversOnline (OSRM)
-if (ride.status === "accepted" && ride.driverId) {
-  // ثبّت مكان القيام عشان ETA يعرف يرسُم للسائق لحد القيام
-  if (ride.pickup?.lat && ride.pickup?.lon) {
-    currentPickup = { lat: Number(ride.pickup.lat), lon: Number(ride.pickup.lon) };
-  }
 
-  // شغّل التتبع اللي جوّه بيحسب ETA ويعرضه في routeMeta
-  startDriverTracking(ride.driverId);
+// خده من ride نفسه بدل users (علشان rules)
+if (ride.status === "accepted") {
+  driverProfile = {
+    name: ride.driverName || "",
+    phone: ride.driverPhone || "",
+    vehicleType: ride.driverVehicleType || ride.vehicleType || "",
+    vehicleCode: ride.driverVehicleCode || ""
+  };
 }
 
-      renderRideCard(ride, driverProfile);
+renderRideCard(ride, driverProfile);
 
-      if (ride.status === "accepted" && driverProfile) {
-        setDriverContactButtons(driverProfile.phone);
-      } else {
-        setDriverContactButtons(null);
-      }
-
+if (ride.status === "accepted") {
+  setDriverContactButtons(driverProfile.phone);
+} else {
+  setDriverContactButtons(null);
+}
 
       // Live tracking (driver marker)
       if (ride.status === "accepted" && ride.driverLoc && ride.driverLoc.lat && ride.driverLoc.lon) {
