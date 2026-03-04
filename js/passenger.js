@@ -22,7 +22,7 @@ switchRoleBtn?.addEventListener("click", openSwitchDriverModal);
 const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 const pGov = $("#pGov"), pCenter = $("#pCenter"), pVehicles = $("#pVehicles");
-pickupMyLocBtn?.addEventListener("click", async () => {
+pickupMyLoc?.addEventListener("click", async () => {
   if (!myLocation?.lat || !myLocation?.lon) {
     notify({ title: "الموقع", body: "حدد موقعك أولاً (زر 🎯)" });
     return;
