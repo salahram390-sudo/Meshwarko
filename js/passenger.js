@@ -1121,7 +1121,11 @@ btnComplete.addEventListener("click", async () => {
 // Rating UI bindings
 rateClose?.addEventListener("click", hideRatingModal);
 rateSkip.onclick = async () => {
-  try { await updateDoc(doc(db,"rides", currentRideId), { archived: true }); } catch(e){}
+  try {
+    await updateDoc(doc(db,"rides", currentRideId), { archived: true });
+  } catch (e) {
+    console.error("RATE SKIP ERROR:", e?.code, e?.message);
+  }
   hideRatingModal();
   currentRideId = null;
   rideUiNone();
