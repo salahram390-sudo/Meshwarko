@@ -1120,7 +1120,12 @@ btnComplete.addEventListener("click", async () => {
 
 // Rating UI bindings
 rateClose?.addEventListener("click", hideRatingModal);
-rateSkip?.addEventListener("click", hideRatingModal);
+rateSkip.onclick = async () => {
+  try { await updateDoc(doc(db,"rides", currentRideId), { archived: true }); } catch(e){}
+  hideRatingModal();
+  currentRideId = null;
+  rideUiNone();
+};
 rateModal?.addEventListener("click", (e) => { if (e.target === rateModal) hideRatingModal(); });
 starsRoot?.addEventListener("click", (e) => {
   const t = e.target;
