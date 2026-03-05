@@ -909,7 +909,7 @@ if (ride.status === "completed") {
   setText(routeMeta, "✅ تم إنهاء الرحلة");
 
   // ✅ اقفل الريايد بشكل صحيح
-  await updateDoc(doc(db, "rides", currentRideId), { archived: true });
+  await updateDoc(doc(db,"rides",currentRideId),{ archived: true });
 
   // ✅ افصل الـ watcher بتاع الوثيقة قبل ما تصفر الـ id
   if (unsubRideWatcher) { unsubRideWatcher(); unsubRideWatcher = null; }
