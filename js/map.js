@@ -295,17 +295,8 @@ async function reverseGov(lat, lon) {
   url.searchParams.set("zoom", "10"); // مستوى محافظة
   url.searchParams.set("addressdetails", "1");
 
-  let res;
-try {
-  res = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
-} catch (e) {
-  // ✅ fallback سريع لو Nominatim اتمنع (CORS/VPN/Block)
-  const fb = new URL("https://geocode.maps.co/search");
-  fb.searchParams.set("q", tries[0]);
-  fb.searchParams.set("country", "EG");
-  fb.searchParams.set("limit", "20");
-  res = await fetch(fb.toString());
-}
+  const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=eg&accept-language=ar&q=" + encodeURIComponent(query);
+const res = await fetch(url);
   if (!res.ok) return null;
 
   const data = await res.json();
