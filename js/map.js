@@ -1,340 +1,257 @@
-import { debounce } from "./utils.js";
+// map.js (fixed & hardened for GitHub Pages / mobile browsers)
+// Leaflet helpers + routing + geocoding (Nominatim with fallback)
 
-let userLat = null;
-let userLon = null;
-let userGov = null;
-let userCenter = null; // new
+let routeLayer = null;
+let myLocMarker = null;
 
-export function createMap(mapElId, options = {}) {
-  const map = L.map(mapElId, { zoomControl: true, preferCanvas: true })
-    .setView(options.center ?? [26.56, 31.70], options.zoom ?? 13);
+export function createMap(el, opts = {}) {
+  const {
+    center = [26.8206, 30.8025], // Egypt
+    zoom = 6,
+    maxZoom = 19
+  } = opts;
 
+  const map = L.map(el, { zoomControl: true }).setView(center, zoom);
+
+  // OSM tiles
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 19,
-  attribution: '© OpenStreetMap'
-}).addTo(map);
+    maxZoom,
+    attribution: '&copy; OpenStreetMap'
+  }).addTo(map);
+
   return map;
 }
 
 export function addMarker(map, latlng, opts = {}) {
-  const m = L.marker(latlng, { draggable: !!opts.draggable }).addTo(map);
+  const m = L.marker(latlng, opts).addTo(map);
   return m;
 }
 
-function normGov(s) {
-  return (s || "")
-    .toString()
-    .replace(/محافظة\s*/g, "")
-    .replace(/Governorate/gi, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-export async function geocodeNominatim(query, userLat, userLon) {
-  query = (query || "").trim();
-  if (!query) return [];
-
-  const lat = Number(userLat);
-  const lon = Number(userLon);
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return [];
-
-  // مربع بحث قريب (حوالي 15 كم)
-  const radiusKm = 30;
-  const dLat = radiusKm / 111;
-  const dLon = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
-
-  const left = lon - dLon;
-  const right = lon + dLon;
-  const top = lat + dLat;
-  const bottom = lat - dLat;
-
-  const url = new URL("https://nominatim.openstreetmap.org/search");
-  url.searchParams.set("format", "json");
-  const tries = buildQueryTries(query);
-url.searchParams.set("q", tries[0]);
-  url.searchParams.set("countrycodes", "eg");
-  url.searchParams.set("limit", "20");
-  url.searchParams.set("addressdetails", "1");
-
-  // ✅ أهم سطرين: يخليه يجيب القريب فقط
-  url.searchParams.set("viewbox", `${left},${top},${right},${bottom}`);
-url.searchParams.set("bounded", "1");
-  const res = await fetch(url.toString(), {
-    headers: { "Accept-Language": "ar" },
-  });
-  if (!res.ok) return [];
-
-  let data = await res.json();
-
-function toResults(arr) {
-  return (arr || [])
-    .map((x) => ({
-      display: x.display_name,
-      lat: Number(x.lat),
-      lon: Number(x.lon),
-    }))
-    .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-}
-
-let results = toResults(data);
-
-// ✅ لو مفيش نتائج جرّب صيغ تانية تلقائيًا
-if (results.length === 0) {
-  for (let i = 1; i < Math.min(tries.length, 5); i++) {
-    url.searchParams.set("q", tries[i]);
-    const r2 = await fetch(url.toString(), { headers: { "Accept-Language": "ar" } });
-    if (!r2.ok) continue;
-    const d2 = await r2.json();
-    results = toResults(d2);
-    if (results.length) break;
-  }
-}
-
-// ✅ فلترة وترتيب حسب القرب
-const maxKm = 80;
-results = results
-  .filter((x) => haversine(lat, lon, x.lat, x.lon) <= maxKm)
-  .sort((a, b) => haversine(lat, lon, a.lat, a.lon) - haversine(lat, lon, b.lat, b.lon));
-
-return results;
+export function drawRoute(map, geojsonLine, fit = true) {
+  // geojsonLine: { type:"LineString", coordinates:[[lon,lat],...] } OR GeoJSON Feature
+  if (routeLayer) {
+    map.removeLayer(routeLayer);
+    routeLayer = null;
   }
 
-function haversine(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const toRad = (d) => (d * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(a));
-}
-function buildQueryTries(q) {
-  const raw = String(q || "").trim();
-  const n = normalizeArabic(raw);
-  const noAl = n.replace(/\bال+/g, "").replace(/\s+/g, " ").trim();
+  const feature = geojsonLine.type === "Feature"
+    ? geojsonLine
+    : { type: "Feature", geometry: geojsonLine, properties: {} };
 
-  const tries = [];
-  const push = (s) => {
-    s = String(s || "").trim();
-    if (s && !tries.includes(s)) tries.push(s);
-  };
+  routeLayer = L.geoJSON(feature, {
+    style: { weight: 5, opacity: 0.9 }
+  }).addTo(map);
 
-  push(raw);
-  push(n);
-  push(noAl);
-
-  const parts = noAl.split(" ").filter(Boolean);
-  if (parts.length > 1) {
-    const longest = [...parts].sort((a, b) => b.length - a.length)[0];
-    push(longest);
+  if (fit) {
+    try {
+      map.fitBounds(routeLayer.getBounds(), { padding: [30, 30] });
+    } catch (_) {}
   }
 
-  if (noAl.length > 4) push(noAl.slice(0, noAl.length - 1));
-  if (noAl.length > 5) push(noAl.slice(0, noAl.length - 2));
-for (const v of smartVariants(raw)) push(v);
-  return tries;
+  return routeLayer;
 }
 
-function normalizeArabic(s) {
-  s = String(s || "").trim();
-  if (!s) return s;
-
-  return s
-    .replace(/[إأآا]/g, "ا")
-    .replace(/ى/g, "ي")
-    .replace(/ؤ/g, "و")
-    .replace(/ئ/g, "ي")
-    .replace(/ة/g, "ه")
-    .replace(/ـ/g, "")
-    .replace(/[\u064B-\u0652]/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-  function smartVariants(q) {
-  const base = normalizeArabic(q);
-  const noAl = base.replace(/\bال+/g, "").replace(/\s+/g, " ").trim();
-
-  // بدائل شائعة للحروف القريبة/المتشابهة
-  const variants = new Set([q, base, noAl]);
-
-  // تبديلات بسيطة (مش هتغطي كل حاجة، بس بتصلح كتير)
-  const swaps = [
-    [/ه/g, "ة"], [/ة/g, "ه"],
-    [/ي/g, "ى"], [/ى/g, "ي"],
-    [/ا/g, "أ"], [/ا/g, "إ"],
-    [/و/g, "ؤ"], [/ي/g, "ئ"],
-  ];
-
-  // جرّب تبديل واحد في كل مرة (خفيف ومفيد)
-  for (const [re, rep] of swaps) {
-    variants.add(noAl.replace(re, rep));
-  }
-
-  // لو كلمة طويلة، جرّب حذف حرف (يعالج غلطات typing بسيطة)
-  if (noAl.length >= 6) {
-    for (let i = 0; i < Math.min(3, noAl.length); i++) {
-      variants.add(noAl.slice(0, i) + noAl.slice(i + 1));
-    }
-  }
-
-  return [...variants].map(s => String(s).trim()).filter(Boolean);
-}
-export async function geocodeEG(query){
+export async function routeOSRM(from, to) {
+  // from/to: {lat, lon}
   const url =
-    "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=eg&q=" +
-    encodeURIComponent(query);
+    `https://router.project-osrm.org/route/v1/driving/` +
+    `${from.lon},${from.lat};${to.lon},${to.lat}` +
+    `?overview=full&geometries=geojson&steps=false`;
 
-  const res = await fetch(url, { headers: { "Accept-Language": "ar" }});
-  const data = await res.json();
-  if (!data?.length) return null;
-  return { lat: +data[0].lat, lon: +data[0].lon, display: data[0].display_name };
+  const r = await fetch(url, { method: "GET" });
+  if (!r.ok) throw new Error("OSRM route failed");
+  const j = await r.json();
+  const route = j?.routes?.[0];
+  if (!route?.geometry) throw new Error("OSRM route missing geometry");
+
+  return {
+    line: route.geometry,              // GeoJSON LineString
+    distanceMeters: route.distance,    // meters
+    durationSec: route.duration        // seconds
+  };
 }
 
-export function bindSearch(inputEl, resultsEl, onPick) {
-  const render = (items) => {
-    resultsEl.innerHTML = "";
-    if (!items.length) {
-      resultsEl.classList.add("hidden");
-      return;
-    }
-    for (const it of items) {
-      const div = document.createElement("div");
-      div.className = "search-item";
-      div.textContent = it.display;
-      div.onclick = () => {
-        resultsEl.classList.add("hidden");
-        resultsEl.innerHTML = "";
-        onPick(it);
-      };
-      resultsEl.appendChild(div);
-    }
-    resultsEl.classList.remove("hidden");
+export function locateOnce(map, onLoc, onErr) {
+  // Uses Leaflet locate
+  map.locate({ setView: false, watch: false, enableHighAccuracy: true, maxZoom: 18 });
+
+  const ok = (e) => {
+    map.off("locationfound", ok);
+    map.off("locationerror", bad);
+    onLoc?.({ lat: e.latitude, lon: e.longitude, accuracy: e.accuracy });
   };
 
-  const doSearch = debounce(async () => {
-    console.log("USER LOCATION:", userLat, userLon);
-    const items = await geocodeNominatim(inputEl.value, userLat, userLon);
-    render(items);
-  }, 350);
+  const bad = (e) => {
+    map.off("locationfound", ok);
+    map.off("locationerror", bad);
+    onErr?.(e);
+  };
 
-  inputEl.addEventListener("input", doSearch);
-  // اختيار أول نتيجة بالـ Enter
-  inputEl.addEventListener("keydown", async (e) => {
-    if (e.key !== "Enter") return;
-    e.preventDefault();
-    const items = await geocodeNominatim(inputEl.value, userLat, userLon);
-    if (items && items[0]) {
-      resultsEl.classList.add("hidden");
-      resultsEl.innerHTML = "";
-      onPick(items[0]);
-    }
-  });
-  inputEl.addEventListener("blur", () => setTimeout(() => resultsEl.classList.add("hidden"), 200));
+  map.on("locationfound", ok);
+  map.on("locationerror", bad);
 }
 
-export async function routeOSRM(p1, p2) {
-  const url = new URL(`https://router.project-osrm.org/route/v1/driving/${p1.lon},${p1.lat};${p2.lon},${p2.lat}`);
-  url.searchParams.set("overview", "full");
-  url.searchParams.set("geometries", "geojson");
-
-  const res = await fetch(url.toString());
-  if (!res.ok) throw new Error("فشل رسم المسار");
-  const data = await res.json();
-  if (!data.routes || !data.routes[0]) throw new Error("لا يوجد مسار");
-
-  const r = data.routes[0];
-  return { distanceMeters: r.distance, durationSec: r.duration, geojson: r.geometry };
-}
-
-export function drawRoute(map, geojson, layerRef) {
-  if (layerRef.current) {
-    map.removeLayer(layerRef.current);
-    layerRef.current = null;
-  }
-  const layer = L.geoJSON(geojson, { style: { weight: 5, opacity: 0.9 } }).addTo(map);
-  layerRef.current = layer;
-
-  const latlngs = [];
-  layer.eachLayer(l => {
-    if (l.getLatLngs) for (const pt of l.getLatLngs()) latlngs.push(pt);
-  });
-  if (latlngs.length) map.fitBounds(L.latLngBounds(latlngs).pad(0.15));
-}
-
-let myLocMarker = null;
-export function showMyLocation(map, loc) {
-  if (!loc) return;
-
+export function showMyLocation(map, loc, opts = {}) {
+  const { pan = true } = opts;
   const latlng = [loc.lat, loc.lon];
 
+  // simple circle marker to avoid any broken html/icon strings
   if (!myLocMarker) {
-   const myLocIcon = L.divIcon({
-  className: "gps-marker",
-  html: "<div class='gps-dot'></div>",
-  iconSize: [30, 30],
-  iconAnchor: [15, 15]
-});
-
-if (!myLocMarker) {
-  myLocMarker = L.marker(latlng, { icon: myLocIcon }).addTo(map);
-} else {
-  myLocMarker.setLatLng(latlng);
-}
-    
+    myLocMarker = L.circleMarker(latlng, {
+      radius: 8,
+      weight: 2,
+      opacity: 1,
+      fillOpacity: 0.9
+    }).addTo(map);
   } else {
     myLocMarker.setLatLng(latlng);
   }
+
+  if (pan) {
+    try { map.setView(latlng, Math.max(map.getZoom(), 15)); } catch (_) {}
+  }
+
+  return myLocMarker;
 }
 
-async function reverseGov(lat, lon) {
-  const url = new URL("https://nominatim.openstreetmap.org/reverse");
-  url.searchParams.set("format", "json");
-  url.searchParams.set("lat", lat);
-  url.searchParams.set("lon", lon);
-  url.searchParams.set("zoom", "10"); // مستوى محافظة
-  url.searchParams.set("addressdetails", "1");
+// ---------------------- Geocoding ----------------------
 
-  const url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=eg&accept-language=ar&q=" + encodeURIComponent(query);
-const res = await fetch(url);
-  if (!res.ok) return null;
-
-  const data = await res.json();
-  const a = data?.address || {};
-  return a.state || a.county || null; // غالباً state = المحافظة في مصر
+function withTimeout(ms = 8000) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), ms);
+  return { signal: ctrl.signal, done: () => clearTimeout(t) };
 }
 
-export function locateOnce(map, onLocated) {
-  if (!navigator.geolocation) return;
-  navigator.geolocation.getCurrentPosition(async (pos) => {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-
-    userLat = lat;
-    userLon = lon;
-
-    userGov = await reverseGov(lat, lon);   // ✅ هنا بنحفظ المحافظة
-    userCenter = await reverseCenter(lat, lon);
-    map.setView([lat, lon], 15);
-    onLocated?.({ lat, lon });
-  }, () => {}, { enableHighAccuracy: true, timeout: 8000 });
+async function fetchJson(url) {
+  const { signal, done } = withTimeout(9000);
+  try {
+    const r = await fetch(url, { method: "GET", signal, headers: { "Accept": "application/json" } });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } finally {
+    done();
+  }
 }
-async function reverseCenter(lat, lon) {
-  const url = new URL("https://nominatim.openstreetmap.org/reverse");
-  url.searchParams.set("format", "json");
-  url.searchParams.set("lat", lat);
-  url.searchParams.set("lon", lon);
-  url.searchParams.set("zoom", "10");
-  url.searchParams.set("addressdetails", "1");
 
-  const res = await fetch(url.toString(), {
-    headers: { "Accept-Language": "ar" }
-  });
+function normItem(it) {
+  // normalize to { title, lat, lon, raw }
+  const title =
+    it.display_name ||
+    it.name ||
+    it?.properties?.name ||
+    it?.properties?.street ||
+    "نتيجة";
 
-  if (!res.ok) return null;
+  const lat = Number(it.lat ?? it?.geometry?.coordinates?.[1]);
+  const lon = Number(it.lon ?? it?.geometry?.coordinates?.[0]);
 
-  const data = await res.json();
-  const a = data?.address || {};
+  return { title, lat, lon, raw: it };
+}
 
-  return a.state || a.county || a.region || null;
+export async function geocodeNominatim(q, limit = 5) {
+  const query = String(q || "").trim();
+  if (!query) return [];
+
+  // 1) Nominatim
+  const url1 =
+    `https://nominatim.openstreetmap.org/search?` +
+    `format=jsonv2&addressdetails=1&limit=${limit}&q=${encodeURIComponent(query)}`;
+
+  try {
+    const j = await fetchJson(url1);
+    if (Array.isArray(j)) return j.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+  } catch (e) {
+    // fall through to fallback
+  }
+
+  // 2) Fallback: Photon (Komoot) – usually CORS-friendly
+  const url2 =
+    `https://photon.komoot.io/api/?limit=${limit}&q=${encodeURIComponent(query)}`;
+
+  const j2 = await fetchJson(url2);
+  const feats = j2?.features || [];
+  return feats.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+}
+
+export async function geocodeEG(q, limit = 5) {
+  const query = String(q || "").trim();
+  if (!query) return [];
+
+  // Try Nominatim narrowed to Egypt first
+  const url1 =
+    `https://nominatim.openstreetmap.org/search?` +
+    `format=jsonv2&addressdetails=1&limit=${limit}` +
+    `&countrycodes=eg&q=${encodeURIComponent(query)}`;
+
+  try {
+    const j = await fetchJson(url1);
+    if (Array.isArray(j)) return j.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+  } catch (_) {}
+
+  // Fallback to photon with Egypt bias (not perfect but helps)
+  const url2 =
+    `https://photon.komoot.io/api/?limit=${limit}` +
+    `&q=${encodeURIComponent(query + " مصر")}`;
+
+  const j2 = await fetchJson(url2);
+  const feats = j2?.features || [];
+  return feats.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+}
+
+export function bindSearch(inputEl, resultsEl, onPick, opts = {}) {
+  const { minChars = 3, limit = 6, useEgypt = true } = opts;
+
+  let lastReq = 0;
+
+  async function runSearch() {
+    const q = (inputEl?.value || "").trim();
+    if (q.length < minChars) {
+      if (resultsEl) resultsEl.innerHTML = "";
+      return;
+    }
+
+    const reqId = ++lastReq;
+    try {
+      const items = useEgypt ? await geocodeEG(q, limit) : await geocodeNominatim(q, limit);
+      if (reqId !== lastReq) return;
+
+      if (!resultsEl) return;
+      resultsEl.innerHTML = "";
+
+      items.forEach((it) => {
+        const row = document.createElement("button");
+        row.type = "button";
+        row.className = "search-item";
+        row.textContent = it.title;
+        row.onclick = () => {
+          resultsEl.innerHTML = "";
+          inputEl.value = it.title;
+          onPick?.(it);
+        };
+        resultsEl.appendChild(row);
+      });
+    } catch (e) {
+      if (reqId !== lastReq) return;
+      console.error("SEARCH ERROR:", e);
+      if (resultsEl) resultsEl.innerHTML = "";
+      // let caller show toast if needed
+      throw e;
+    }
+  }
+
+  let t = null;
+  const onInput = () => {
+    clearTimeout(t);
+    t = setTimeout(runSearch, 350);
+  };
+
+  inputEl?.addEventListener("input", onInput);
+  inputEl?.addEventListener("change", runSearch);
+
+  // return unbind
+  return () => {
+    clearTimeout(t);
+    inputEl?.removeEventListener("input", onInput);
+    inputEl?.removeEventListener("change", runSearch);
+  };
 }
