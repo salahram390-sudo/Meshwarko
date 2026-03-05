@@ -850,7 +850,7 @@ if (ride.status === "accepted") {
 
 
       // Rating on completion (passenger)
-      if (ride.status === "completed" && !ride.passengerRating) {
+      if (ride.status === "completed" && !ride.passengerRating && !ride.archived) {
         renderStars(0);
         setText(rateHint, ""); 
         showRatingModal();
