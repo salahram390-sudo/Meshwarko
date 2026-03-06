@@ -169,7 +169,7 @@ function normItem(it) {
 }
 
 
-async function geocodeNominatim(q, limit = 8) {
+export async function geocodeNominatim(q, limit = 8) {
   q = (q || "").trim();
   if (!q) return [];
 
