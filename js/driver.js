@@ -576,10 +576,20 @@ console.log("ME role =", me.data()?.role);
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
   setDriverStatus("متصل");
 
-  locateOnce(map, (loc) => {
-  myLocation = loc;
-  showMyLocation(map, loc);
-});
+locateOnce(
+  map,
+  (loc) => {
+    myLocation = loc;
+    showMyLocation(map, loc);
+    map.setView([loc.lat, loc.lon], 16);
+    setDriverStatus("تم تحديد موقعك");
+  },
+  (err) => {
+    console.error("AUTO DRIVER LOCATE ERROR:", err);
+    setDriverStatus("تعذر تحديد الموقع تلقائيًا");
+  }
+);
+  
 let liveTimer = null;
 
 function startLiveDriverLocation() {
