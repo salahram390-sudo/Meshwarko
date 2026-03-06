@@ -198,16 +198,6 @@ export async function geocodeNominatim(q, limit = 5) {
     errs.push(e?.message || String(e));
   }
 
-  // 3) Fallback: maps.co (public geocoder proxy)
-  const url3 = `https://geocode.maps.co/search?q=${encodeURIComponent(query)}`;
-
-  try {
-    const j3 = await fetchJson(url3);
-    if (Array.isArray(j3)) return j3.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-  } catch (e) {
-    errs.push(e?.message || String(e));
-  }
-
   // Nothing worked: throw a helpful error message for UI
   throw new Error("SEARCH_FAILED: " + errs.slice(0, 3).join(" | "));
 }
