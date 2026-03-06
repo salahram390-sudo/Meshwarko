@@ -673,35 +673,39 @@ if (!authUid || ride.passengerId !== authUid) {
     setStatus("السائق وصل");
     if (ride.driverId) startDriverTracking(ride.driverId);
   } else if (ride.status === "completed") {
-    setText(routeMeta, "الرحلة انتهت ✅");
-    setStatus("الرحلة انتهت");
+  setText(routeMeta, "الرحلة انتهت ✅");
+  setStatus("الرحلة انتهت");
+  stopDriverTracking();
 
-    stopDriverTracking();
-
-    if (!ride.passengerRating) {
-      renderStars(0);
-      setText(rateHint, "");
-      showRatingModal();
-    } else {
-      if (currentRideDocUnsub) {
-        currentRideDocUnsub();
-        currentRideDocUnsub = null;
-      }
-      rideUiNone();
-      return;
-    }
-  } else if (ride.status === "canceled") {
-    setText(routeMeta, "تم إلغاء الطلب.");
-    setStatus("تم الإلغاء");
-
-    stopDriverTracking();
-
-    if (currentRideDocUnsub) {
-      currentRideDocUnsub();
-      currentRideDocUnsub = null;
-    }
-    rideUiNone();
+  if (!ride.passengerRating) {
+    renderStars(0);
+    setText(rateHint, "");
+    showRatingModal();
     return;
+  }
+
+  if (currentRideDocUnsub) {
+    currentRideDocUnsub();
+    currentRideDocUnsub = null;
+  }
+
+  cleanupRideState();
+  rideUiNone();
+  return;
+
+} else if (ride.status === "canceled") {
+  setText(routeMeta, "تم إلغاء الطلب.");
+  setStatus("تم الإلغاء");
+  stopDriverTracking();
+
+  if (currentRideDocUnsub) {
+    currentRideDocUnsub();
+    currentRideDocUnsub = null;
+  }
+
+  cleanupRideState();
+  rideUiNone();
+  return;
   }
   if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) {
     arrivedToastShownFor = currentRideId;
