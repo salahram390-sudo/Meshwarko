@@ -229,6 +229,8 @@ function watchPassengerEndRequest(rideId) {
   acceptedRideUnsub = onSnapshot(doc(db, "rides", rideId), (snap) => {
     if (!snap.exists()) return;
     const ride = snap.data();
+    selectedRideData = { ...ride, id: rideId };
+    refreshSelectedRideButtons(selectedRideData);
 
     if ((ride.status === "accepted" || ride.status === "arrived") && ride.passengerEndRequested === true) {
       btnComplete.disabled = false;
@@ -255,18 +257,38 @@ async function drawRideRoute(ride) {
   }
 }
 
+function refreshSelectedRideButtons(ride) {
+  const myUid = auth.currentUser?.uid || null;
+  const mine = ride?.driverId === myUid;
+  const status = String(ride?.status || "");
+  const canOffer = status === "requested" && !ride?.driverId;
+  const canAccept =
+    (status === "requested" && !ride?.driverId) ||
+    (status === "offered" && (!ride?.driverId || mine)) ||
+    (status === "accepted" && mine);
+  const canTrack = mine && (status === "accepted" || status === "arrived");
+  const canArrive = mine && status === "accepted";
+  const canComplete = mine && (status === "arrived" || ride?.passengerEndRequested === true);
+  const canCancel = mine && (status === "accepted" || status === "arrived" || status === "offered");
+
+  btnSendOffer.disabled = !canOffer;
+  btnAccept.disabled = !canAccept;
+  btnTrackToggle.disabled = !canTrack;
+  btnCancel.disabled = !canCancel;
+  btnArrived.disabled = !canArrive;
+  btnComplete.disabled = !canComplete;
+
+  if (!canTrack) {
+    trackingEnabled = false;
+    setTrackBtn();
+  }
+}
+
 async function selectRide(id, ride) {
   selectedRideId = id;
   selectedRideData = ride;
   syncOfferBtn();
-  btnSendOffer.disabled = false;
-  btnAccept.disabled = false;
-  btnTrackToggle.disabled = true;
-  btnComplete.disabled = true;
-  btnCancel.disabled = true;
-  btnArrived.disabled = true;
-  trackingEnabled = false;
-  setTrackBtn();
+  refreshSelectedRideButtons(ride);
 
   if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
   if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
@@ -499,9 +521,25 @@ btnAccept.addEventListener("click", async () => {
     const rideSnap = await getDoc(rideRef);
     if (!rideSnap.exists()) throw new Error("الطلب غير موجود");
     const liveRide = rideSnap.data();
+    const status = String(liveRide?.status || "");
+    const mine = liveRide?.driverId === myUser.uid;
+
     if (isRideExpired(liveRide) || liveRide.archived === true) throw new Error("الطلب منتهي");
     if (liveRide.driverId && liveRide.driverId !== myUser.uid) throw new Error("تم التقاط الطلب بواسطة سائق آخر");
-    if (!["requested", "offered", "accepted"].includes(liveRide.status)) throw new Error("الحالة الحالية لا تسمح بالقبول");
+
+    if (status === "accepted" && mine) {
+      selectedRideData = { ...liveRide, id: selectedRideId };
+      refreshSelectedRideButtons(selectedRideData);
+      await showAcceptedDetails(selectedRideId);
+      watchPassengerEndRequest(selectedRideId);
+      notify({ title: "الرحلة مقبولة بالفعل", body: "الطلب مسجل باسمك بالفعل.", tag: "ride-already-accepted" });
+      setDriverStatus("على الطريق");
+      return;
+    }
+
+    if (!["requested", "offered"].includes(status)) {
+      throw new Error(`لا يمكن قبول الطلب الآن لأن حالته الحالية هي: ${status || "غير معروفة"}`);
+    }
 
     await updateDoc(rideRef, {
       status: "accepted",
@@ -516,14 +554,20 @@ btnAccept.addEventListener("click", async () => {
       expiresAtMs: null,
     });
 
-    btnAccept.disabled = true;
-    btnSendOffer.disabled = true;
-    btnComplete.disabled = true;
-    btnCancel.disabled = false;
-    btnArrived.disabled = false;
-    btnTrackToggle.disabled = false;
-    trackingEnabled = false;
-    setTrackBtn();
+    selectedRideData = {
+      ...liveRide,
+      id: selectedRideId,
+      status: "accepted",
+      driverId: myUser.uid,
+      driverName: myUser.name || "",
+      driverPhone: myUser.phone || "",
+      driverVehicleType: myUser.vehicleType || "",
+      driverVehicleCode: myUser.vehicleCode || "",
+      price: liveRide.offerPrice || liveRide.price || 0,
+      expiresAt: null,
+      expiresAtMs: null,
+    };
+    refreshSelectedRideButtons(selectedRideData);
     startLiveTracking(selectedRideId);
     await showAcceptedDetails(selectedRideId);
     watchPassengerEndRequest(selectedRideId);
