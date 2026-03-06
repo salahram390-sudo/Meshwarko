@@ -606,13 +606,34 @@ async function handleRideSnapshot(rideSnap) {
   } else if (ride.status === "completed") {
     setText(routeMeta, "الرحلة انتهت ✅");
     setStatus("الرحلة انتهت");
+
     stopDriverTracking();
+
+    if (!ride.passengerRating) {
+      renderStars(0);
+      setText(rateHint, "");
+      showRatingModal();
+    } else {
+      if (currentRideDocUnsub) {
+        currentRideDocUnsub();
+        currentRideDocUnsub = null;
+      }
+      rideUiNone();
+      return;
+    }
   } else if (ride.status === "canceled") {
     setText(routeMeta, "تم إلغاء الطلب.");
     setStatus("تم الإلغاء");
-    stopDriverTracking();
-  }
 
+    stopDriverTracking();
+
+    if (currentRideDocUnsub) {
+      currentRideDocUnsub();
+      currentRideDocUnsub = null;
+    }
+    rideUiNone();
+    return;
+  }
   if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) {
     arrivedToastShownFor = currentRideId;
     notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
