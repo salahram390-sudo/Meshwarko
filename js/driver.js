@@ -272,39 +272,62 @@ async function showAcceptedDetails(rideId) {
 }
 
 function watchRidesForDriver() {
-  if (ridesUnsub) { ridesUnsub(); ridesUnsub = null; }
-  if (!myUser?.governorate || !myUser?.center) return;
+  if (ridesUnsub) {
+    ridesUnsub();
+    ridesUnsub = null;
+  }
 
-  const qArea = query(
+  if (!myUser?.governorate || !myUser?.center || !auth.currentUser?.uid) return;
+
+  const driverUid = auth.currentUser.uid;
+
+  const qOpen = query(
     collection(db, "rides"),
+    where("status", "==", "requested"),
+    where("driverId", "==", null),
     where("governorate", "==", myUser.governorate),
     where("center", "==", myUser.center)
   );
 
-  ridesUnsub = onSnapshot(qArea, (snap) => {
-    const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    const openRides = rows
-      .filter((r) => {
-        const activeStatus = ["requested", "offered", "accepted", "arrived"].includes(r.status);
-        const notExpired = !r.expiresAt?.toMillis || r.expiresAt.toMillis() > Date.now();
-        const matchVehicle = !myUser.vehicleType || !r.vehicleType || myUser.vehicleType === r.vehicleType;
-        const openForMe = r.status === "requested" || r.driverId === auth.currentUser.uid;
-        return activeStatus && notExpired && matchVehicle && openForMe;
-      })
-      .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
+  const qMine = query(
+    collection(db, "rides"),
+    where("driverId", "==", driverUid)
+  );
+
+  let openRows = [];
+  let mineRows = [];
+
+  const renderMerged = () => {
+    const mergedMap = new Map();
+
+    [...openRows, ...mineRows].forEach((r) => {
+      const notExpired = !r.expiresAt?.toMillis || r.expiresAt.toMillis() > Date.now();
+      const activeStatus = ["requested", "offered", "accepted", "arrived"].includes(r.status);
+      const notArchived = r.archived !== true;
+      const matchVehicle = !myUser.vehicleType || !r.vehicleType || myUser.vehicleType === r.vehicleType;
+
+      if (activeStatus && notExpired && notArchived && matchVehicle) {
+        mergedMap.set(r.id, r);
+      }
+    });
+
+    const rides = Array.from(mergedMap.values()).sort(
+      (a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0)
+    );
 
     ridesList.innerHTML = "";
-    if (!openRides.length) {
+
+    if (!rides.length) {
       ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
       return;
     }
 
-    openRides.forEach((r) => {
+    rides.forEach((r) => {
       const item = document.createElement("div");
       item.className = "list-item" + (selectedRideId === r.id ? " active" : "");
       item.innerHTML = `
         <div class="row-between">
-          <b>${r.status === "offered" && r.driverId === auth.currentUser.uid ? "عرضي" : "طلب"}</b>
+          <b>${r.driverId === driverUid ? "طلبي الحالي" : "طلب"}</b>
           <span class="muted small">${moneyEGP(r.offerPrice || r.price)}</span>
         </div>
         <div class="muted small">مركبة: ${escapeHtml(r.vehicleType || "-")}</div>
@@ -314,7 +337,35 @@ function watchRidesForDriver() {
       item.onclick = () => selectRide(r.id, r);
       ridesList.appendChild(item);
     });
-  });
+  };
+
+  const unsubOpen = onSnapshot(
+    qOpen,
+    (snap) => {
+      openRows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      renderMerged();
+    },
+    (err) => {
+      console.error("qOpen snapshot error:", err);
+      ridesList.innerHTML = `<div class="muted small">تعذر تحميل الطلبات المفتوحة.</div>`;
+    }
+  );
+
+  const unsubMine = onSnapshot(
+    qMine,
+    (snap) => {
+      mineRows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      renderMerged();
+    },
+    (err) => {
+      console.error("qMine snapshot error:", err);
+    }
+  );
+
+  ridesUnsub = () => {
+    try { unsubOpen(); } catch (_) {}
+    try { unsubMine(); } catch (_) {}
+  };
 }
 
 logoutBtn.addEventListener("click", async () => {
