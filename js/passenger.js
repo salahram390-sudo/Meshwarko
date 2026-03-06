@@ -546,7 +546,7 @@ function watchCurrentRide(userId) {
   currentRideListUnsub = onSnapshot(query(collection(db, "rides"), where("passengerId", "==", userId)), (snap) => {
     const docs = snap.docs
       .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((r) => ["requested", "offered", "accepted", "arrived", "completed"].includes(r.status))
+      .filter((r) => ["requested", "offered", "accepted", "arrived"].includes(r.status) && r.archived !== true)
       .sort((a, b) => {
         const at = a.createdAt?.toMillis?.() || 0;
         const bt = b.createdAt?.toMillis?.() || 0;
