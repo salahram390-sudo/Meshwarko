@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
-import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, geocodeEG, geocodeNominatim, bindSearch } from "./map.js";
+import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, geocodeEG, geocodeNominatim, bindSearch, createCarIcon, moveCarMarkerSmooth } from "./map.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
 console.log("passenger.js loaded ✅");
@@ -17,6 +17,7 @@ window.__db = db;
 let arrivedToastShownFor = null; // علشان ما تكررش الرسالة كل تحديث
 let myData = {};
 let driverMarker = null;
+let driverLastLoc = null;
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
@@ -476,13 +477,13 @@ function setDropoff(point) {
 }
 
 bindSearch(pickupText, pickupResults, (it) =>
-  setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || it.title || "" }),
-  { getBiasLocation: () => myLocation, countryCode: "eg" }
+  setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" }),
+  { getBiasLocation: () => myLocation }
 );
 
 bindSearch(dropText, dropResults, (it) =>
-  setDropoff({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || it.title || "" }),
-  { getBiasLocation: () => myLocation, countryCode: "eg" }
+  setDropoff({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" }),
+  { getBiasLocation: () => myLocation }
 );
 
 priceSlider.addEventListener("input", () => {
@@ -536,11 +537,14 @@ let driverRouteLayerRef = { current: null };
     const pos = [lat, lon];
 
     if (!driverMarker) {
-      driverMarker = L.marker(pos).addTo(map);
+      driverMarker = L.marker(pos, { icon: createCarIcon(0) }).addTo(map);
+    } else if (driverLastLoc) {
+      moveCarMarkerSmooth(driverMarker, driverLastLoc, { lat, lon }, 900);
     } else {
       driverMarker.setLatLng(pos);
     }
 
+    driverLastLoc = { lat, lon };
     map.panTo(pos);
 
     if (currentPickup) {
@@ -642,6 +646,8 @@ function rideUiNone() {
   btnTrack.style.display = "none";
   btnCall.style.display = "none";
   btnWhats.style.display = "none";
+  driverLastLoc = null;
+  if (driverMarker) { try { map.removeLayer(driverMarker); } catch (_) {} driverMarker = null; }
 
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
   setStatus("جاهز");

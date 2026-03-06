@@ -8,7 +8,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
-import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation } from "./map.js";
+import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, createCarIcon, moveCarMarkerSmooth } from "./map.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
 
@@ -55,8 +55,27 @@ let dropMarker = null;
 let geoWatchId = null;
 let trackingRideId = null;
 let trackingEnabled = false;
+let driverMapMarker = null;
+let driverLastLoc = null;
 
 function setDriverStatus(t){ setText(driverStatus, t); }
+
+function updateDriverOwnMarker(lat, lon, pan = false) {
+  const next = { lat: Number(lat), lon: Number(lon) };
+  if (!Number.isFinite(next.lat) || !Number.isFinite(next.lon)) return;
+
+  if (!driverMapMarker) {
+    driverMapMarker = L.marker([next.lat, next.lon], { icon: createCarIcon(0) }).addTo(map);
+  } else if (driverLastLoc) {
+    moveCarMarkerSmooth(driverMapMarker, driverLastLoc, next, 900);
+  } else {
+    driverMapMarker.setLatLng([next.lat, next.lon]);
+  }
+
+  driverLastLoc = next;
+  showMyLocation(map, next, { pan: false });
+  if (pan) map.panTo([next.lat, next.lon]);
+}
 
 logoutBtn.addEventListener("click", async () => {
   stopLiveTracking();
@@ -66,22 +85,7 @@ logoutBtn.addEventListener("click", async () => {
 
 switchRoleBtn.addEventListener("click", () => { location.href = "./passenger.html"; });
 
-btnLocate.addEventListener("click", () => {
-  locateOnce(
-    map,
-    (loc) => {
-      myLocation = loc;
-      showMyLocation(map, loc);
-      map.setView([loc.lat, loc.lon], 16);
-      setDriverStatus("تم تحديد موقعك");
-    },
-    (err) => {
-      console.error("DRIVER LOCATE ERROR:", err);
-      setDriverStatus("تعذر تحديد الموقع");
-      notify({ title: "الموقع", body: "فعّل إذن الموقع ثم حاول مرة أخرى" });
-    }
-  );
-});
+btnLocate.addEventListener("click", () => { locateOnce(map, (loc) => { myLocation = loc; }); });
 
 btnClear.addEventListener("click", () => {
   stopLiveTracking();
@@ -121,7 +125,7 @@ function startLiveTracking(rideId) {
     if (!trackingRideId) return;
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
-    showMyLocation(map, myLocation, { pan: false });
+    myLocation = { lat, lon };
     try{
       await updateDoc(doc(db, "rides", trackingRideId), {
         driverLoc: { lat, lon },
@@ -576,20 +580,10 @@ console.log("ME role =", me.data()?.role);
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
   setDriverStatus("متصل");
 
-locateOnce(
-  map,
-  (loc) => {
-    myLocation = loc;
-    showMyLocation(map, loc);
-    map.setView([loc.lat, loc.lon], 16);
-    setDriverStatus("تم تحديد موقعك");
-  },
-  (err) => {
-    console.error("AUTO DRIVER LOCATE ERROR:", err);
-    setDriverStatus("تعذر تحديد الموقع تلقائيًا");
-  }
-);
-  
+  locateOnce(map, (loc) => {
+  myLocation = loc;
+  showMyLocation(map, loc, { pan: true });
+});
 let liveTimer = null;
 
 function startLiveDriverLocation() {
@@ -607,6 +601,9 @@ function startLiveDriverLocation() {
       const lat = pos.coords.latitude;
       const lon = pos.coords.longitude;
 
+      myLocation = { lat, lon };
+      updateDriverOwnMarker(lat, lon, false);
+
       await setDoc(ref, {
         uid: u.uid,
         name: myUser.name || "",
@@ -622,7 +619,7 @@ function startLiveDriverLocation() {
   };
 
   push();
-  liveTimer = setInterval(push, 4000);
+  liveTimer = setInterval(push, 2000);
 }
   startLiveDriverLocation();
   // watch available rides

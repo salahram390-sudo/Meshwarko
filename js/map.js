@@ -6,6 +6,7 @@
 
 let routeLayer = null;
 let myLocMarker = null;
+let myLocPulse = null;
 
 const DEFAULT_TIMEOUT_MS = 12000;
 const EGYPT_BOUNDS = {
@@ -93,6 +94,78 @@ function normalizeItem(raw, fallbackTitle = 'نتيجة') {
     lon,
     raw,
   };
+}
+
+
+function bearingDeg(fromLat, fromLon, toLat, toLon) {
+  const toRad = (x) => x * Math.PI / 180;
+  const toDeg = (x) => x * 180 / Math.PI;
+  const φ1 = toRad(fromLat), φ2 = toRad(toLat);
+  const Δλ = toRad(toLon - fromLon);
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1) * Math.sin(φ2) - Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+  let θ = toDeg(Math.atan2(y, x));
+  if (θ < 0) θ += 360;
+  return θ;
+}
+
+function myLocationIconHTML() {
+  return `
+    <div class="mw-my-loc-wrap">
+      <div class="mw-my-loc-pulse"></div>
+      <div class="mw-my-loc-pin">📍</div>
+    </div>
+  `;
+}
+
+function ensureSharedMapStyles() {
+  if (document.getElementById('mw-map-shared-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'mw-map-shared-styles';
+  style.textContent = `
+    .mw-my-loc-wrap{position:relative;width:42px;height:42px;display:flex;align-items:center;justify-content:center;}
+    .mw-my-loc-pulse{position:absolute;inset:8px;border-radius:999px;background:rgba(59,130,246,.22);animation:mwPulse 1.8s ease-out infinite;}
+    .mw-my-loc-pin{position:relative;z-index:2;width:42px;height:42px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:24px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.35));}
+    .mw-car-wrap{width:40px;height:40px;display:flex;align-items:center;justify-content:center;transition:transform .25s linear;will-change:transform;}
+    .mw-car-body{width:34px;height:34px;border-radius:999px;background:#111827;border:2px solid #facc15;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.35);font-size:18px;}
+    @keyframes mwPulse{0%{transform:scale(.6);opacity:.8}100%{transform:scale(1.65);opacity:0}}
+  `;
+  document.head.appendChild(style);
+}
+
+export function createCarIcon(headingDeg = 0) {
+  ensureSharedMapStyles();
+  return L.divIcon({
+    className: 'mw-car-icon',
+    html: `<div class="mw-car-wrap" style="transform:rotate(${headingDeg}deg)"><div class="mw-car-body">🚕</div></div>`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+  });
+}
+
+export function updateMarkerHeading(marker, headingDeg = 0) {
+  const el = marker?.getElement?.();
+  const body = el?.querySelector?.('.mw-car-wrap');
+  if (body) body.style.transform = `rotate(${headingDeg}deg)`;
+}
+
+export function animateMarkerTo(marker, from, to, ms = 900) {
+  if (!marker || !from || !to) return;
+  const start = performance.now();
+  function step(t) {
+    const p = Math.min(1, (t - start) / ms);
+    const lat = from.lat + (to.lat - from.lat) * p;
+    const lon = from.lon + (to.lon - from.lon) * p;
+    marker.setLatLng([lat, lon]);
+    if (p < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+export function moveCarMarkerSmooth(marker, from, to, ms = 900) {
+  const heading = bearingDeg(from.lat, from.lon, to.lat, to.lon);
+  updateMarkerHeading(marker, heading);
+  animateMarkerTo(marker, from, to, ms);
 }
 
 export function createMap(el, opts = {}) {
@@ -189,11 +262,20 @@ export function locateOnce(map, onLoc, onErr) {
 }
 
 export function showMyLocation(map, loc, opts = {}) {
+  ensureSharedMapStyles();
   const { pan = false } = opts;
   const latlng = [loc.lat, loc.lon];
 
   if (!myLocMarker) {
-    myLocMarker = L.marker(latlng).addTo(map);
+    myLocMarker = L.marker(latlng, {
+      icon: L.divIcon({
+        className: 'mw-my-loc-icon',
+        html: myLocationIconHTML(),
+        iconSize: [42, 42],
+        iconAnchor: [21, 21],
+      }),
+      zIndexOffset: 1000,
+    }).addTo(map);
   } else {
     myLocMarker.setLatLng(latlng);
   }
