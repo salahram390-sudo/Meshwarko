@@ -101,7 +101,7 @@ navigator.geolocation.getCurrentPosition(
     myLocation = { lat, lon };
     console.log("USER LOCATION OK:", myLocation);
 
-    map.setView([lat, lon], 15);
+    showMyLocation(map, myLocation, { pan: true });
   },
   (err) => {
     console.log("LOCATION ERROR:", err.code, err.message, err);
@@ -440,6 +440,18 @@ function clearAll() {
 
 async function updateRouteIfReady() {
   if (!pickup || !dropoff) return;
+
+  const nearEnough =
+    Math.abs(Number(pickup.lat) - Number(dropoff.lat)) < 0.00035 &&
+    Math.abs(Number(pickup.lon) - Number(dropoff.lon)) < 0.00035;
+
+  if (nearEnough) {
+    setStatus("قريب جداً");
+    setText(routeMeta, "مكان القيام والوصول قريبان جداً. اختر نقطتين أبعد قليلاً.");
+    setText(distanceValue, "مسافة قصيرة جداً");
+    return;
+  }
+
   setStatus("يرسم المسار...");
   try {
     const r = await routeOSRM({ lat: pickup.lat, lon: pickup.lon }, { lat: dropoff.lat, lon: dropoff.lon });
@@ -494,7 +506,10 @@ priceSlider.addEventListener("input", () => {
 btnClear.addEventListener("click", clearAll);
 
 btnLocate.addEventListener("click", () => {
-  locateOnce(map, (loc) => { myLocation = loc; });
+  locateOnce(map, (loc) => {
+    myLocation = loc;
+    showMyLocation(map, loc, { pan: true });
+  });
 });
 
 let pickMode = null;

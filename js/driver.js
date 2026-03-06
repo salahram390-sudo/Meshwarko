@@ -85,7 +85,13 @@ logoutBtn.addEventListener("click", async () => {
 
 switchRoleBtn.addEventListener("click", () => { location.href = "./passenger.html"; });
 
-btnLocate.addEventListener("click", () => { locateOnce(map, (loc) => { myLocation = loc; }); });
+btnLocate.addEventListener("click", () => {
+  locateOnce(map, (loc) => {
+    myLocation = loc;
+    showMyLocation(map, loc, { pan: true });
+    updateDriverOwnMarker(loc.lat, loc.lon, true);
+  });
+});
 
 btnClear.addEventListener("click", () => {
   stopLiveTracking();
@@ -518,7 +524,13 @@ btnCancel.addEventListener("click", async () => {
     btnComplete.disabled = true;
     btnCancel.disabled = true;
     btnTrackToggle.disabled = true;
-    btnArrived.disabled = true; 
+    btnArrived.disabled = true;
+    selectedRideId = null;
+    selectedRideData = null;
+    selectedRideEl.innerHTML = `<div class="muted">تم إلغاء الطلب.</div>`;
+    if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} pickupMarker = null; }
+    if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} dropMarker = null; }
+    if (routeLayerRef.current) { try { map.removeLayer(routeLayerRef.current); } catch (_) {} routeLayerRef.current = null; }
     notify({ title: "تم إلغاء الطلب", body: "تم الإلغاء.", tag: "ride-cancel" });
   } catch { setDriverStatus("خطأ"); }
 });
