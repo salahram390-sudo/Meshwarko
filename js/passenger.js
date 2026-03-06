@@ -594,8 +594,11 @@ function startLiveDriversLayer({ governorate, center }) {
         driverMarkers.delete(uid);
       }
     }
-  });
-}
+  },
+  (err) => {
+    console.error("PASSENGER liveDrivers ERROR:", err);
+  }
+);
 
 async function initAdmin() {
   admin = await loadEgyptAdmin();
