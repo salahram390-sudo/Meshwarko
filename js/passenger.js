@@ -607,9 +607,9 @@ function watchCurrentRide(userId) {
       const ride = docs[0] || null;
 
       if (!ride) {
-  hardResetPassengerUI();
-  return;
-}
+        hardResetPassengerUI();
+        return;
+      }
 
       if (currentRideId === ride.id && currentRideDocUnsub) return;
 
@@ -620,7 +620,10 @@ function watchCurrentRide(userId) {
         currentRideDocUnsub = null;
       }
 
-      currentRideDocUnsub = onSnapshot(doc(db, "rides", currentRideId), handleRideSnapshot);
+      currentRideDocUnsub = onSnapshot(
+        doc(db, "rides", currentRideId),
+        handleRideSnapshot
+      );
     }
   );
 }
