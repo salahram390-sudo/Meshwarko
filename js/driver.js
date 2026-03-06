@@ -88,6 +88,11 @@ function clearRouteAndMarkers() {
 }
 
 function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
+  if (acceptedRideUnsub) {
+    acceptedRideUnsub();
+    acceptedRideUnsub = null;
+  }
+
   selectedRideId = null;
   selectedRideData = null;
   selectedRideEl.innerHTML = `<div class="muted">${escapeHtml(message)}</div>`;
