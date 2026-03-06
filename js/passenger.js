@@ -102,6 +102,41 @@ function showEl(el) {
   if (el) el.style.display = "";
 }
 
+function clearSearchResults(container) {
+  if (!container) return;
+  container.innerHTML = "";
+  container.classList.add("hidden");
+}
+
+function showSearchResults(container) {
+  if (!container) return;
+  container.classList.remove("hidden");
+}
+
+function clearAllSearchResults() {
+  clearSearchResults(pickupResults);
+  clearSearchResults(dropResults);
+}
+
+function setupSearchResultsAutoHide(inputEl, resultsEl) {
+  if (!inputEl || !resultsEl) return;
+
+  inputEl.addEventListener("input", () => {
+    const hasText = (inputEl.value || "").trim().length > 0;
+    if (!hasText) {
+      clearSearchResults(resultsEl);
+      return;
+    }
+    showSearchResults(resultsEl);
+  });
+
+  inputEl.addEventListener("blur", () => {
+    window.setTimeout(() => {
+      if (!resultsEl.matches(":hover")) clearSearchResults(resultsEl);
+    }, 180);
+  });
+}
+
 function resetActionVisibility() {
   showEl(btnAcceptOffer);
   showEl(btnRejectOffer);
@@ -388,6 +423,7 @@ async function reverseNameEG(lat, lon) {
 function setPickup(point) {
   pickup = point;
   pickupText.value = point.text || point.display || "";
+  clearSearchResults(pickupResults);
   if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
   pickupMarker = addMarker(map, [point.lat, point.lon], { icon: createPickupIcon() });
   updateRouteIfReady();
@@ -396,6 +432,7 @@ function setPickup(point) {
 function setDropoff(point) {
   dropoff = point;
   dropText.value = point.text || point.display || "";
+  clearSearchResults(dropResults);
   if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
   dropMarker = addMarker(map, [point.lat, point.lon], { icon: createDropoffIcon() });
   updateRouteIfReady();
@@ -417,6 +454,7 @@ async function manualSearch(type) {
   }
 
   try {
+    clearSearchResults(isPickup ? pickupResults : dropResults);
     const items = await geocodeNominatim(q, 8, myLocation);
     const it = items?.[0];
     if (!it) {
@@ -836,6 +874,18 @@ bindSearch(pickupText, pickupResults, (it) => {
 bindSearch(dropText, dropResults, (it) => {
   setDropoff({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" });
 }, { getBiasLocation: () => myLocation });
+
+setupSearchResultsAutoHide(pickupText, pickupResults);
+setupSearchResultsAutoHide(dropText, dropResults);
+
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  const insidePickup = pickupText?.contains(target) || pickupResults?.contains(target) || pickupSearchBtn?.contains(target) || pickupPick?.contains(target) || pickupMyLoc?.contains(target);
+  const insideDrop = dropText?.contains(target) || dropResults?.contains(target) || dropSearchBtn?.contains(target) || dropPick?.contains(target);
+
+  if (!insidePickup) clearSearchResults(pickupResults);
+  if (!insideDrop) clearSearchResults(dropResults);
+});
 
 priceSlider.addEventListener("input", () => {
   priceSlider.dataset.touched = "1";
