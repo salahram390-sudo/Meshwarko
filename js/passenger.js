@@ -86,6 +86,24 @@ const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
 const driverRouteLayerRef = { current: null };
 
+pickupSearchBtn?.addEventListener("click", () => manualSearch("pickup"));
+dropSearchBtn?.addEventListener("click", () => manualSearch("dropoff"));
+
+btnClear?.addEventListener("click", () => {
+  if (currentRideId) return;
+  clearAll();
+  setStatus("جاهز");
+});
+
+logoutBtn?.addEventListener("click", async () => {
+  stopLiveDrivers();
+  stopDriverTracking();
+  if (currentRideListUnsub) { currentRideListUnsub(); currentRideListUnsub = null; }
+  if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
+  await signOut(auth);
+  location.href = "./index.html";
+});
+
 function setStatus(text) {
   setText(rideStatus, text);
 }
@@ -226,12 +244,17 @@ function clearAll() {
 }
 
 function cleanupRideState() {
+  if (currentRideDocUnsub) {
+    currentRideDocUnsub();
+    currentRideDocUnsub = null;
+  }
   currentRideId = null;
   currentPickup = null;
   arrivedToastShownFor = null;
   stopDriverTracking();
   setDriverContactButtons(null);
   resetActionVisibility();
+  hideRatingModal();
 }
 
 function rideUiNone() {
@@ -586,6 +609,10 @@ async function handleRideSnapshot(rideSnap) {
     return;
   }
   const ride = rideSnap.data();
+  if (ride.archived === true && ride.status !== "completed") {
+    rideUiNone();
+    return;
+  }
   currentRideId = rideSnap.id;
   currentPickup = ride.pickup?.lat && ride.pickup?.lon ? { lat: Number(ride.pickup.lat), lon: Number(ride.pickup.lon) } : null;
 
@@ -666,9 +693,6 @@ async function handleRideSnapshot(rideSnap) {
 
 }
 
-pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
-dropSearchBtn.addEventListener("click", () => manualSearch("dropoff"));
-
 bindSearch(pickupText, pickupResults, (it) => {
   setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" });
 }, { getBiasLocation: () => myLocation });
@@ -681,8 +705,6 @@ priceSlider.addEventListener("input", () => {
   priceSlider.dataset.touched = "1";
   updatePriceUI();
 });
-
-btnClear.addEventListener("click", clearAll);
 
 btnLocate.addEventListener("click", () => {
   locateOnce(map, (loc) => {
@@ -723,13 +745,6 @@ map.on("click", (e) => {
   if (pickMode === "pickup") setPickup(point);
   else setDropoff(point);
   pickMode = null;
-});
-
-logoutBtn.addEventListener("click", async () => {
-  stopLiveDrivers();
-  stopDriverTracking();
-  await signOut(auth);
-  location.href = "./index.html";
 });
 
 btnRequest.addEventListener("click", async () => {
