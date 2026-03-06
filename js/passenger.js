@@ -888,11 +888,14 @@ btnComplete.addEventListener("click", async () => {
 
 rateSend?.addEventListener("click", async () => {
   if (!currentRideId) return;
+
   if (!ratingValue) {
     setText(rateHint, "اختر عدد نجوم أولاً.");
     return;
   }
+
   setText(rateHint, "جارٍ الإرسال...");
+
   try {
     await updateDoc(doc(db, "rides", currentRideId), {
       passengerRating: ratingValue,
@@ -900,23 +903,33 @@ rateSend?.addEventListener("click", async () => {
       ratedAt: serverTimestamp(),
       archived: true,
     });
+
     hideRatingModal();
 
-if (currentRideDocUnsub) {
-  currentRideDocUnsub();
-  currentRideDocUnsub = null;
-}
+    if (currentRideDocUnsub) {
+      currentRideDocUnsub();
+      currentRideDocUnsub = null;
+    }
 
-cleanupRideState();
-rideUiNone();
+    cleanupRideState();
+    rideUiNone();
 
-notify({ title: "تم إرسال التقييم", body: "شكراً لمشاركتك رأيك.", tag: "rated" });
+    notify({
+      title: "تم إرسال التقييم",
+      body: "شكراً لمشاركتك رأيك.",
+      tag: "rated"
+    });
+  } catch (e) {
+    console.error("RATE ERROR:", e);
+    setText(rateHint, "تعذر إرسال التقييم. جرّب مرة أخرى.");
   }
 });
 
 rateClose?.addEventListener("click", hideRatingModal);
 rateSkip?.addEventListener("click", hideRatingModal);
-rateModal?.addEventListener("click", (e) => { if (e.target === rateModal) hideRatingModal(); });
+rateModal?.addEventListener("click", (e) => {
+  if (e.target === rateModal) hideRatingModal();
+});
 starsRoot?.addEventListener("click", (e) => {
   const t = e.target;
   if (!t || !t.classList.contains("star")) return;
