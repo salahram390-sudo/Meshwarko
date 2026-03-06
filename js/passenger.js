@@ -236,6 +236,7 @@ function cleanupRideState() {
 
 function rideUiNone() {
   cleanupRideState();
+  clearAll(); // ✅ يمسح pickup / dropoff / route
   btnRequest.disabled = false;
   btnCancel.disabled = true;
   btnAcceptOffer.disabled = true;
@@ -252,7 +253,6 @@ function rideUiNone() {
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
   setStatus("جاهز");
 }
-
 async function reverseNameEG(lat, lon) {
   try {
     const url = new URL("https://nominatim.openstreetmap.org/reverse");
