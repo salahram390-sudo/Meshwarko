@@ -295,23 +295,7 @@ function hardResetPassengerUI() {
 }
 
 function rideUiNone() {
-  cleanupRideState();
-  clearAll();
-  btnRequest.disabled = false;
-  btnCancel.disabled = true;
-  btnAcceptOffer.disabled = true;
-  btnRejectOffer.disabled = true;
-  btnTrack.disabled = true;
-  btnComplete.disabled = true;
-  hideEl(btnAcceptOffer);
-  hideEl(btnRejectOffer);
-  hideEl(btnCancel);
-  hideEl(btnComplete);
-  hideEl(btnTrack);
-  hideEl(btnCall);
-  hideEl(btnWhats);
-  rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
-  setStatus("جاهز");
+  hardResetPassengerUI();
 }
 
 async function reverseNameEG(lat, lon) {
