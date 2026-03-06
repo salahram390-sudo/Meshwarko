@@ -46,6 +46,7 @@ const ACTIVE_RIDE_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
+switchRoleBtn?.addEventListener("click", openSwitchDriverModal);
 const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 const pGov = $("#pGov");
