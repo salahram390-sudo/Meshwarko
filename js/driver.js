@@ -66,7 +66,22 @@ logoutBtn.addEventListener("click", async () => {
 
 switchRoleBtn.addEventListener("click", () => { location.href = "./passenger.html"; });
 
-btnLocate.addEventListener("click", () => { locateOnce(map, (loc) => { myLocation = loc; }); });
+btnLocate.addEventListener("click", () => {
+  locateOnce(
+    map,
+    (loc) => {
+      myLocation = loc;
+      showMyLocation(map, loc);
+      map.setView([loc.lat, loc.lon], 16);
+      setDriverStatus("تم تحديد موقعك");
+    },
+    (err) => {
+      console.error("DRIVER LOCATE ERROR:", err);
+      setDriverStatus("تعذر تحديد الموقع");
+      notify({ title: "الموقع", body: "فعّل إذن الموقع ثم حاول مرة أخرى" });
+    }
+  );
+});
 
 btnClear.addEventListener("click", () => {
   stopLiveTracking();
