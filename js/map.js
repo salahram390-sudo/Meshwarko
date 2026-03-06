@@ -168,77 +168,54 @@ function normItem(it) {
   return { title, lat, lon, raw: it };
 }
 
-export async function geocodeNominatim(q, limit = 5) {
-  const query = String(q || "").trim();
-  if (!query) return [];
 
-  const errs = [];
+async function geocodeNominatim(q, limit = 8) {
+  q = (q || "").trim();
+  if (!q) return [];
+
+  // ✅ اجبار limit يبقى رقم صحيح (حتى لو اتبعت lat/lon بالغلط)
+  let lim = Number(limit);
+  if (!Number.isFinite(lim)) lim = 8;
+  lim = Math.max(1, Math.min(20, Math.round(lim)));
 
   // 1) Nominatim
-  const url1 =
-    `https://nominatim.openstreetmap.org/search?` +
-    `format=jsonv2&addressdetails=1&limit=${limit}&q=${encodeURIComponent(query)}`;
-
   try {
-    const j = await fetchJson(url1);
-    if (Array.isArray(j)) return j.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-  } catch (e) {
-    errs.push(e?.message || String(e));
-  }
+    const url = "https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1"
+      + `&limit=${encodeURIComponent(lim)}&q=${encodeURIComponent(q)}`;
 
-  // 2) Fallback: Photon (Komoot) – usually CORS-friendly
-  const url2 = `https://photon.komoot.io/api/?limit=${limit}&q=${encodeURIComponent(query)}`;
-
-  try {
-    const j2 = await fetchJson(url2);
-    const feats = j2?.features || [];
-    const out = feats.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-    if (out.length) return out;
-  } catch (e) {
-    errs.push(e?.message || String(e));
-  }
-
-  // Nothing worked: throw a helpful error message for UI
-  throw new Error("SEARCH_FAILED: " + errs.slice(0, 3).join(" | "));
-}
-
-export async function geocodeEG(q, limit = 5) {
-  const query = String(q || "").trim();
-  if (!query) return [];
-
-  // Try Nominatim narrowed to Egypt first
-  const url1 =
-    `https://nominatim.openstreetmap.org/search?` +
-    `format=jsonv2&addressdetails=1&limit=${limit}` +
-    `&countrycodes=eg&q=${encodeURIComponent(query)}`;
-
-  try {
-    const j = await fetchJson(url1);
-    if (Array.isArray(j)) return j.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-  } catch (_) {}
-
-  // Fallback to photon with Egypt bias (not perfect but helps)
-  const url2 =
-    `https://photon.komoot.io/api/?limit=${limit}` +
-    `&q=${encodeURIComponent(query + " مصر")}`;
-
-  const j2 = await fetchJson(url2);
-  const feats = j2?.features || [];
-  return feats.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-}
-
-export function bindSearch(inputEl, resultsEl, onPick, opts = {}) {
-  const { minChars = 3, limit = 6, useEgypt = true } = opts;
-
-  let lastReq = 0;
-
-  async function runSearch() {
-    const q = (inputEl?.value || "").trim();
-    if (q.length < minChars) {
-      if (resultsEl) resultsEl.innerHTML = "";
-      return;
+    const data = await fetchJson(url, { timeoutMs: 12000 });
+    if (Array.isArray(data) && data.length) {
+      return data.map(x => ({
+        lat: Number(x.lat),
+        lon: Number(x.lon),
+        text: x.display_name || q
+      })).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
     }
+  } catch (e) {
+    // كمل على Photon
+  }
 
+  // 2) Photon (fallback)
+  try {
+    const url = `https://photon.komoot.io/api/?limit=${encodeURIComponent(lim)}&q=${encodeURIComponent(q)}`;
+    const j = await fetchJson(url, { timeoutMs: 12000 });
+    const feats = j?.features || [];
+    if (feats.length) {
+      return feats.map(f => {
+        const c = f?.geometry?.coordinates;
+        const lon = Number(c?.[0]);
+        const lat = Number(c?.[1]);
+        const props = f?.properties || {};
+        const name = props.name || props.street || props.city || props.state || q;
+        return { lat, lon, text: name };
+      }).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+    }
+  } catch (e) {
+    // مفيش فوايد
+  }
+
+  return [];
+}
     const reqId = ++lastReq;
     try {
       const items = useEgypt ? await geocodeEG(q, limit) : await geocodeNominatim(q, limit);
