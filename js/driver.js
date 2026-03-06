@@ -121,7 +121,7 @@ function startLiveTracking(rideId) {
     if (!trackingRideId) return;
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
-    myLocation = { lat, lon };
+    showMyLocation(map, myLocation, { pan: false });
     try{
       await updateDoc(doc(db, "rides", trackingRideId), {
         driverLoc: { lat, lon },
