@@ -295,6 +295,8 @@ function hardResetPassengerUI() {
 }
 
 function rideUiNone() {
+  hardResetPassengerUI();
+}
   cleanupRideState();
   clearAll(); // ✅ يمسح pickup / dropoff / route
   btnRequest.disabled = false;
