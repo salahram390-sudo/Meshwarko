@@ -1,3 +1,4 @@
+
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
@@ -85,24 +86,7 @@ const rateHint = $("#rateHint");
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
 const driverRouteLayerRef = { current: null };
-
-pickupSearchBtn?.addEventListener("click", () => manualSearch("pickup"));
-dropSearchBtn?.addEventListener("click", () => manualSearch("dropoff"));
-
-btnClear?.addEventListener("click", () => {
-  if (currentRideId) return;
-  clearAll();
-  setStatus("جاهز");
-});
-
-logoutBtn?.addEventListener("click", async () => {
-  stopLiveDrivers();
-  stopDriverTracking();
-  if (currentRideListUnsub) { currentRideListUnsub(); currentRideListUnsub = null; }
-  if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
-  await signOut(auth);
-  location.href = "./index.html";
-});
+const driverMarkers = new Map();
 
 function setStatus(text) {
   setText(rideStatus, text);
@@ -229,8 +213,8 @@ function stopDriverTracking() {
 function clearAll() {
   pickup = null;
   dropoff = null;
-  pickupText.value = "";
-  dropText.value = "";
+  if (pickupText) pickupText.value = "";
+  if (dropText) dropText.value = "";
   if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
   if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
   pickupMarker = null;
@@ -244,22 +228,17 @@ function clearAll() {
 }
 
 function cleanupRideState() {
-  if (currentRideDocUnsub) {
-    currentRideDocUnsub();
-    currentRideDocUnsub = null;
-  }
   currentRideId = null;
   currentPickup = null;
   arrivedToastShownFor = null;
   stopDriverTracking();
   setDriverContactButtons(null);
   resetActionVisibility();
-  hideRatingModal();
 }
 
 function rideUiNone() {
   cleanupRideState();
-  clearAll(); // ✅ يمسح pickup / dropoff / route
+  clearAll();
   btnRequest.disabled = false;
   btnCancel.disabled = true;
   btnAcceptOffer.disabled = true;
@@ -276,6 +255,7 @@ function rideUiNone() {
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
   setStatus("جاهز");
 }
+
 async function reverseNameEG(lat, lon) {
   try {
     const url = new URL("https://nominatim.openstreetmap.org/reverse");
@@ -304,6 +284,7 @@ function setPickup(point) {
   pickupText.value = point.text || point.display || "";
   if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
   pickupMarker = addMarker(map, [point.lat, point.lon], { icon: createPickupIcon() });
+  map.setView([point.lat, point.lon], Math.max(map.getZoom(), 15));
   updateRouteIfReady();
 }
 
@@ -312,6 +293,7 @@ function setDropoff(point) {
   dropText.value = point.text || point.display || "";
   if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
   dropMarker = addMarker(map, [point.lat, point.lon], { icon: createDropoffIcon() });
+  map.setView([point.lat, point.lon], Math.max(map.getZoom(), 15));
   updateRouteIfReady();
 }
 
@@ -334,7 +316,6 @@ async function manualSearch(type) {
     const obj = { lat: Number(it.lat), lon: Number(it.lon), text: it.text || q };
     if (isPickup) setPickup(obj);
     else setDropoff(obj);
-    map.setView([obj.lat, obj.lon], Math.max(map.getZoom(), 15));
   } catch (e) {
     console.error("SEARCH ERROR:", e);
     alert("خطأ في البحث");
@@ -344,24 +325,12 @@ async function manualSearch(type) {
 async function updateRouteIfReady() {
   if (!pickup || !dropoff) return;
 
-  const latDiff = Math.abs(Number(pickup.lat) - Number(dropoff.lat));
-  const lonDiff = Math.abs(Number(pickup.lon) - Number(dropoff.lon));
-  const nearEnough = latDiff < 0.00035 && lonDiff < 0.00035;
-
   setStatus("يرسم المسار...");
   try {
-    let r;
-    if (nearEnough) {
-      r = await routeOSRM(
-        { lat: pickup.lat, lon: pickup.lon },
-        { lat: dropoff.lat, lon: dropoff.lon }
-      );
-    } else {
-      r = await routeOSRM(
-        { lat: pickup.lat, lon: pickup.lon },
-        { lat: dropoff.lat, lon: dropoff.lon }
-      );
-    }
+    const r = await routeOSRM(
+      { lat: pickup.lat, lon: pickup.lon },
+      { lat: dropoff.lat, lon: dropoff.lon }
+    );
 
     lastDistanceMeters = r.distanceMeters;
     lastDurationSec = r.durationSec;
@@ -369,7 +338,7 @@ async function updateRouteIfReady() {
     const km = (r.distanceMeters / 1000);
     const mins = Math.max(1, Math.round(r.durationSec / 60));
     setText(distanceValue, `${km.toFixed(1)} كم • ${mins} د`);
-    setText(routeMeta, nearEnough ? "المسافة قصيرة جداً وتم رسم خط مباشر." : "تم رسم المسار. عدّل السعر ثم أرسل الطلب.");
+    setText(routeMeta, r.isFallbackStraightLine ? "المسافة قصيرة جداً وتم رسم خط مباشر." : "تم رسم المسار. عدّل السعر ثم أرسل الطلب.");
     setStatus("جاهز");
     updatePriceUI();
   } catch (e) {
@@ -511,8 +480,6 @@ function stopLiveDrivers() {
   driverMarkers.clear();
 }
 
-const driverMarkers = new Map();
-
 function startLiveDriversLayer({ governorate, center }) {
   stopLiveDrivers();
   const q = query(collection(db, "driversOnline"), where("governorate", "==", governorate), where("center", "==", center));
@@ -626,25 +593,24 @@ async function handleRideSnapshot(rideSnap) {
     rideUiNone();
     return;
   }
+
   const ride = rideSnap.data();
   const authUid = auth.currentUser?.uid || null;
 
-// لو الرحلة ليست للحساب الحالي امسحها فورًا من الواجهة
-if (!authUid || ride.passengerId !== authUid) {
-  if (currentRideDocUnsub) {
-    currentRideDocUnsub();
-    currentRideDocUnsub = null;
-  }
-  cleanupRideState();
-  rideUiNone();
-  return;
-}
-  if (ride.archived === true && ride.status !== "completed") {
+  if (!authUid || ride.passengerId !== authUid) {
+    if (currentRideDocUnsub) {
+      currentRideDocUnsub();
+      currentRideDocUnsub = null;
+    }
+    cleanupRideState();
     rideUiNone();
     return;
   }
+
   currentRideId = rideSnap.id;
-  currentPickup = ride.pickup?.lat && ride.pickup?.lon ? { lat: Number(ride.pickup.lat), lon: Number(ride.pickup.lon) } : null;
+  currentPickup = ride.pickup?.lat && ride.pickup?.lon
+    ? { lat: Number(ride.pickup.lat), lon: Number(ride.pickup.lon) }
+    : null;
 
   updateRideActionVisibility(ride);
   btnRequest.disabled = true;
@@ -673,40 +639,40 @@ if (!authUid || ride.passengerId !== authUid) {
     setStatus("السائق وصل");
     if (ride.driverId) startDriverTracking(ride.driverId);
   } else if (ride.status === "completed") {
-  setText(routeMeta, "الرحلة انتهت ✅");
-  setStatus("الرحلة انتهت");
-  stopDriverTracking();
+    setText(routeMeta, "الرحلة انتهت ✅");
+    setStatus("الرحلة انتهت");
+    stopDriverTracking();
 
-  if (!ride.passengerRating) {
-    renderStars(0);
-    setText(rateHint, "");
-    showRatingModal();
+    if (!ride.passengerRating) {
+      renderStars(0);
+      setText(rateHint, "");
+      showRatingModal();
+      return;
+    }
+
+    if (currentRideDocUnsub) {
+      currentRideDocUnsub();
+      currentRideDocUnsub = null;
+    }
+
+    cleanupRideState();
+    rideUiNone();
+    return;
+  } else if (ride.status === "canceled") {
+    setText(routeMeta, "تم إلغاء الطلب.");
+    setStatus("تم الإلغاء");
+    stopDriverTracking();
+
+    if (currentRideDocUnsub) {
+      currentRideDocUnsub();
+      currentRideDocUnsub = null;
+    }
+
+    cleanupRideState();
+    rideUiNone();
     return;
   }
 
-  if (currentRideDocUnsub) {
-    currentRideDocUnsub();
-    currentRideDocUnsub = null;
-  }
-
-  cleanupRideState();
-  rideUiNone();
-  return;
-
-} else if (ride.status === "canceled") {
-  setText(routeMeta, "تم إلغاء الطلب.");
-  setStatus("تم الإلغاء");
-  stopDriverTracking();
-
-  if (currentRideDocUnsub) {
-    currentRideDocUnsub();
-    currentRideDocUnsub = null;
-  }
-
-  cleanupRideState();
-  rideUiNone();
-  return;
-  }
   if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) {
     arrivedToastShownFor = currentRideId;
     notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
@@ -724,8 +690,10 @@ if (!authUid || ride.passengerId !== authUid) {
   renderRideCard(ride, driverProfile);
   if (driverProfile) setDriverContactButtons(driverProfile.phone);
   else setDriverContactButtons(null);
-
 }
+
+pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
+dropSearchBtn.addEventListener("click", () => manualSearch("dropoff"));
 
 bindSearch(pickupText, pickupResults, (it) => {
   setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" });
@@ -739,6 +707,8 @@ priceSlider.addEventListener("input", () => {
   priceSlider.dataset.touched = "1";
   updatePriceUI();
 });
+
+btnClear.addEventListener("click", clearAll);
 
 btnLocate.addEventListener("click", () => {
   locateOnce(map, (loc) => {
@@ -781,6 +751,13 @@ map.on("click", (e) => {
   pickMode = null;
 });
 
+logoutBtn.addEventListener("click", async () => {
+  stopLiveDrivers();
+  stopDriverTracking();
+  await signOut(auth);
+  location.href = "./index.html";
+});
+
 btnRequest.addEventListener("click", async () => {
   const user = auth.currentUser;
   if (!user) return;
@@ -791,7 +768,6 @@ btnRequest.addEventListener("click", async () => {
     return;
   }
 
-  // منع أكثر من طلب مفتوح لنفس الراكب على الواجهة
   if (currentRideId) {
     notify({ title: "يوجد طلب نشط", body: "أنهِ الطلب الحالي أو ألغِه أولاً.", tag: "ride-exists" });
     return;
@@ -976,9 +952,7 @@ rateSend?.addEventListener("click", async () => {
 
 rateClose?.addEventListener("click", hideRatingModal);
 rateSkip?.addEventListener("click", hideRatingModal);
-rateModal?.addEventListener("click", (e) => {
-  if (e.target === rateModal) hideRatingModal();
-});
+rateModal?.addEventListener("click", (e) => { if (e.target === rateModal) hideRatingModal(); });
 starsRoot?.addEventListener("click", (e) => {
   const t = e.target;
   if (!t || !t.classList.contains("star")) return;

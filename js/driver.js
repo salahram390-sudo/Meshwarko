@@ -1,16 +1,17 @@
+
 import { auth, db } from "./firebase.js";
 console.log("driver.js loaded ✅");
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
   doc, getDoc, updateDoc, setDoc, deleteDoc,
   collection, onSnapshot, query, where,
-  serverTimestamp, Timestamp
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
-  createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
+  createPickupIcon, createDropoffIcon,
 } from "./map.js";
 import { loadEgyptAdmin } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
@@ -71,7 +72,7 @@ function syncOfferBtn() {
   btnSendOffer.disabled = !selectedRideId || !Number.isFinite(v) || v <= 0;
 }
 
-offerInput.addEventListener("input", syncOfferBtn);
+offerInput?.addEventListener("input", syncOfferBtn);
 
 function clearRouteAndMarkers() {
   try {
@@ -87,11 +88,6 @@ function clearRouteAndMarkers() {
 }
 
 function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
-  if (acceptedRideUnsub) {
-    acceptedRideUnsub();
-    acceptedRideUnsub = null;
-  }
-
   selectedRideId = null;
   selectedRideData = null;
   selectedRideEl.innerHTML = `<div class="muted">${escapeHtml(message)}</div>`;
@@ -102,14 +98,13 @@ function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   btnCancel.disabled = true;
   btnArrived.disabled = true;
   btnComplete.disabled = true;
-  offerInput.value = "";
+  if (offerInput) offerInput.value = "";
   stopLiveTracking();
 }
 
 function updateOwnDriverMarker(lat, lon, pan = false) {
   const next = { lat: Number(lat), lon: Number(lon) };
   if (![next.lat, next.lon].every(Number.isFinite)) return;
-
   liveDriverMarker = showMyLocation(map, next, { pan });
 }
 
@@ -201,7 +196,7 @@ function watchPassengerEndRequest(rideId) {
       btnComplete.disabled = false;
     }
 
-    if (ride.status === "completed" || ride.status === "canceled") {
+    if (ride.status === "completed" || ride.status === "canceled" || ride.archived === true) {
       if (acceptedRideUnsub) { acceptedRideUnsub(); acceptedRideUnsub = null; }
       resetSelectedRideUi(ride.status === "completed" ? "تم إنهاء الرحلة." : "تم إلغاء الرحلة.");
     }
@@ -286,10 +281,11 @@ function watchRidesForDriver() {
     const openRides = rows
       .filter((r) => {
         const activeStatus = ["requested", "offered", "accepted", "arrived"].includes(r.status);
+        const notArchived = r.archived !== true;
         const notExpired = !r.expiresAt?.toMillis || r.expiresAt.toMillis() > Date.now();
         const matchVehicle = !myUser.vehicleType || !r.vehicleType || myUser.vehicleType === r.vehicleType;
         const openForMe = r.status === "requested" || r.driverId === auth.currentUser.uid;
-        return activeStatus && notExpired && matchVehicle && openForMe;
+        return activeStatus && notArchived && notExpired && matchVehicle && openForMe;
       })
       .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
 
@@ -317,7 +313,7 @@ function watchRidesForDriver() {
   });
 }
 
-logoutBtn.addEventListener("click", async () => {
+logoutBtn?.addEventListener("click", async () => {
   stopLiveTracking();
   stopDriverHeartbeat();
   await cleanupDriverOnline();
@@ -325,9 +321,9 @@ logoutBtn.addEventListener("click", async () => {
   location.href = "./index.html";
 });
 
-switchRoleBtn.addEventListener("click", () => { location.href = "./passenger.html"; });
+switchRoleBtn?.addEventListener("click", () => { location.href = "./passenger.html"; });
 
-btnLocate.addEventListener("click", () => {
+btnLocate?.addEventListener("click", () => {
   locateOnce(map, (loc) => {
     myLocation = loc;
     updateOwnDriverMarker(loc.lat, loc.lon, true);
@@ -335,11 +331,11 @@ btnLocate.addEventListener("click", () => {
   });
 });
 
-btnClear.addEventListener("click", () => {
+btnClear?.addEventListener("click", () => {
   resetSelectedRideUi("لم يتم تحديد طلب.");
 });
 
-btnRefresh.addEventListener("click", () => {
+btnRefresh?.addEventListener("click", () => {
   subText.textContent = "تم التحديث.";
   setTimeout(() => { subText.textContent = "اختر طلب ثم اقبل أو اقترح سعر"; }, 900);
 });
@@ -356,7 +352,7 @@ btnTrackToggle?.addEventListener("click", () => {
 });
 setTrackBtn();
 
-btnSendOffer.addEventListener("click", async () => {
+btnSendOffer?.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
   const offer = clampPrice(offerInput.value);
   if (!offer) {
@@ -386,7 +382,7 @@ btnSendOffer.addEventListener("click", async () => {
   }
 });
 
-btnAccept.addEventListener("click", async () => {
+btnAccept?.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
   setDriverStatus("يقبل...");
   try {
@@ -419,7 +415,7 @@ btnAccept.addEventListener("click", async () => {
   }
 });
 
-btnArrived.addEventListener("click", async () => {
+btnArrived?.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("وصل لموقع الراكب");
   try {
@@ -436,7 +432,7 @@ btnArrived.addEventListener("click", async () => {
   }
 });
 
-btnComplete.addEventListener("click", async () => {
+btnComplete?.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("ينهي...");
   try {
@@ -459,7 +455,7 @@ btnComplete.addEventListener("click", async () => {
   }
 });
 
-btnCancel.addEventListener("click", async () => {
+btnCancel?.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("يلغي...");
   try {
@@ -482,7 +478,7 @@ btnCancel.addEventListener("click", async () => {
   }
 });
 
-editProfileBtn.addEventListener("click", async () => {
+editProfileBtn?.addEventListener("click", async () => {
   if (!admin || !myUser) return;
   const gov = prompt("المحافظة", myUser.governorate || "");
   if (!gov) return;

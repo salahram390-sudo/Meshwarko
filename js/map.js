@@ -1,3 +1,4 @@
+
 // map.js — stable map helpers for Meshwarko
 
 let routeLayer = null;
@@ -43,7 +44,7 @@ function myLocationIconHTML() {
 }
 
 function escapeHtml(str) {
-  return String(str ?? "").replace(/[&<>\"]/g, (m) => ({
+  return String(str ?? "").replace(/[&<>"]/g, (m) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -244,6 +245,7 @@ export async function routeOSRM(from, to) {
       line: geojson,
       distanceMeters: straightMeters,
       durationSec: Math.max(10, straightMeters / 3),
+      isFallbackStraightLine: true,
     };
   }
 
@@ -261,6 +263,7 @@ export async function routeOSRM(from, to) {
     line: route.geometry,
     distanceMeters: Number(route.distance || 0),
     durationSec: Number(route.duration || 0),
+    isFallbackStraightLine: false,
   };
 }
 
