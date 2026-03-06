@@ -242,7 +242,7 @@ async function manualSearch(type) {
   }
 
   try {
-    const items = await geocodeNominatim(q, myLocation?.lat, myLocation?.lon);
+    const items = await geocodeNominatim(q, 8);
 const it = items?.[0];
     if (!it) {
       alert("المكان غير موجود");
