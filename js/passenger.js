@@ -607,14 +607,9 @@ function watchCurrentRide(userId) {
       const ride = docs[0] || null;
 
       if (!ride) {
-        if (currentRideDocUnsub) {
-          currentRideDocUnsub();
-          currentRideDocUnsub = null;
-        }
-        currentRideId = null;
-        rideUiNone();
-        return;
-      }
+  hardResetPassengerUI();
+  return;
+}
 
       if (currentRideId === ride.id && currentRideDocUnsub) return;
 
