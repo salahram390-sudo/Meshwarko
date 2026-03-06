@@ -631,7 +631,7 @@ async function handleRideSnapshot(rideSnap) {
     return;
   }
 
-  // ✅ تجاهل أي snapshot قديم بعد تغيير currentRideId
+  // تجاهل أي snapshot قديم
   if (!currentRideId || rideSnap.id !== currentRideId) {
     return;
   }
@@ -639,21 +639,13 @@ async function handleRideSnapshot(rideSnap) {
   const ride = rideSnap.data();
   const authUid = auth.currentUser?.uid || null;
 
-  // ✅ أمان إضافي: الرحلة لازم تكون لنفس الراكب الحالي
-  if (!authUid || ride.passengerId !== authUid) {
-    hardResetPassengerUI();
-    return;
-  }
-
-  const authUid = auth.currentUser?.uid || null;
-
+  // أمان: لازم الرحلة تخص نفس المستخدم الحالي
   if (!authUid || ride.passengerId !== authUid) {
     if (currentRideDocUnsub) {
       currentRideDocUnsub();
       currentRideDocUnsub = null;
     }
-    cleanupRideState();
-    rideUiNone();
+    hardResetPassengerUI();
     return;
   }
 
@@ -663,6 +655,7 @@ async function handleRideSnapshot(rideSnap) {
     : null;
 
   updateRideActionVisibility(ride);
+
   btnRequest.disabled = true;
   btnCancel.disabled = !(ride.status === "requested" || ride.status === "offered");
   btnAcceptOffer.disabled = ride.status !== "offered";
@@ -705,8 +698,7 @@ async function handleRideSnapshot(rideSnap) {
       currentRideDocUnsub = null;
     }
 
-    cleanupRideState();
-    rideUiNone();
+    hardResetPassengerUI();
     return;
   } else if (ride.status === "canceled") {
     setText(routeMeta, "تم إلغاء الطلب.");
@@ -718,26 +710,31 @@ async function handleRideSnapshot(rideSnap) {
       currentRideDocUnsub = null;
     }
 
-    cleanupRideState();
-    rideUiNone();
+    hardResetPassengerUI();
     return;
   }
 
   if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) {
     arrivedToastShownFor = currentRideId;
-    notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
+    notify({
+      title: "السائق وصل",
+      body: "السائق وصل لمكان القيام ✅",
+      tag: "driver-arrived"
+    });
   }
 
-  const driverProfile = (ride.status === "accepted" || ride.status === "arrived" || ride.status === "completed")
-    ? {
-        name: ride.driverName || "",
-        phone: ride.driverPhone || "",
-        vehicleType: ride.driverVehicleType || ride.vehicleType || "",
-        vehicleCode: ride.driverVehicleCode || "",
-      }
-    : null;
+  const driverProfile =
+    (ride.status === "accepted" || ride.status === "arrived" || ride.status === "completed")
+      ? {
+          name: ride.driverName || "",
+          phone: ride.driverPhone || "",
+          vehicleType: ride.driverVehicleType || ride.vehicleType || "",
+          vehicleCode: ride.driverVehicleCode || "",
+        }
+      : null;
 
   renderRideCard(ride, driverProfile);
+
   if (driverProfile) setDriverContactButtons(driverProfile.phone);
   else setDriverContactButtons(null);
 }
