@@ -242,7 +242,7 @@ async function manualSearch(type) {
   }
 
   try {
-    const items = await geocodeNominatim(q, 8);
+    const items = await geocodeNominatim(q, 8, myLocation);
 const it = items?.[0];
     if (!it) {
       alert("المكان غير موجود");
@@ -476,11 +476,13 @@ function setDropoff(point) {
 }
 
 bindSearch(pickupText, pickupResults, (it) =>
-  setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" })
+  setPickup({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || it.title || "" }),
+  { getBiasLocation: () => myLocation, countryCode: "eg" }
 );
 
 bindSearch(dropText, dropResults, (it) =>
-  setDropoff({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || "" })
+  setDropoff({ lat: Number(it.lat), lon: Number(it.lon), text: it.display || it.text || it.title || "" }),
+  { getBiasLocation: () => myLocation, countryCode: "eg" }
 );
 
 priceSlider.addEventListener("input", () => {
