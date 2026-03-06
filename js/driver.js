@@ -282,12 +282,13 @@ function watchRidesForDriver() {
   const driverUid = auth.currentUser.uid;
 
   const qOpen = query(
-    collection(db, "rides"),
-    where("status", "==", "requested"),
-    where("driverId", "==", null),
-    where("governorate", "==", myUser.governorate),
-    where("center", "==", myUser.center)
-  );
+  collection(db, "rides"),
+  where("status", "==", "requested"),
+  where("driverId", "==", null),
+  where("archived", "==", false),
+  where("governorate", "==", myUser.governorate),
+  where("center", "==", myUser.center)
+);
 
   const qMine = query(
     collection(db, "rides"),
