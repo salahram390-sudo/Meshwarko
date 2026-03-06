@@ -110,14 +110,7 @@ function updateOwnDriverMarker(lat, lon, pan = false) {
   const next = { lat: Number(lat), lon: Number(lon) };
   if (![next.lat, next.lon].every(Number.isFinite)) return;
 
-  if (!liveDriverMarker) {
-    liveDriverMarker = showMyLocation(map, next, { pan });
-  } else {
-    showMyLocation(map, next, { pan });
-  }
-
-  if (!liveDriverLast) liveDriverLast = next;
-  else liveDriverLast = next;
+  liveDriverMarker = showMyLocation(map, next, { pan });
 }
 
 async function pushDriverOnline() {
