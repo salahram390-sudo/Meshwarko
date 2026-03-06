@@ -1080,6 +1080,7 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = "./index.html"; return; }
+  hardResetPassengerUI();
   await ensureNotificationPermission(true);
 
   const me = await getDoc(doc(db, "users", user.uid));
