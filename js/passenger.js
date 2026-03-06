@@ -901,11 +901,16 @@ rateSend?.addEventListener("click", async () => {
       archived: true,
     });
     hideRatingModal();
-    cleanupRideState();
-    rideUiNone();
-    notify({ title: "تم إرسال التقييم", body: "شكراً لمشاركتك رأيك.", tag: "rated" });
-  } catch {
-    setText(rateHint, "تعذر إرسال التقييم. جرّب مرة أخرى.");
+
+if (currentRideDocUnsub) {
+  currentRideDocUnsub();
+  currentRideDocUnsub = null;
+}
+
+cleanupRideState();
+rideUiNone();
+
+notify({ title: "تم إرسال التقييم", body: "شكراً لمشاركتك رأيك.", tag: "rated" });
   }
 });
 
