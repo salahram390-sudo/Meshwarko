@@ -223,6 +223,7 @@ function friendlyAuthError(err) {
   if (code.includes("auth/user-not-found")) return "لا يوجد حساب بهذا الإيميل.";
   if (code.includes("auth/email-already-in-use")) return "الإيميل مستخدم بالفعل.";
   if (code.includes("auth/weak-password")) return "الباسورد ضعيف (6 أحرف على الأقل).";
+  if (code.includes("permission-denied") || code.includes("insufficient-permission")) return "صلاحيات Firestore تمنع العملية. عدّل Rules ثم أعد المحاولة.";
   return "حدث خطأ. حاول مرة أخرى.";
 }
 

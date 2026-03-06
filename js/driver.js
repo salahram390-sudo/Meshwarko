@@ -7,7 +7,7 @@ import {
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, isActiveRideStatus, normalizeArabicDigits } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
   createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
@@ -61,9 +61,29 @@ function setTrackBtn() {
 }
 
 function clampPrice(v) {
-  const n = Number(String(v || "").replace(/[٠-٩]/g, (d) => "0123456789"["٠١٢٣٤٥٦٧٨٩".indexOf(d)]));
+  const n = Number(normalizeArabicDigits(v));
   if (!Number.isFinite(n)) return null;
   return Math.min(3000, Math.max(15, Math.round(n / 5) * 5));
+}
+
+function isRideVisibleForDriver(ride) {
+  if (!ride || !isActiveRideStatus(ride.status) || ride.archived === true) return false;
+  if (isRideExpired(ride)) return false;
+  if (ride.driverId && ride.driverId !== auth.currentUser?.uid) return false;
+  if (myUser?.vehicleType && ride.vehicleType && myUser.vehicleType !== ride.vehicleType) return false;
+  if (ride.status === "requested" && ride.driverId == null) {
+    const nearestId = ride.nearestDriverId || null;
+    const nearestIds = Array.isArray(ride.nearestDriverIds) ? ride.nearestDriverIds : [];
+    if (nearestId && nearestId !== auth.currentUser?.uid && nearestIds.length) {
+      return nearestIds.includes(auth.currentUser?.uid);
+    }
+  }
+  return true;
+}
+
+function getRideDistanceToMe(ride) {
+  if (!myLocation || !ride?.pickup) return Infinity;
+  return haversineMeters(myLocation, { lat: ride.pickup.lat, lon: ride.pickup.lon });
 }
 
 function syncOfferBtn() {
@@ -237,8 +257,8 @@ async function selectRide(id, ride) {
 
   if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
   if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
-  pickupMarker = addMarker(map, [ride.pickup.lat, ride.pickup.lon], { icon: createPickupIcon() });
-  dropMarker = addMarker(map, [ride.dropoff.lat, ride.dropoff.lon], { icon: createDropoffIcon() });
+  if (ride?.pickup?.lat != null && ride?.pickup?.lon != null) pickupMarker = addMarker(map, [ride.pickup.lat, ride.pickup.lon], { icon: createPickupIcon() });
+  if (ride?.dropoff?.lat != null && ride?.dropoff?.lon != null) dropMarker = addMarker(map, [ride.dropoff.lat, ride.dropoff.lon], { icon: createDropoffIcon() });
 
   selectedRideEl.innerHTML = `
     <div class="row-between"><b>السعر</b><span>${moneyEGP(ride.price)}</span></div>
@@ -302,19 +322,20 @@ function watchRidesForDriver() {
     const mergedMap = new Map();
 
     [...openRows, ...mineRows].forEach((r) => {
-      const notExpired = !r.expiresAt?.toMillis || r.expiresAt.toMillis() > Date.now();
-      const activeStatus = ["requested", "offered", "accepted", "arrived"].includes(r.status);
-      const notArchived = r.archived !== true;
-      const matchVehicle = !myUser.vehicleType || !r.vehicleType || myUser.vehicleType === r.vehicleType;
-
-      if (activeStatus && notExpired && notArchived && matchVehicle) {
+      if (isRideVisibleForDriver(r)) {
         mergedMap.set(r.id, r);
       }
     });
 
-    const rides = Array.from(mergedMap.values()).sort(
-      (a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0)
-    );
+    const rides = Array.from(mergedMap.values()).sort((a, b) => {
+      const aMine = a.driverId === driverUid ? 1 : 0;
+      const bMine = b.driverId === driverUid ? 1 : 0;
+      if (aMine !== bMine) return bMine - aMine;
+      const da = getRideDistanceToMe(a);
+      const db = getRideDistanceToMe(b);
+      if (Number.isFinite(da) || Number.isFinite(db)) return da - db;
+      return (b.createdAt?.toMillis?.() || b.createdAtMs || 0) - (a.createdAt?.toMillis?.() || a.createdAtMs || 0);
+    });
 
     ridesList.innerHTML = "";
 
@@ -334,6 +355,7 @@ function watchRidesForDriver() {
         <div class="muted small">مركبة: ${escapeHtml(r.vehicleType || "-")}</div>
         <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
         <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
+        <div class="muted small">${Number.isFinite(getRideDistanceToMe(r)) ? `يبعد عنك ${(getRideDistanceToMe(r)/1000).toFixed(1)} كم` : ""}</div>
       `;
       item.onclick = () => selectRide(r.id, r);
       ridesList.appendChild(item);
@@ -348,7 +370,8 @@ function watchRidesForDriver() {
     },
     (err) => {
       console.error("qOpen snapshot error:", err);
-      ridesList.innerHTML = `<div class="muted small">تعذر تحميل الطلبات المفتوحة.</div>`;
+      const isPermission = String(err?.code || err?.message || "").includes("permission");
+      ridesList.innerHTML = `<div class="muted small">${isPermission ? "Firestore Rules تمنع قراءة الطلبات." : "تعذر تحميل الطلبات المفتوحة."}</div>`;
     }
   );
 
@@ -418,7 +441,13 @@ btnSendOffer.addEventListener("click", async () => {
 
   setDriverStatus("يرسل عرض...");
   try {
-    await updateDoc(doc(db, "rides", selectedRideId), {
+    const rideRef = doc(db, "rides", selectedRideId);
+    const rideSnap = await getDoc(rideRef);
+    if (!rideSnap.exists()) throw new Error("الطلب غير موجود");
+    const liveRide = rideSnap.data();
+    if (!isRideVisibleForDriver(liveRide) || liveRide.status !== "requested") throw new Error("الطلب لم يعد متاحاً");
+
+    await updateDoc(rideRef, {
       status: "offered",
       driverId: myUser.uid,
       offerPrice: offer,
@@ -442,7 +471,15 @@ btnAccept.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
   setDriverStatus("يقبل...");
   try {
-    await updateDoc(doc(db, "rides", selectedRideId), {
+    const rideRef = doc(db, "rides", selectedRideId);
+    const rideSnap = await getDoc(rideRef);
+    if (!rideSnap.exists()) throw new Error("الطلب غير موجود");
+    const liveRide = rideSnap.data();
+    if (isRideExpired(liveRide) || liveRide.archived === true) throw new Error("الطلب منتهي");
+    if (liveRide.driverId && liveRide.driverId !== myUser.uid) throw new Error("تم التقاط الطلب بواسطة سائق آخر");
+    if (!["requested", "offered", "accepted"].includes(liveRide.status)) throw new Error("الحالة الحالية لا تسمح بالقبول");
+
+    await updateDoc(rideRef, {
       status: "accepted",
       driverId: myUser.uid,
       driverName: myUser.name || "",

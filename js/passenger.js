@@ -2,12 +2,12 @@ import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
   doc, getDoc, updateDoc,
-  collection, addDoc,
+  collection, addDoc, getDocs,
   onSnapshot, query, where,
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, timestampToMillis } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
   geocodeNominatim, bindSearch, createCarIcon, moveCarMarkerSmooth,
@@ -42,6 +42,7 @@ let lastDistanceMeters = null;
 let lastDurationSec = null;
 let rideWatcherToken = 0;
 const ACTIVE_RIDE_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes
+const DRIVER_ONLINE_MAX_AGE_MS = 2 * 60 * 1000;
 
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
@@ -176,6 +177,47 @@ function clampPrice(v) {
   const n = Number(v);
   if (!Number.isFinite(n)) return 15;
   return Math.min(3000, Math.max(15, Math.round(n / 5) * 5));
+}
+function canUseDriverOnlineRow(d) {
+  const lat = Number(d?.lat);
+  const lon = Number(d?.lon ?? d?.lng);
+  const lastSeenMs = Number(d?.lastSeenMs || 0);
+  if (![lat, lon].every(Number.isFinite)) return false;
+  if (!lastSeenMs) return false;
+  return Date.now() - lastSeenMs <= DRIVER_ONLINE_MAX_AGE_MS;
+}
+
+async function findNearestDriversMeta({ governorate, center, vehicleType, pickupPoint, limit = 8 }) {
+  try {
+    const snap = await getDocs(query(
+      collection(db, "driversOnline"),
+      where("governorate", "==", governorate),
+      where("center", "==", center)
+    ));
+
+    const rows = snap.docs
+      .map((d) => ({ uid: d.id, ...d.data() }))
+      .filter((d) => canUseDriverOnlineRow(d))
+      .filter((d) => !vehicleType || !d.vehicleType || d.vehicleType === vehicleType)
+      .map((d) => ({
+        uid: d.uid,
+        distanceToPickupM: Math.round(haversineMeters({ lat: d.lat, lon: d.lon }, pickupPoint)),
+        vehicleType: d.vehicleType || null,
+        lastSeenMs: Number(d.lastSeenMs || 0),
+      }))
+      .filter((d) => Number.isFinite(d.distanceToPickupM))
+      .sort((a, b) => a.distanceToPickupM - b.distanceToPickupM)
+      .slice(0, limit);
+
+    return {
+      nearestDriverId: rows[0]?.uid || null,
+      nearestDriverIds: rows.map((d) => d.uid),
+      nearestDrivers: rows,
+    };
+  } catch (e) {
+    console.warn("findNearestDriversMeta failed", e);
+    return { nearestDriverId: null, nearestDriverIds: [], nearestDrivers: [] };
+  }
 }
 
 function updatePriceUI() {
@@ -577,7 +619,7 @@ function startLiveDriversLayer({ governorate, center }) {
       const lon = Number(d.lon ?? d.lng);
       const lastSeenMs = Number(d.lastSeenMs || 0);
       if (![lat, lon].every(Number.isFinite)) return;
-      if (Date.now() - lastSeenMs > 2 * 60 * 1000) return;
+      if (Date.now() - lastSeenMs > DRIVER_ONLINE_MAX_AGE_MS) return;
       seen.add(uid);
       const prev = driverMarkers.get(uid);
       if (!prev) {
@@ -653,13 +695,11 @@ function watchCurrentRide(userId) {
       const docs = snap.docs
         .map((d) => ({ id: d.id, ...d.data() }))
         .filter((r) => {
-          const created = r.createdAt?.toMillis?.() || 0;
-          const age = created ? (now - created) : 0;
           return (
             r.passengerId === userId &&
             ["requested", "offered", "accepted", "arrived"].includes(r.status) &&
             r.archived !== true &&
-            age < ACTIVE_RIDE_MAX_AGE_MS
+            !isRideExpired(r, ACTIVE_RIDE_MAX_AGE_MS, now)
           );
         })
         .sort((a, b) => {
@@ -908,7 +948,12 @@ btnRequest.addEventListener("click", async () => {
     notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
   } catch (e) {
     console.error("ADD DOC ERROR:", e);
-    alert("FIRESTORE ERROR: " + (e?.message || e));
+    const msg = String(e?.message || e || "");
+    if (msg.includes("Missing or insufficient permissions") || msg.includes("permission-denied")) {
+      alert("Firestore Rules تمنع إنشاء الطلب. فعّل القراءة والكتابة للمستخدم المسجل دخول مؤقتاً ثم أعد المحاولة.");
+    } else {
+      alert("FIRESTORE ERROR: " + msg);
+    }
     setStatus("خطأ");
     setText(routeMeta, "تعذر إرسال الطلب. جرّب مرة أخرى.");
   }
