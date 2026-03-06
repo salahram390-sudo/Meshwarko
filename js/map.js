@@ -320,6 +320,42 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
   lim = clamp(Math.round(lim), 1, 20);
 
   const countryCode = String(options.countryCode || "eg").toLowerCase();
+
+  // 1) لو عندي موقع المستخدم: ابحث في صندوق صغير حوله فقط
+  if (biasLocation?.lat && biasLocation?.lon) {
+    const localUrl = new URL("https://nominatim.openstreetmap.org/search");
+    localUrl.searchParams.set("format", "jsonv2");
+    localUrl.searchParams.set("addressdetails", "1");
+    localUrl.searchParams.set("limit", String(lim));
+    localUrl.searchParams.set("accept-language", "ar");
+    localUrl.searchParams.set("countrycodes", countryCode);
+    localUrl.searchParams.set("q", q);
+
+    const dLon = 0.35;
+    const dLat = 0.25;
+
+    localUrl.searchParams.set(
+      "viewbox",
+      `${biasLocation.lon - dLon},${biasLocation.lat + dLat},${biasLocation.lon + dLon},${biasLocation.lat - dLat}`
+    );
+    localUrl.searchParams.set("bounded", "1");
+
+    try {
+      const localData = await fetchJson(localUrl.toString());
+      const localItems = (Array.isArray(localData) ? localData : [])
+        .map((x) => normalizeSearchItem(x, q))
+        .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+
+      if (localItems.length) {
+        localItems.sort(
+          (a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b)
+        );
+        return localItems;
+      }
+    } catch (_) {}
+  }
+
+  // 2) fallback داخل مصر كلها
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "jsonv2");
   url.searchParams.set("addressdetails", "1");
@@ -327,22 +363,11 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
   url.searchParams.set("accept-language", "ar");
   url.searchParams.set("countrycodes", countryCode);
   url.searchParams.set("q", q);
-
-  if (biasLocation?.lat && biasLocation?.lon) {
-    const dLon = 1.0;
-    const dLat = 0.8;
-    url.searchParams.set(
-      "viewbox",
-      `${biasLocation.lon - dLon},${biasLocation.lat + dLat},${biasLocation.lon + dLon},${biasLocation.lat - dLat}`
-    );
-    url.searchParams.set("bounded", "0");
-  } else {
-    url.searchParams.set(
-      "viewbox",
-      `${EGYPT_BOUNDS.minLon},${EGYPT_BOUNDS.maxLat},${EGYPT_BOUNDS.maxLon},${EGYPT_BOUNDS.minLat}`
-    );
-    url.searchParams.set("bounded", "0");
-  }
+  url.searchParams.set(
+    "viewbox",
+    `${EGYPT_BOUNDS.minLon},${EGYPT_BOUNDS.maxLat},${EGYPT_BOUNDS.maxLon},${EGYPT_BOUNDS.minLat}`
+  );
+  url.searchParams.set("bounded", "1");
 
   try {
     const data = await fetchJson(url.toString());
@@ -351,27 +376,14 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
       .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 
     if (biasLocation?.lat && biasLocation?.lon) {
-      items.sort((a, b) => haversineMeters(biasLocation, b) - haversineMeters(biasLocation, a));
+      items.sort(
+        (a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b)
+      );
     }
+
     return items;
   } catch (_) {
-    const p = new URL("https://photon.komoot.io/api/");
-    p.searchParams.set("limit", String(lim));
-    p.searchParams.set("q", q);
-    if (biasLocation?.lat && biasLocation?.lon) {
-      p.searchParams.set("lat", String(biasLocation.lat));
-      p.searchParams.set("lon", String(biasLocation.lon));
-    }
-
-    const j = await fetchJson(p.toString());
-    const items = (j?.features || [])
-      .map((f) => normalizeSearchItem(f, q))
-      .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-
-    if (biasLocation?.lat && biasLocation?.lon) {
-      items.sort((a, b) => haversineMeters(biasLocation, b) - haversineMeters(biasLocation, a));
-    }
-    return items;
+    return [];
   }
 }
 
