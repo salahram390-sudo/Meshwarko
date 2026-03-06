@@ -236,6 +236,64 @@ function cleanupRideState() {
   resetActionVisibility();
 }
 
+function hardResetPassengerUI() {
+  if (currentRideDocUnsub) {
+    currentRideDocUnsub();
+    currentRideDocUnsub = null;
+  }
+
+  currentRideId = null;
+  currentPickup = null;
+  arrivedToastShownFor = null;
+
+  stopDriverTracking();
+  stopLiveDrivers();
+
+  if (pickupMarker) {
+    try { map.removeLayer(pickupMarker); } catch (_) {}
+    pickupMarker = null;
+  }
+
+  if (dropMarker) {
+    try { map.removeLayer(dropMarker); } catch (_) {}
+    dropMarker = null;
+  }
+
+  removeRouteLayer(routeLayerRef);
+  removeRouteLayer(driverRouteLayerRef);
+
+  pickup = null;
+  dropoff = null;
+  lastDistanceMeters = null;
+  lastDurationSec = null;
+
+  if (pickupText) pickupText.value = "";
+  if (dropText) dropText.value = "";
+
+  setDriverContactButtons(null);
+
+  rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
+  setText(routeMeta, "اختر قيام/وصول لرسم المسار");
+  setText(distanceValue, "—");
+  setText(priceValue, "—");
+  setStatus("جاهز");
+
+  btnRequest.disabled = false;
+  btnCancel.disabled = true;
+  btnAcceptOffer.disabled = true;
+  btnRejectOffer.disabled = true;
+  btnTrack.disabled = true;
+  btnComplete.disabled = true;
+
+  hideEl(btnAcceptOffer);
+  hideEl(btnRejectOffer);
+  hideEl(btnCancel);
+  hideEl(btnComplete);
+  hideEl(btnTrack);
+  hideEl(btnCall);
+  hideEl(btnWhats);
+}
+
 function rideUiNone() {
   cleanupRideState();
   clearAll();
