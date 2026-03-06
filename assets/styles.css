@@ -1176,3 +1176,43 @@ body:before{
 .search-wrap {
   position: relative;
 }
+
+
+/* Meshwarko polish: clearer search dropdown and cards */
+.search-results {
+  position: relative;
+  margin-top: 8px;
+  border: 1px solid rgba(255,215,0,.18);
+  background: rgba(8,12,20,.96);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0,0,0,.38);
+  z-index: 50;
+}
+.search-results.hidden {
+  display: none !important;
+}
+.search-item {
+  width: 100%;
+  text-align: right;
+  color: #fff;
+  background: transparent;
+  border: 0;
+  padding: 13px 14px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+}
+.search-item:last-child {
+  border-bottom: none;
+}
+.search-item:hover,
+.search-item:active,
+.search-item:focus {
+  background: rgba(255,215,0,.08);
+  outline: none;
+}
+
+.ride-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
