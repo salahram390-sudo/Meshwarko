@@ -1,4 +1,3 @@
-
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
@@ -41,6 +40,8 @@ let ratingValue = 0;
 let pickMode = null;
 let lastDistanceMeters = null;
 let lastDurationSec = null;
+let rideWatcherToken = 0;
+const ACTIVE_RIDE_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes
 
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
@@ -86,7 +87,6 @@ const rateHint = $("#rateHint");
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
 const driverRouteLayerRef = { current: null };
-const driverMarkers = new Map();
 
 function setStatus(text) {
   setText(rideStatus, text);
@@ -213,8 +213,8 @@ function stopDriverTracking() {
 function clearAll() {
   pickup = null;
   dropoff = null;
-  if (pickupText) pickupText.value = "";
-  if (dropText) dropText.value = "";
+  pickupText.value = "";
+  dropText.value = "";
   if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
   if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
   pickupMarker = null;
@@ -236,55 +236,15 @@ function cleanupRideState() {
   resetActionVisibility();
 }
 
-function hardResetPassengerUI() {
-  if (currentRideDocUnsub) {
-    currentRideDocUnsub();
-    currentRideDocUnsub = null;
-  }
-
-  currentRideId = null;
-  currentPickup = null;
-  arrivedToastShownFor = null;
-
-  stopDriverTracking();
-  stopLiveDrivers();
-
-  if (pickupMarker) {
-    try { map.removeLayer(pickupMarker); } catch (_) {}
-    pickupMarker = null;
-  }
-
-  if (dropMarker) {
-    try { map.removeLayer(dropMarker); } catch (_) {}
-    dropMarker = null;
-  }
-
-  removeRouteLayer(routeLayerRef);
-  removeRouteLayer(driverRouteLayerRef);
-
-  pickup = null;
-  dropoff = null;
-  lastDistanceMeters = null;
-  lastDurationSec = null;
-
-  if (pickupText) pickupText.value = "";
-  if (dropText) dropText.value = "";
-
-  setDriverContactButtons(null);
-
-  rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
-  setText(routeMeta, "اختر قيام/وصول لرسم المسار");
-  setText(distanceValue, "—");
-  setText(priceValue, "—");
-  setStatus("جاهز");
-
+function rideUiNone() {
+  cleanupRideState();
+  clearAll(); // ✅ يمسح pickup / dropoff / route
   btnRequest.disabled = false;
   btnCancel.disabled = true;
   btnAcceptOffer.disabled = true;
   btnRejectOffer.disabled = true;
   btnTrack.disabled = true;
   btnComplete.disabled = true;
-
   hideEl(btnAcceptOffer);
   hideEl(btnRejectOffer);
   hideEl(btnCancel);
@@ -292,12 +252,9 @@ function hardResetPassengerUI() {
   hideEl(btnTrack);
   hideEl(btnCall);
   hideEl(btnWhats);
+  rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
+  setStatus("جاهز");
 }
-
-function rideUiNone() {
-  hardResetPassengerUI();
-}
-
 async function reverseNameEG(lat, lon) {
   try {
     const url = new URL("https://nominatim.openstreetmap.org/reverse");
@@ -326,7 +283,6 @@ function setPickup(point) {
   pickupText.value = point.text || point.display || "";
   if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
   pickupMarker = addMarker(map, [point.lat, point.lon], { icon: createPickupIcon() });
-  map.setView([point.lat, point.lon], Math.max(map.getZoom(), 15));
   updateRouteIfReady();
 }
 
@@ -335,7 +291,6 @@ function setDropoff(point) {
   dropText.value = point.text || point.display || "";
   if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
   dropMarker = addMarker(map, [point.lat, point.lon], { icon: createDropoffIcon() });
-  map.setView([point.lat, point.lon], Math.max(map.getZoom(), 15));
   updateRouteIfReady();
 }
 
@@ -358,6 +313,7 @@ async function manualSearch(type) {
     const obj = { lat: Number(it.lat), lon: Number(it.lon), text: it.text || q };
     if (isPickup) setPickup(obj);
     else setDropoff(obj);
+    map.setView([obj.lat, obj.lon], Math.max(map.getZoom(), 15));
   } catch (e) {
     console.error("SEARCH ERROR:", e);
     alert("خطأ في البحث");
@@ -367,12 +323,24 @@ async function manualSearch(type) {
 async function updateRouteIfReady() {
   if (!pickup || !dropoff) return;
 
+  const latDiff = Math.abs(Number(pickup.lat) - Number(dropoff.lat));
+  const lonDiff = Math.abs(Number(pickup.lon) - Number(dropoff.lon));
+  const nearEnough = latDiff < 0.00035 && lonDiff < 0.00035;
+
   setStatus("يرسم المسار...");
   try {
-    const r = await routeOSRM(
-      { lat: pickup.lat, lon: pickup.lon },
-      { lat: dropoff.lat, lon: dropoff.lon }
-    );
+    let r;
+    if (nearEnough) {
+      r = await routeOSRM(
+        { lat: pickup.lat, lon: pickup.lon },
+        { lat: dropoff.lat, lon: dropoff.lon }
+      );
+    } else {
+      r = await routeOSRM(
+        { lat: pickup.lat, lon: pickup.lon },
+        { lat: dropoff.lat, lon: dropoff.lon }
+      );
+    }
 
     lastDistanceMeters = r.distanceMeters;
     lastDurationSec = r.durationSec;
@@ -380,7 +348,7 @@ async function updateRouteIfReady() {
     const km = (r.distanceMeters / 1000);
     const mins = Math.max(1, Math.round(r.durationSec / 60));
     setText(distanceValue, `${km.toFixed(1)} كم • ${mins} د`);
-    setText(routeMeta, r.isFallbackStraightLine ? "المسافة قصيرة جداً وتم رسم خط مباشر." : "تم رسم المسار. عدّل السعر ثم أرسل الطلب.");
+    setText(routeMeta, nearEnough ? "المسافة قصيرة جداً وتم رسم خط مباشر." : "تم رسم المسار. عدّل السعر ثم أرسل الطلب.");
     setStatus("جاهز");
     updatePriceUI();
   } catch (e) {
@@ -522,6 +490,8 @@ function stopLiveDrivers() {
   driverMarkers.clear();
 }
 
+const driverMarkers = new Map();
+
 function startLiveDriversLayer({ governorate, center }) {
   stopLiveDrivers();
   const q = query(collection(db, "driversOnline"), where("governorate", "==", governorate), where("center", "==", center));
@@ -586,29 +556,36 @@ async function initAdmin() {
 }
 
 function watchCurrentRide(userId) {
-  if (currentRideListUnsub) currentRideListUnsub();
+  if (currentRideListUnsub) {
+    currentRideListUnsub();
+    currentRideListUnsub = null;
+  }
+  if (currentRideDocUnsub) {
+    currentRideDocUnsub();
+    currentRideDocUnsub = null;
+  }
+
+  const token = ++rideWatcherToken;
+  currentRideId = null;
 
   currentRideListUnsub = onSnapshot(
     query(collection(db, "rides"), where("passengerId", "==", userId)),
     (snap) => {
+      if (token !== rideWatcherToken) return;
+
+      const now = Date.now();
       const docs = snap.docs
         .map((d) => ({ id: d.id, ...d.data() }))
-        const now = Date.now();
-const MAX_AGE = 15 * 60 * 1000; // 15 دقيقة
-
-const docs = snap.docs
-  .map((d) => ({ id: d.id, ...d.data() }))
-  .filter((r) => {
-    const created = r.createdAt?.toMillis?.() || 0;
-    const age = now - created;
-
-    return (
-      r.passengerId === userId &&
-      ["requested", "offered", "accepted", "arrived"].includes(r.status) &&
-      r.archived !== true &&
-      age < MAX_AGE
-    );
-  })
+        .filter((r) => {
+          const created = r.createdAt?.toMillis?.() || 0;
+          const age = created ? (now - created) : 0;
+          return (
+            r.passengerId === userId &&
+            ["requested", "offered", "accepted", "arrived"].includes(r.status) &&
+            r.archived !== true &&
+            age < ACTIVE_RIDE_MAX_AGE_MS
+          );
+        })
         .sort((a, b) => {
           const at = a.createdAt?.toMillis?.() || 0;
           const bt = b.createdAt?.toMillis?.() || 0;
@@ -616,7 +593,6 @@ const docs = snap.docs
         });
 
       const ride = docs[0] || null;
-
       if (!ride) {
         hardResetPassengerUI();
         return;
@@ -624,17 +600,23 @@ const docs = snap.docs
 
       if (currentRideId === ride.id && currentRideDocUnsub) return;
 
-      currentRideId = ride.id;
-
       if (currentRideDocUnsub) {
         currentRideDocUnsub();
         currentRideDocUnsub = null;
       }
 
+      currentRideId = ride.id;
       currentRideDocUnsub = onSnapshot(
         doc(db, "rides", currentRideId),
-        handleRideSnapshot
+        (rideSnap) => {
+          if (token !== rideWatcherToken) return;
+          handleRideSnapshot(rideSnap);
+        }
       );
+    },
+    (err) => {
+      console.error("watchCurrentRide error:", err);
+      hardResetPassengerUI();
     }
   );
 }
@@ -645,16 +627,29 @@ async function handleRideSnapshot(rideSnap) {
     return;
   }
 
-  // تجاهل أي snapshot قديم
-  if (!currentRideId || rideSnap.id !== currentRideId) {
-    return;
-  }
+  if (!currentRideId || rideSnap.id !== currentRideId) return;
 
   const ride = rideSnap.data();
   const authUid = auth.currentUser?.uid || null;
 
-  // أمان: لازم الرحلة تخص نفس المستخدم الحالي
   if (!authUid || ride.passengerId !== authUid) {
+    if (currentRideDocUnsub) {
+      currentRideDocUnsub();
+      currentRideDocUnsub = null;
+    }
+    hardResetPassengerUI();
+    return;
+  }
+
+  if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
+    if (ride.status === "completed" && !ride.passengerRating) {
+      currentRideId = rideSnap.id;
+      renderStars(0);
+      setText(rateHint, "");
+      showRatingModal();
+      return;
+    }
+
     if (currentRideDocUnsub) {
       currentRideDocUnsub();
       currentRideDocUnsub = null;
@@ -669,7 +664,6 @@ async function handleRideSnapshot(rideSnap) {
     : null;
 
   updateRideActionVisibility(ride);
-
   btnRequest.disabled = true;
   btnCancel.disabled = !(ride.status === "requested" || ride.status === "offered");
   btnAcceptOffer.disabled = ride.status !== "offered";
@@ -695,60 +689,23 @@ async function handleRideSnapshot(rideSnap) {
     setText(routeMeta, "السائق وصل لمكان القيام ✅");
     setStatus("السائق وصل");
     if (ride.driverId) startDriverTracking(ride.driverId);
-  } else if (ride.status === "completed") {
-    setText(routeMeta, "الرحلة انتهت ✅");
-    setStatus("الرحلة انتهت");
-    stopDriverTracking();
-
-    if (!ride.passengerRating) {
-      renderStars(0);
-      setText(rateHint, "");
-      showRatingModal();
-      return;
-    }
-
-    if (currentRideDocUnsub) {
-      currentRideDocUnsub();
-      currentRideDocUnsub = null;
-    }
-
-    hardResetPassengerUI();
-    return;
-  } else if (ride.status === "canceled") {
-    setText(routeMeta, "تم إلغاء الطلب.");
-    setStatus("تم الإلغاء");
-    stopDriverTracking();
-
-    if (currentRideDocUnsub) {
-      currentRideDocUnsub();
-      currentRideDocUnsub = null;
-    }
-
-    hardResetPassengerUI();
-    return;
   }
 
   if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) {
     arrivedToastShownFor = currentRideId;
-    notify({
-      title: "السائق وصل",
-      body: "السائق وصل لمكان القيام ✅",
-      tag: "driver-arrived"
-    });
+    notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
   }
 
-  const driverProfile =
-    (ride.status === "accepted" || ride.status === "arrived" || ride.status === "completed")
-      ? {
-          name: ride.driverName || "",
-          phone: ride.driverPhone || "",
-          vehicleType: ride.driverVehicleType || ride.vehicleType || "",
-          vehicleCode: ride.driverVehicleCode || "",
-        }
-      : null;
+  const driverProfile = (ride.status === "accepted" || ride.status === "arrived")
+    ? {
+        name: ride.driverName || "",
+        phone: ride.driverPhone || "",
+        vehicleType: ride.driverVehicleType || ride.vehicleType || "",
+        vehicleCode: ride.driverVehicleCode || "",
+      }
+    : null;
 
   renderRideCard(ride, driverProfile);
-
   if (driverProfile) setDriverContactButtons(driverProfile.phone);
   else setDriverContactButtons(null);
 }
@@ -829,6 +786,7 @@ btnRequest.addEventListener("click", async () => {
     return;
   }
 
+  // منع أكثر من طلب مفتوح لنفس الراكب على الواجهة
   if (currentRideId) {
     notify({ title: "يوجد طلب نشط", body: "أنهِ الطلب الحالي أو ألغِه أولاً.", tag: "ride-exists" });
     return;
@@ -1013,7 +971,9 @@ rateSend?.addEventListener("click", async () => {
 
 rateClose?.addEventListener("click", hideRatingModal);
 rateSkip?.addEventListener("click", hideRatingModal);
-rateModal?.addEventListener("click", (e) => { if (e.target === rateModal) hideRatingModal(); });
+rateModal?.addEventListener("click", (e) => {
+  if (e.target === rateModal) hideRatingModal();
+});
 starsRoot?.addEventListener("click", (e) => {
   const t = e.target;
   if (!t || !t.classList.contains("star")) return;
@@ -1091,7 +1051,6 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = "./index.html"; return; }
-  hardResetPassengerUI();
   await ensureNotificationPermission(true);
 
   const me = await getDoc(doc(db, "users", user.uid));

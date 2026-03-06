@@ -1,4 +1,3 @@
-
 // map.js — stable map helpers for Meshwarko
 
 let routeLayer = null;
@@ -44,7 +43,7 @@ function myLocationIconHTML() {
 }
 
 function escapeHtml(str) {
-  return String(str ?? "").replace(/[&<>"]/g, (m) => ({
+  return String(str ?? "").replace(/[&<>\"]/g, (m) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
@@ -352,7 +351,7 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
       .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 
     if (biasLocation?.lat && biasLocation?.lon) {
-      items.sort((a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b));
+      items.sort((a, b) => haversineMeters(biasLocation, b) - haversineMeters(biasLocation, a));
     }
     return items;
   } catch (_) {
@@ -370,7 +369,7 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
       .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 
     if (biasLocation?.lat && biasLocation?.lon) {
-      items.sort((a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b));
+      items.sort((a, b) => haversineMeters(biasLocation, b) - haversineMeters(biasLocation, a));
     }
     return items;
   }
