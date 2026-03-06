@@ -566,7 +566,9 @@ const driverMarkers = new Map();
 function startLiveDriversLayer({ governorate, center }) {
   stopLiveDrivers();
   const q = query(collection(db, "driversOnline"), where("governorate", "==", governorate), where("center", "==", center));
-  liveDriversUnsub = onSnapshot(q, (snap) => {
+  liveDriversUnsub = onSnapshot(
+  q,
+  (snap) => {
     const seen = new Set();
     snap.forEach((row) => {
       const d = row.data();
