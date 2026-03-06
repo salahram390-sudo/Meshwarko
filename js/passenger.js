@@ -363,8 +363,14 @@ async function manualSearch(type) {
   const isPickup = type === "pickup";
   const inputEl = isPickup ? pickupText : dropText;
   const q = (inputEl.value || "").trim();
+
   if (!q) {
     alert("اكتب اسم المكان");
+    return;
+  }
+
+  if (!myLocation?.lat || !myLocation?.lon) {
+    notify({ title: "الموقع", body: "حدد موقعك أولاً (زر 🎯)" });
     return;
   }
 
