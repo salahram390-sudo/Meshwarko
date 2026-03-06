@@ -44,6 +44,7 @@ let selectedRideId = null;
 let selectedRideData = null;
 let pickupMarker = null;
 let dropMarker = null;
+let liveDriverMarker = null;
 let geoWatchId = null;
 let trackingRideId = null;
 let trackingEnabled = false;
