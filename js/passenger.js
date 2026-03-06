@@ -389,6 +389,18 @@ function updateRideActionVisibility(ride) {
   }
 }
 
+function getRideStatusLabel(status) {
+  switch (status) {
+    case "requested": return "جاري البحث";
+    case "offered": return "وصل عرض";
+    case "accepted": return "السائق في الطريق";
+    case "arrived": return "السائق وصل";
+    case "completed": return "الرحلة انتهت";
+    case "canceled": return "تم الإلغاء";
+    default: return status || "-";
+  }
+}
+
 function renderRideCard(ride, driverProfile) {
   if (!ride) {
     rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
