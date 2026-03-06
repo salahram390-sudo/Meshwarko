@@ -591,7 +591,7 @@ function startLiveDriversLayer({ governorate, center }) {
     for (const [uid, obj] of driverMarkers.entries()) {
       if (!seen.has(uid)) {
         try { obj.marker.remove(); } catch (_) {}
-        driverMarkers.delete(uid);
+                driverMarkers.delete(uid);
       }
     }
   },
@@ -599,7 +599,7 @@ function startLiveDriversLayer({ governorate, center }) {
     console.error("PASSENGER liveDrivers ERROR:", err);
   }
 );
-
+}
 async function initAdmin() {
   admin = await loadEgyptAdmin();
   const govs = admin.governorates.map((g) => g.name);
