@@ -652,14 +652,6 @@ async function handleRideSnapshot(rideSnap) {
   if (driverProfile) setDriverContactButtons(driverProfile.phone);
   else setDriverContactButtons(null);
 
-  if (ride.status === "completed" && !ride.passengerRating) {
-    renderStars(0);
-    setText(rateHint, "");
-    showRatingModal();
-  } else if (ride.status === "completed" && ride.passengerRating) {
-    hideRatingModal();
-    rideUiNone();
-  }
 }
 
 pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
