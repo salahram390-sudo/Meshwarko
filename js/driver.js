@@ -2,40 +2,35 @@ import { auth, db } from "./firebase.js";
 console.log("driver.js loaded ✅");
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
-  doc, getDoc, updateDoc, setDoc,
-  collection, onSnapshot, query, where, orderBy, limit,
+  doc, getDoc, updateDoc, setDoc, deleteDoc,
+  collection, onSnapshot, query, where,
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 import { $, setText, moneyEGP, escapeHtml } from "./utils.js";
-import { createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation, createCarIcon, moveCarMarkerSmooth } from "./map.js";
-import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
+import {
+  createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
+  createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
+} from "./map.js";
+import { loadEgyptAdmin } from "./admin_data.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
 
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
 const editProfileBtn = $("#editProfileBtn");
-
 const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 const btnRefresh = $("#btnRefresh");
-
 const ridesList = $("#ridesList");
 const selectedRideEl = $("#selectedRide");
 const offerInput = $("#offerInput");
-
 const btnSendOffer = $("#btnSendOffer");
 const btnAccept = $("#btnAccept");
 const btnComplete = $("#btnComplete");
 const btnCancel = $("#btnCancel");
 const btnTrackToggle = $("#btnTrackToggle");
 const btnArrived = $("#btnArrived");
-function syncOfferBtn(){
-  const v = Number((offerInput.value || "").trim());
-  btnSendOffer.disabled = !selectedRideId || !Number.isFinite(v) || v <= 0;
-}
-offerInput.addEventListener("input", syncOfferBtn);
 const driverStatus = $("#driverStatus");
 const subText = $("#subText");
 
@@ -45,81 +40,119 @@ const routeLayerRef = { current: null };
 let admin = null;
 let myUser = null;
 let myLocation = null;
-
 let selectedRideId = null;
 let selectedRideData = null;
-
 let pickupMarker = null;
 let dropMarker = null;
-
+let liveDriverMarker = null;
+let liveDriverLast = null;
 let geoWatchId = null;
 let trackingRideId = null;
 let trackingEnabled = false;
-let driverMapMarker = null;
-let driverLastLoc = null;
+let ridesUnsub = null;
+let acceptedRideUnsub = null;
+let heartbeatInterval = null;
+let ownDriverPosDocRef = null;
 
-function setDriverStatus(t){ setText(driverStatus, t); }
+function setDriverStatus(t) { setText(driverStatus, t); }
 
-function updateDriverOwnMarker(lat, lon, pan = false) {
-  const next = { lat: Number(lat), lon: Number(lon) };
-  if (!Number.isFinite(next.lat) || !Number.isFinite(next.lon)) return;
-
-  if (!driverMapMarker) {
-    driverMapMarker = L.marker([next.lat, next.lon], { icon: createCarIcon(0) }).addTo(map);
-  } else if (driverLastLoc) {
-    moveCarMarkerSmooth(driverMapMarker, driverLastLoc, next, 900);
-  } else {
-    driverMapMarker.setLatLng([next.lat, next.lon]);
-  }
-
-  driverLastLoc = next;
-  showMyLocation(map, next, { pan: false });
-  if (pan) map.panTo([next.lat, next.lon]);
+function setTrackBtn() {
+  if (!btnTrackToggle) return;
+  btnTrackToggle.textContent = trackingEnabled ? "إيقاف التتبع" : "ابدأ التتبع";
 }
 
-logoutBtn.addEventListener("click", async () => {
+function clampPrice(v) {
+  const n = Number(String(v || "").replace(/[٠-٩]/g, (d) => "0123456789"["٠١٢٣٤٥٦٧٨٩".indexOf(d)]));
+  if (!Number.isFinite(n)) return null;
+  return Math.min(3000, Math.max(15, Math.round(n / 5) * 5));
+}
+
+function syncOfferBtn() {
+  const v = Number((offerInput.value || "").trim());
+  btnSendOffer.disabled = !selectedRideId || !Number.isFinite(v) || v <= 0;
+}
+
+offerInput.addEventListener("input", syncOfferBtn);
+
+function clearRouteAndMarkers() {
+  try {
+    if (routeLayerRef.current) {
+      map.removeLayer(routeLayerRef.current);
+      routeLayerRef.current = null;
+    }
+  } catch (_) {}
+  if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
+  if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
+  pickupMarker = null;
+  dropMarker = null;
+}
+
+function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
+  selectedRideId = null;
+  selectedRideData = null;
+  selectedRideEl.innerHTML = `<div class="muted">${escapeHtml(message)}</div>`;
+  clearRouteAndMarkers();
+  btnSendOffer.disabled = true;
+  btnAccept.disabled = true;
+  btnTrackToggle.disabled = true;
+  btnCancel.disabled = true;
+  btnArrived.disabled = true;
+  btnComplete.disabled = true;
+  offerInput.value = "";
   stopLiveTracking();
-  await signOut(auth);
-  location.href = "./index.html";
-});
+}
 
-switchRoleBtn.addEventListener("click", () => { location.href = "./passenger.html"; });
+function updateOwnDriverMarker(lat, lon, pan = false) {
+  const next = { lat: Number(lat), lon: Number(lon) };
+  if (![next.lat, next.lon].every(Number.isFinite)) return;
 
-btnLocate.addEventListener("click", () => {
-  locateOnce(map, (loc) => {
-    myLocation = loc;
-    showMyLocation(map, loc, { pan: true });
-    updateDriverOwnMarker(loc.lat, loc.lon, true);
-  });
-});
-
-btnClear.addEventListener("click", () => {
-  stopLiveTracking();
-  selectedRideId = null; selectedRideData = null;
-  btnSendOffer.disabled = true; btnAccept.disabled = true; btnComplete.disabled = true; btnCancel.disabled = true;
-  selectedRideEl.innerHTML = `<div class="muted">لم يتم تحديد طلب.</div>`;
-  if (pickupMarker) map.removeLayer(pickupMarker), pickupMarker = null;
-  if (dropMarker) map.removeLayer(dropMarker), dropMarker = null;
-  if (routeLayerRef.current) map.removeLayer(routeLayerRef.current), routeLayerRef.current = null;
-});
-
-btnTrackToggle?.addEventListener("click", async () => {
-  if (!selectedRideId) return;
-  if (!trackingEnabled) {
-    notify({ title: "التتبع", body: "ابدأ تتبع الموقع…", tag: "track-on" });
-    startLiveTracking(selectedRideId);
+  if (!liveDriverMarker) {
+    liveDriverMarker = showMyLocation(map, next, { pan });
   } else {
-    notify({ title: "التتبع", body: "تم إيقاف التتبع.", tag: "track-off" });
-    stopLiveTracking();
+    showMyLocation(map, next, { pan });
   }
-});
-setTrackBtn();
 
-btnRefresh.addEventListener("click", () => {
-  subText.textContent = "تم التحديث.";
-  setTimeout(() => subText.textContent = "اختر طلب ثم اقبل أو اقترح سعر", 900);
-});
+  if (!liveDriverLast) liveDriverLast = next;
+  else liveDriverLast = next;
+}
 
+async function pushDriverOnline() {
+  const u = auth.currentUser;
+  if (!u || !myUser || !myLocation || !ownDriverPosDocRef) return;
+  try {
+    await setDoc(ownDriverPosDocRef, {
+      uid: u.uid,
+      name: myUser.name || "",
+      governorate: myUser.governorate || "",
+      center: myUser.center || "",
+      vehicleType: myUser.vehicleType || "",
+      lat: myLocation.lat,
+      lon: myLocation.lon,
+      lastSeenMs: Date.now(),
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+  } catch (e) {
+    console.error("pushDriverOnline error", e);
+  }
+}
+
+async function cleanupDriverOnline() {
+  try {
+    if (ownDriverPosDocRef) await deleteDoc(ownDriverPosDocRef);
+  } catch (e) {
+    console.warn("cleanupDriverOnline failed", e);
+  }
+}
+
+function startDriverHeartbeat() {
+  if (heartbeatInterval) return;
+  heartbeatInterval = setInterval(pushDriverOnline, 2000);
+}
+
+function stopDriverHeartbeat() {
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = null;
+}
 
 function startLiveTracking(rideId) {
   if (!navigator.geolocation) return;
@@ -127,127 +160,71 @@ function startLiveTracking(rideId) {
   trackingRideId = rideId;
   trackingEnabled = true;
   setTrackBtn();
-  geoWatchId = navigator.geolocation.watchPosition(async (pos) => {
-    if (!trackingRideId) return;
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-    myLocation = { lat, lon };
-    try{
+
+  const pushRideLoc = async (lat, lon) => {
+    try {
       await updateDoc(doc(db, "rides", trackingRideId), {
         driverLoc: { lat, lon },
         driverLocUpdatedAt: serverTimestamp(),
       });
-    } catch {}
-  }, () => {}, { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 });
+    } catch (e) {
+      console.warn("update driverLoc failed", e);
+    }
+  };
+
+  geoWatchId = navigator.geolocation.watchPosition(async (pos) => {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    myLocation = { lat, lon };
+    updateOwnDriverMarker(lat, lon, false);
+    await pushDriverOnline();
+    if (trackingRideId) await pushRideLoc(lat, lon);
+  }, () => {}, { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 });
 }
 
 function stopLiveTracking() {
-  if (geoWatchId != null) {
-    navigator.geolocation.clearWatch(geoWatchId);
-    geoWatchId = null;
-  }
+  if (geoWatchId != null) navigator.geolocation.clearWatch(geoWatchId);
+  geoWatchId = null;
   trackingRideId = null;
   trackingEnabled = false;
   setTrackBtn();
-}
-
-
-function setTrackBtn() {
-  if (!btnTrackToggle) return;
-  btnTrackToggle.textContent = trackingEnabled ? "إيقاف التتبع" : "ابدأ التتبع";
-}
-
-
-
-function normalizeDigits(v){
-  return String(v || "").replace(/[٠-٩]/g, d => "0123456789"["٠١٢٣٤٥٦٧٨٩".indexOf(d)]);
-}
-function clampPrice(v){
-  const n = Number(normalizeDigits(v));
-  if (!Number.isFinite(n)) return null;
-  const clamped = Math.min(3000, Math.max(15, Math.round(n/5)*5));
-  return clamped;
 }
 
 async function initAdmin() {
   admin = await loadEgyptAdmin();
 }
 
-function watchRidesForDriver() {
-  // Match passenger's governorate+center+vehicleType (optional by vehicleType)
-  // ✅ مرة واحدة فقط
-const now = Timestamp.fromMillis(Date.now());
+function watchPassengerEndRequest(rideId) {
+  if (acceptedRideUnsub) { acceptedRideUnsub(); acceptedRideUnsub = null; }
+  acceptedRideUnsub = onSnapshot(doc(db, "rides", rideId), (snap) => {
+    if (!snap.exists()) return;
+    const ride = snap.data();
 
-// ✅ الطلبات المفتوحة (requested فقط)
-const qOpen = query(
-  collection(db, "rides"),
-  where("status", "==", "requested"),
-  where("driverId", "==", null),
-  where("governorate", "==", (myUser?.governorate || "")),
-  where("center", "==", (myUser?.center || "")),
-  where("expiresAt", ">", now),
-  orderBy("expiresAt", "asc"),
-  orderBy("createdAt", "desc"),
-  limit(30)
-);
+    if ((ride.status === "accepted" || ride.status === "arrived") && ride.passengerEndRequested === true) {
+      btnComplete.disabled = false;
+    }
 
-// ✅ عروضي أنا فقط (offered)
-const qMine = query(
-  collection(db, "rides"),
-  where("status", "==", "offered"),
-  where("driverId", "==", auth.currentUser.uid),
-  where("expiresAt", ">", now),
-  orderBy("expiresAt", "asc"),
-  orderBy("createdAt", "desc"),
-  limit(30)
-);
-  
-  onSnapshot(qOpen, (snap) => {
-    console.log("watchRidesForDriver: got snapshot, docs:", snap.docs.length);
-  ridesList.innerHTML = "";
-  let shown = 0;
-
-  if (snap.empty) {
-    console.log("snapshot empty");
-    ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
-    return;
-  }
-
-  snap.docs.forEach((d) => {
-    const r = d.data();
-    console.log("ride doc:", d.id, r);
-    // filter by vehicle type: if driver has vehicleType, only show matching
-if (myUser.vehicleType && r.vehicleType && myUser.vehicleType !== r.vehicleType) return;
-
-shown++;
-
-const item = document.createElement("div");
-item.className = "list-item" + (selectedRideId === d.id ? " active" : "");
-item.innerHTML = `
-  <div class="row-between">
-    <b>طلب</b>
-    <span class="muted small">${moneyEGP(r.price)}</span>
-  </div>
-  <div class="muted small">مركبة: ${escapeHtml(r.vehicleType || "-")}</div>
-  <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
-  <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
-`;
-item.onclick = () => selectRide(d.id, r);
-ridesList.appendChild(item);
+    if (ride.status === "completed" || ride.status === "canceled") {
+      if (acceptedRideUnsub) { acceptedRideUnsub(); acceptedRideUnsub = null; }
+      resetSelectedRideUi(ride.status === "completed" ? "تم إنهاء الرحلة." : "تم إلغاء الرحلة.");
+    }
   });
-      
-  console.log("shown after loop:", shown);
-  if (shown === 0) {
-    ridesList.innerHTML = `<div class="muted small">لا توجد طلبات مناسبة لنوع مركبتك الآن.</div>`;
-  }
-});
-  onSnapshot(qMine, (snap) => {
-  snap.docs.forEach((d) => {
-    const r = d.data();
-    console.log("MY OFFER:", d.id, r);
-  });
-});
 }
+
+async function drawRideRoute(ride) {
+  try {
+    const p = ride.pickup || {};
+    const d = ride.dropoff || {};
+    const start = { lat: Number(p.lat), lon: Number(p.lon) };
+    const end = { lat: Number(d.lat), lon: Number(d.lon) };
+    if (![start.lat, start.lon, end.lat, end.lon].every(Number.isFinite)) return;
+    const r = await routeOSRM(start, end);
+    drawRoute(map, r.geojson, routeLayerRef);
+  } catch (e) {
+    console.error("ROUTE ERROR:", e);
+  }
+}
+
 async function selectRide(id, ride) {
   selectedRideId = id;
   selectedRideData = ride;
@@ -257,148 +234,133 @@ async function selectRide(id, ride) {
   btnTrackToggle.disabled = true;
   btnComplete.disabled = true;
   btnCancel.disabled = true;
+  btnArrived.disabled = true;
   trackingEnabled = false;
   setTrackBtn();
 
-  if (pickupMarker) map.removeLayer(pickupMarker);
-  if (dropMarker) map.removeLayer(dropMarker);
-  pickupMarker = addMarker(map, [ride.pickup.lat, ride.pickup.lon]);
-  dropMarker = addMarker(map, [ride.dropoff.lat, ride.dropoff.lon]);
+  if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} }
+  if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} }
+  pickupMarker = addMarker(map, [ride.pickup.lat, ride.pickup.lon], { icon: createPickupIcon() });
+  dropMarker = addMarker(map, [ride.dropoff.lat, ride.dropoff.lon], { icon: createDropoffIcon() });
 
   selectedRideEl.innerHTML = `
     <div class="row-between"><b>السعر</b><span>${moneyEGP(ride.price)}</span></div>
     ${ride.offerPrice ? `<div class="row-between"><b>عرض حالي</b><span>${moneyEGP(ride.offerPrice)}</span></div>` : ""}
-    <div class="muted small">المنطقة: ${escapeHtml(ride.governorate)} / ${escapeHtml(ride.center)} • مركبة: ${escapeHtml(ride.vehicleType)}</div>
+    <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")} • مركبة: ${escapeHtml(ride.vehicleType || "-")}</div>
     <div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>
     <div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>
     <div class="muted small">بيانات الراكب تظهر بعد القبول.</div>
   `;
 
-  try {
-  const start = {
-    lat: ride.pickup.lat,
-    lon: ride.pickup.lon,
-  };
-
-  const end = {
-    lat: ride.dropoff.lat,
-    lon: ride.dropoff.lon,
-  };
-
-  console.log("ROUTE START/END:", start, end);
-
-  const r = await routeOSRM(start, end);
-  drawRoute(map, r.geojson, routeLayerRef);
-} catch (e) {
-  console.error("ROUTE ERROR:", e);
-}
-}
-let unsubAcceptedWatcher = null;
-
-function showButtonComplete() {
-  btnComplete.style.display = "";
-  btnComplete.disabled = false;
+  await drawRideRoute(ride);
 }
 
-function hideButtonComplete() {
-  btnComplete.style.display = "";
-  btnComplete.disabled = true;
-}
-
-function watchPassengerEndRequest(rideId) {
-  if (unsubAcceptedWatcher) { unsubAcceptedWatcher(); unsubAcceptedWatcher = null; }
-
-  unsubAcceptedWatcher = onSnapshot(doc(db, "rides", rideId), (snap) => {
-    if (!snap.exists()) return;
-    const ride = snap.data();
-
-    // افتح زر الإنهاء فقط لما الراكب يطلب الإنهاء
-    if ((ride.status === "accepted" || ride.status === "arrived") && ride.passengerEndRequested === true) {
-      showButtonComplete();
-    } else {
-      hideButtonComplete();
-    }
-
-    // لو خلصت/اتلغت اقفل الواتشر
-    if (ride.status === "completed" || ride.status === "canceled") {
-      if (unsubAcceptedWatcher) { unsubAcceptedWatcher(); unsubAcceptedWatcher = null; }
-      hideButtonComplete();
-    }
-  });
-}
 async function showAcceptedDetails(rideId) {
   const rideSnap = await getDoc(doc(db, "rides", rideId));
   if (!rideSnap.exists()) return;
   const ride = rideSnap.data();
+  await drawRideRoute(ride);
 
-// رسم المسار من موقع الراكب إلى وجهته
-// ===== ROUTE DRAW (DEBUG + FIX) =====
-try {
-  const p = ride.pickup || {};
-  const d = ride.dropoff || {};
+  selectedRideEl.innerHTML = `
+    <div class="row-between"><b>الحالة</b><span class="muted">${escapeHtml(ride.status || "accepted")}</span></div>
+    <div class="row-between"><b>السعر النهائي</b><span>${moneyEGP(ride.price)}</span></div>
+    <div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>
+    <div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>
+    <div class="divider"></div>
+    <div><b>الراكب</b></div>
+    <div class="muted small">الاسم: ${escapeHtml(ride.passengerName || "-")}</div>
+    <div class="muted small">الهاتف: ${escapeHtml(ride.passengerPhone || "-")}</div>
+    <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")}</div>
+  `;
+}
 
-  const start = { lat: Number(p.lat), lon: Number(p.lon) };
-  const end   = { lat: Number(d.lat), lon: Number(d.lon) };
+function watchRidesForDriver() {
+  if (ridesUnsub) { ridesUnsub(); ridesUnsub = null; }
+  if (!myUser?.governorate || !myUser?.center) return;
 
-  console.log("ROUTE start/end:", start, end);
+  const qArea = query(
+    collection(db, "rides"),
+    where("governorate", "==", myUser.governorate),
+    where("center", "==", myUser.center)
+  );
 
-  if (!Number.isFinite(start.lat) || !Number.isFinite(start.lon) ||
-      !Number.isFinite(end.lat)   || !Number.isFinite(end.lon)) {
-    console.warn("ROUTE: invalid coords", { p, d });
-    setDriverStatus("خطأ: إحداثيات غير صحيحة");
-  } else {
+  ridesUnsub = onSnapshot(qArea, (snap) => {
+    const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const openRides = rows
+      .filter((r) => {
+        const activeStatus = ["requested", "offered", "accepted", "arrived"].includes(r.status);
+        const notExpired = !r.expiresAt?.toMillis || r.expiresAt.toMillis() > Date.now();
+        const matchVehicle = !myUser.vehicleType || !r.vehicleType || myUser.vehicleType === r.vehicleType;
+        const openForMe = r.status === "requested" || r.driverId === auth.currentUser.uid;
+        return activeStatus && notExpired && matchVehicle && openForMe;
+      })
+      .sort((a, b) => (b.createdAt?.toMillis?.() || 0) - (a.createdAt?.toMillis?.() || 0));
 
-    // امسح المسار القديم (لو الدالة عندك بتستخدم routeLayerRef.current)
-    try {
-      if (routeLayerRef?.current) {
-        map.removeLayer(routeLayerRef.current);
-        routeLayerRef.current = null;
-      } else if (routeLayerRef) {
-        // لو عندك ref مش current
-        map.removeLayer(routeLayerRef);
-      }
-    } catch (_) {}
-
-    const r = await routeOSRM(start, end);
-    console.log("OSRM response:", r);
-
-    if (!r || !r.geojson) {
-      console.warn("ROUTE: no geojson returned", r);
-      setDriverStatus("تعذر رسم المسار (OSRM)");
-    } else {
-      drawRoute(map, r.geojson, routeLayerRef);
-      setDriverStatus("تم رسم المسار ✅");
+    ridesList.innerHTML = "";
+    if (!openRides.length) {
+      ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
+      return;
     }
-  }
-} catch (e) {
-  console.error("ROUTE ERROR:", e);
-  alert("ROUTE ERROR: " + (e?.message || e));
-  setDriverStatus("خطأ في رسم المسار");
-}
-// ===== END ROUTE =====
-  
-  const passengerName = ride.passengerName || "";
-const passengerPhone = ride.passengerPhone || "";
-const passengerGovernorate = ride.governorate || "";
-const passengerCenter = ride.center || "";
 
-  const lines = [];
-  lines.push(`<div class="row-between"><b>الحالة</b><span class="muted">accepted</span></div>`);
-  lines.push(`<div class="row-between"><b>السعر النهائي</b><span>${moneyEGP(ride.price)}</span></div>`);
-  lines.push(`<div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>`);
-  lines.push(`<div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>`);
-  lines.push(`<div class="divider"></div>`);
-lines.push(`<div><b>الراكب</b></div>`);
-lines.push(`<div class="muted small">الاسم: ${escapeHtml(passengerName || "-")}</div>`);
-lines.push(`<div class="muted small">الهاتف: ${escapeHtml(passengerPhone || "-")}</div>`);
-lines.push(`<div class="muted small">المنطقة: ${escapeHtml(passengerGovernorate || "-")} / ${escapeHtml(passengerCenter || "-")}</div>`);
-  
-  selectedRideEl.innerHTML = lines.join("");
+    openRides.forEach((r) => {
+      const item = document.createElement("div");
+      item.className = "list-item" + (selectedRideId === r.id ? " active" : "");
+      item.innerHTML = `
+        <div class="row-between">
+          <b>${r.status === "offered" && r.driverId === auth.currentUser.uid ? "عرضي" : "طلب"}</b>
+          <span class="muted small">${moneyEGP(r.offerPrice || r.price)}</span>
+        </div>
+        <div class="muted small">مركبة: ${escapeHtml(r.vehicleType || "-")}</div>
+        <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
+        <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
+      `;
+      item.onclick = () => selectRide(r.id, r);
+      ridesList.appendChild(item);
+    });
+  });
 }
+
+logoutBtn.addEventListener("click", async () => {
+  stopLiveTracking();
+  stopDriverHeartbeat();
+  await cleanupDriverOnline();
+  await signOut(auth);
+  location.href = "./index.html";
+});
+
+switchRoleBtn.addEventListener("click", () => { location.href = "./passenger.html"; });
+
+btnLocate.addEventListener("click", () => {
+  locateOnce(map, (loc) => {
+    myLocation = loc;
+    updateOwnDriverMarker(loc.lat, loc.lon, true);
+    pushDriverOnline();
+  });
+});
+
+btnClear.addEventListener("click", () => {
+  resetSelectedRideUi("لم يتم تحديد طلب.");
+});
+
+btnRefresh.addEventListener("click", () => {
+  subText.textContent = "تم التحديث.";
+  setTimeout(() => { subText.textContent = "اختر طلب ثم اقبل أو اقترح سعر"; }, 900);
+});
+
+btnTrackToggle?.addEventListener("click", () => {
+  if (!selectedRideId) return;
+  if (!trackingEnabled) {
+    notify({ title: "التتبع", body: "بدأ تتبع الموقع.", tag: "track-on" });
+    startLiveTracking(selectedRideId);
+  } else {
+    notify({ title: "التتبع", body: "تم إيقاف التتبع.", tag: "track-off" });
+    stopLiveTracking();
+  }
+});
+setTrackBtn();
 
 btnSendOffer.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
-
   const offer = clampPrice(offerInput.value);
   if (!offer) {
     notify({ title: "سعر غير صحيح", body: "اكتب سعر بين 15 و 3000 بخطوة 5.", tag: "bad-offer" });
@@ -408,26 +370,21 @@ btnSendOffer.addEventListener("click", async () => {
   setDriverStatus("يرسل عرض...");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), {
-  status: "offered",
-  driverId: myUser.uid,
-  offerPrice: offer,
-  driverName: myUser.name || "",
-  driverPhone: myUser.phone || "",
-  driverVehicleType: myUser.vehicleType || "",
-  driverVehicleCode: myUser.vehicleCode || "",
-  offeredAt: serverTimestamp(),
-});
-
-    // متقفلهاش للأبد — خليه يقفل لحظياً بس
+      status: "offered",
+      driverId: myUser.uid,
+      offerPrice: offer,
+      driverName: myUser.name || "",
+      driverPhone: myUser.phone || "",
+      driverVehicleType: myUser.vehicleType || "",
+      driverVehicleCode: myUser.vehicleCode || "",
+      offeredAt: serverTimestamp(),
+    });
     btnSendOffer.disabled = true;
-    setTimeout(() => { btnSendOffer.disabled = false; }, 800);
-
-    btnAccept.disabled = false;
-    btnCancel.disabled = true;
-
+    setTimeout(syncOfferBtn, 800);
     notify({ title: "تم إرسال العرض", body: `عرض سعر: ${offer} ج`, tag: "offer-sent" });
     setDriverStatus("بانتظار رد الراكب");
-  } catch {
+  } catch (e) {
+    console.error(e);
     setDriverStatus("خطأ");
   }
 });
@@ -436,114 +393,105 @@ btnAccept.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
   setDriverStatus("يقبل...");
   try {
-    console.log("DRIVER selectedRideId =", selectedRideId);
     await updateDoc(doc(db, "rides", selectedRideId), {
-  status: "accepted",
-  driverId: myUser.uid,
-  driverName: myUser.name || "",
-  driverPhone: myUser.phone || "",
-  driverVehicleType: myUser.vehicleType || "",
-  driverVehicleCode: myUser.vehicleCode || "",
-  acceptedAt: serverTimestamp(),
-});
+      status: "accepted",
+      driverId: myUser.uid,
+      driverName: myUser.name || "",
+      driverPhone: myUser.phone || "",
+      driverVehicleType: myUser.vehicleType || "",
+      driverVehicleCode: myUser.vehicleCode || "",
+      acceptedAt: serverTimestamp(),
+    });
 
     btnAccept.disabled = true;
     btnSendOffer.disabled = true;
     btnComplete.disabled = true;
     btnCancel.disabled = false;
     btnArrived.disabled = false;
-    
     btnTrackToggle.disabled = false;
     trackingEnabled = false;
     setTrackBtn();
     await showAcceptedDetails(selectedRideId);
     watchPassengerEndRequest(selectedRideId);
-    notify({ title: "تم قبول الطلب", body: "الآن يمكنك إنهاء الرحلة بعد الوصول.", tag: "ride-accepted" });
+    notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });
     setDriverStatus("على الطريق");
-    } catch (e) {
-  console.error("DRIVER ACCEPT ERROR:", e);
-  alert("ACCEPT ERROR: " + (e?.message || e));
-  setDriverStatus("خطأ");
-}
+  } catch (e) {
+    console.error("DRIVER ACCEPT ERROR:", e);
+    alert("ACCEPT ERROR: " + (e?.message || e));
+    setDriverStatus("خطأ");
+  }
 });
 
 btnArrived.addEventListener("click", async () => {
-
-if (!selectedRideId) return;
-
-setDriverStatus("وصل لموقع الراكب");
-
-try {
-
-await updateDoc(doc(db, "rides", selectedRideId), {
-status: "arrived",
-arrivedAtPickup: true,
-arrivedAt: serverTimestamp()
-});
-
-btnArrived.disabled = true;
-
-notify({
-title: "وصلت",
-body: "تم إشعار الراكب أنك وصلت"
-});
-
-} catch (e) {
-console.error(e);
-setDriverStatus("خطأ");
-}
-
+  if (!selectedRideId) return;
+  setDriverStatus("وصل لموقع الراكب");
+  try {
+    await updateDoc(doc(db, "rides", selectedRideId), {
+      status: "arrived",
+      arrivedAtPickup: true,
+      arrivedAt: serverTimestamp(),
+    });
+    btnArrived.disabled = true;
+    notify({ title: "وصلت", body: "تم إشعار الراكب أنك وصلت", tag: "arrived" });
+  } catch (e) {
+    console.error(e);
+    setDriverStatus("خطأ");
+  }
 });
 
 btnComplete.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("ينهي...");
   try {
-    await updateDoc(doc(db, "rides", selectedRideId), { status: "completed", completedAt: serverTimestamp() });
-    if (unsubAcceptedWatcher) { unsubAcceptedWatcher(); unsubAcceptedWatcher = null; }
+    await updateDoc(doc(db, "rides", selectedRideId), {
+      status: "completed",
+      completedAt: serverTimestamp(),
+      archived: true,
+    });
     stopLiveTracking();
-    setDriverStatus("مكتمل");
     btnComplete.disabled = true;
     btnCancel.disabled = true;
     btnTrackToggle.disabled = true;
     btnArrived.disabled = true;
-    selectedRideId = null;
-    selectedRideData = null;
-    selectedRideEl.innerHTML = `<div class="muted">تم إنهاء الرحلة.</div>`;
+    resetSelectedRideUi("تم إنهاء الرحلة.");
     notify({ title: "تم إنهاء الرحلة", body: "شكراً لك.", tag: "ride-complete" });
-  } catch { setDriverStatus("خطأ"); }
+    setDriverStatus("مكتمل");
+  } catch (e) {
+    console.error(e);
+    setDriverStatus("خطأ");
+  }
 });
 
 btnCancel.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("يلغي...");
   try {
-    await updateDoc(doc(db, "rides", selectedRideId), { status: "canceled", canceledAt: serverTimestamp() });
+    await updateDoc(doc(db, "rides", selectedRideId), {
+      status: "canceled",
+      canceledAt: serverTimestamp(),
+      archived: true,
+    });
     stopLiveTracking();
-    setDriverStatus("ملغي");
     btnComplete.disabled = true;
     btnCancel.disabled = true;
     btnTrackToggle.disabled = true;
     btnArrived.disabled = true;
-    selectedRideId = null;
-    selectedRideData = null;
-    selectedRideEl.innerHTML = `<div class="muted">تم إلغاء الطلب.</div>`;
-    if (pickupMarker) { try { map.removeLayer(pickupMarker); } catch (_) {} pickupMarker = null; }
-    if (dropMarker) { try { map.removeLayer(dropMarker); } catch (_) {} dropMarker = null; }
-    if (routeLayerRef.current) { try { map.removeLayer(routeLayerRef.current); } catch (_) {} routeLayerRef.current = null; }
+    resetSelectedRideUi("تم إلغاء الرحلة.");
     notify({ title: "تم إلغاء الطلب", body: "تم الإلغاء.", tag: "ride-cancel" });
-  } catch { setDriverStatus("خطأ"); }
+    setDriverStatus("ملغي");
+  } catch (e) {
+    console.error(e);
+    setDriverStatus("خطأ");
+  }
 });
 
-// Profile edit: quick prompt-based for mobile
 editProfileBtn.addEventListener("click", async () => {
   if (!admin || !myUser) return;
-
   const gov = prompt("المحافظة", myUser.governorate || "");
   if (!gov) return;
-  const g = admin.governorates.find(x => x.name === gov) || admin.governorates[0];
+  const g = admin.governorates.find((x) => x.name === gov) || admin.governorates[0];
   const center = prompt("المركز/الحي", myUser.center || (g?.centers?.[0] || ""));
-  const vType = prompt("نوع المركبة (tuktuk/sedan/tricycle/truck/microbus/tmanya/delivery_bike)", myUser.vehicleType || "sedan");
+  const vType = prompt("نوع المركبة", myUser.vehicleType || "sedan");
   const address = prompt("العنوان", myUser.address || "");
   const vehicleCode = prompt("كود المركبة", myUser.vehicleCode || "");
   const phone = prompt("رقم الهاتف", myUser.phone || "");
@@ -559,13 +507,12 @@ editProfileBtn.addEventListener("click", async () => {
       vehicleCode: vehicleCode || "",
       updatedAt: serverTimestamp(),
     });
-    myUser = { ...myUser, governorate: gov, center, vehicleType: vType, address, vehicleCode };
     myUser = { ...myUser, governorate: gov, center, vehicleType: vType, address, vehicleCode, phone };
     notify({ title: "تم تحديث البيانات", body: "تم حفظ بيانات السائق.", tag: "profile-updated" });
     setDriverStatus("متصل");
-    // Restart watcher by reloading (simple & robust)
     location.reload();
-  } catch {
+  } catch (e) {
+    console.error(e);
     setDriverStatus("خطأ");
   }
 });
@@ -573,70 +520,35 @@ editProfileBtn.addEventListener("click", async () => {
 onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = "./index.html"; return; }
   await ensureNotificationPermission(true);
+  await initAdmin().catch(() => {});
 
-  await initAdmin().catch(()=>{});
-
-  console.log("AUTH UID =", user.uid);
-
-const meRef = doc(db, "users", user.uid);
-const me = await getDoc(meRef);
-
-console.log("ME exists =", me.exists());
-console.log("ME data =", me.data());
-console.log("ME role =", me.data()?.role);
+  const me = await getDoc(doc(db, "users", user.uid));
   if (!me.exists() || me.data().role !== "driver") {
     location.href = "./passenger.html";
     return;
   }
+
   myUser = { uid: user.uid, ...me.data() };
+  ownDriverPosDocRef = doc(db, "driversOnline", user.uid);
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
   setDriverStatus("متصل");
 
-  locateOnce(map, (loc) => {
-  myLocation = loc;
-  showMyLocation(map, loc, { pan: true });
-});
-let liveTimer = null;
+  locateOnce(map, async (loc) => {
+    myLocation = loc;
+    updateOwnDriverMarker(loc.lat, loc.lon, true);
+    await pushDriverOnline();
+    startDriverHeartbeat();
+  });
 
-function startLiveDriverLocation() {
-  if (liveTimer) return;
-
-  const u = auth.currentUser;
-  if (!u || !myUser) return;
-
-  const ref = doc(db, "driversOnline", u.uid);
-
-  const push = () => {
-    if (!navigator.geolocation) return;
-
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
-
-      myLocation = { lat, lon };
-      updateDriverOwnMarker(lat, lon, false);
-
-      await setDoc(ref, {
-        uid: u.uid,
-        name: myUser.name || "",
-        governorate: myUser.governorate || "",
-        center: myUser.center || "",
-        vehicleType: myUser.vehicleType || "",
-        lat,
-        lon,
-        lastSeenMs: Date.now(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-    });
-  };
-
-  push();
-  liveTimer = setInterval(push, 2000);
-}
-  startLiveDriverLocation();
-  // watch available rides
   watchRidesForDriver();
 });
+
+window.addEventListener("beforeunload", () => {
+  stopLiveTracking();
+  stopDriverHeartbeat();
+  cleanupDriverOnline();
+});
+
 window.addEventListener("error", (e) => {
   alert(`JS ERROR: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`);
 });
