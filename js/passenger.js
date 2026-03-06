@@ -593,11 +593,22 @@ function watchCurrentRide(userId) {
     (snap) => {
       const docs = snap.docs
         .map((d) => ({ id: d.id, ...d.data() }))
-        .filter((r) =>
-          r.passengerId === userId &&
-          ["requested", "offered", "accepted", "arrived"].includes(r.status) &&
-          r.archived !== true
-        )
+        const now = Date.now();
+const MAX_AGE = 15 * 60 * 1000; // 15 دقيقة
+
+const docs = snap.docs
+  .map((d) => ({ id: d.id, ...d.data() }))
+  .filter((r) => {
+    const created = r.createdAt?.toMillis?.() || 0;
+    const age = now - created;
+
+    return (
+      r.passengerId === userId &&
+      ["requested", "offered", "accepted", "arrived"].includes(r.status) &&
+      r.archived !== true &&
+      age < MAX_AGE
+    );
+  })
         .sort((a, b) => {
           const at = a.createdAt?.toMillis?.() || 0;
           const bt = b.createdAt?.toMillis?.() || 0;
