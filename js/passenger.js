@@ -408,7 +408,7 @@ function renderRideCard(ride, driverProfile) {
   }
 
   const lines = [];
-  lines.push(`<div class="row-between"><b>الحالة</b><span class="muted">${escapeHtml(ride.status || "-")}</span></div>`);
+  lines.push(`<div class="row-between"><b>الحالة</b><span class="muted">${escapeHtml(getRideStatusLabel(ride.status))}</span></div>`);
   lines.push(`<div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>`);
   lines.push(`<div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>`);
   lines.push(`<div class="row-between"><b>السعر الحالي</b><span>${moneyEGP(ride.price)}</span></div>`);
