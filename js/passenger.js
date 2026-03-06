@@ -632,11 +632,24 @@ function watchCurrentRide(userId) {
 
 async function handleRideSnapshot(rideSnap) {
   if (!rideSnap.exists()) {
-    rideUiNone();
+    hardResetPassengerUI();
+    return;
+  }
+
+  // ✅ تجاهل أي snapshot قديم بعد تغيير currentRideId
+  if (!currentRideId || rideSnap.id !== currentRideId) {
     return;
   }
 
   const ride = rideSnap.data();
+  const authUid = auth.currentUser?.uid || null;
+
+  // ✅ أمان إضافي: الرحلة لازم تكون لنفس الراكب الحالي
+  if (!authUid || ride.passengerId !== authUid) {
+    hardResetPassengerUI();
+    return;
+  }
+
   const authUid = auth.currentUser?.uid || null;
 
   if (!authUid || ride.passengerId !== authUid) {
