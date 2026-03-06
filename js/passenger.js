@@ -578,29 +578,47 @@ async function initAdmin() {
 
 function watchCurrentRide(userId) {
   if (currentRideListUnsub) currentRideListUnsub();
-  currentRideListUnsub = onSnapshot(query(collection(db, "rides"), where("passengerId", "==", userId)), (snap) => {
-    const docs = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((r) => ["requested", "offered", "accepted", "arrived"].includes(r.status) && r.archived !== true)
-      .sort((a, b) => {
-        const at = a.createdAt?.toMillis?.() || 0;
-        const bt = b.createdAt?.toMillis?.() || 0;
-        return bt - at;
-      });
 
-    const ride = docs[0] || null;
+  currentRideListUnsub = onSnapshot(
+    query(collection(db, "rides"), where("passengerId", "==", userId)),
+    (snap) => {
+      const docs = snap.docs
+        .map((d) => ({ id: d.id, ...d.data() }))
+        .filter((r) =>
+          r.passengerId === userId &&
+          ["requested", "offered", "accepted", "arrived"].includes(r.status) &&
+          r.archived !== true
+        )
+        .sort((a, b) => {
+          const at = a.createdAt?.toMillis?.() || 0;
+          const bt = b.createdAt?.toMillis?.() || 0;
+          return bt - at;
+        });
 
-    if (!ride) {
-      if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
-      rideUiNone();
-      return;
+      const ride = docs[0] || null;
+
+      if (!ride) {
+        if (currentRideDocUnsub) {
+          currentRideDocUnsub();
+          currentRideDocUnsub = null;
+        }
+        currentRideId = null;
+        rideUiNone();
+        return;
+      }
+
+      if (currentRideId === ride.id && currentRideDocUnsub) return;
+
+      currentRideId = ride.id;
+
+      if (currentRideDocUnsub) {
+        currentRideDocUnsub();
+        currentRideDocUnsub = null;
+      }
+
+      currentRideDocUnsub = onSnapshot(doc(db, "rides", currentRideId), handleRideSnapshot);
     }
-
-    if (currentRideId === ride.id && currentRideDocUnsub) return;
-    currentRideId = ride.id;
-    if (currentRideDocUnsub) currentRideDocUnsub();
-    currentRideDocUnsub = onSnapshot(doc(db, "rides", currentRideId), handleRideSnapshot);
-  });
+  );
 }
 
 async function handleRideSnapshot(rideSnap) {
