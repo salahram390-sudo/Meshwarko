@@ -627,6 +627,18 @@ async function handleRideSnapshot(rideSnap) {
     return;
   }
   const ride = rideSnap.data();
+  const authUid = auth.currentUser?.uid || null;
+
+// لو الرحلة ليست للحساب الحالي امسحها فورًا من الواجهة
+if (!authUid || ride.passengerId !== authUid) {
+  if (currentRideDocUnsub) {
+    currentRideDocUnsub();
+    currentRideDocUnsub = null;
+  }
+  cleanupRideState();
+  rideUiNone();
+  return;
+}
   if (ride.archived === true && ride.status !== "completed") {
     rideUiNone();
     return;
