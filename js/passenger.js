@@ -7,7 +7,7 @@ import {
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, timestampToMillis } from "./utils.js";
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, timestampToMillis, getRideFreshMaxAgeMs } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
   geocodeNominatim, bindSearch, createCarIcon, moveCarMarkerSmooth,
@@ -41,8 +41,10 @@ let pickMode = null;
 let lastDistanceMeters = null;
 let lastDurationSec = null;
 let rideWatcherToken = 0;
-const ACTIVE_RIDE_MAX_AGE_MS = 15 * 60 * 1000; // 15 minutes
+const REQUEST_EXPIRE_MS = 3 * 60 * 1000;
+const ACTIVE_RIDE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const DRIVER_ONLINE_MAX_AGE_MS = 2 * 60 * 1000;
+const NEARBY_DRIVER_RADIUS_M = 8000;
 
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
@@ -242,7 +244,7 @@ async function findNearestDriversMeta({ governorate, center, vehicleType, pickup
       }))
       .filter((d) => Number.isFinite(d.distanceToPickupM))
       .sort((a, b) => a.distanceToPickupM - b.distanceToPickupM)
-      .slice(0, limit);
+      .filter((d, index) => index < limit && d.distanceToPickupM <= NEARBY_DRIVER_RADIUS_M);
 
     return {
       nearestDriverId: rows[0]?.uid || null,
@@ -737,7 +739,7 @@ function watchCurrentRide(userId) {
             r.passengerId === userId &&
             ["requested", "offered", "accepted", "arrived"].includes(r.status) &&
             r.archived !== true &&
-            !isRideExpired(r, ACTIVE_RIDE_MAX_AGE_MS, now)
+            !isRideExpired(r, getRideFreshMaxAgeMs(r.status) || ACTIVE_RIDE_MAX_AGE_MS, now)
           );
         })
         .sort((a, b) => {
@@ -923,13 +925,12 @@ dropPick.addEventListener("click", () => {
   setStatus("اختر الوصول من الخريطة");
 });
 
-map.on("click", (e) => {
+map.on("click", async (e) => {
   if (!pickMode) return;
-  const point = {
-    lat: e.latlng.lat,
-    lon: e.latlng.lng,
-    text: `(${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)})`,
-  };
+  const lat = e.latlng.lat;
+  const lon = e.latlng.lng;
+  const label = (await reverseNameEG(lat, lon)) || `(${lat.toFixed(5)}, ${lon.toFixed(5)})`;
+  const point = { lat, lon, text: label };
   if (pickMode === "pickup") setPickup(point);
   else setDropoff(point);
   pickMode = null;
@@ -959,7 +960,9 @@ btnRequest.addEventListener("click", async () => {
   }
 
   const price = clampPrice(priceSlider.value);
-  const expiresAt = Timestamp.fromMillis(Date.now() + 15 * 60 * 1000);
+  const createdAtMs = Date.now();
+  const expiresAtMs = createdAtMs + REQUEST_EXPIRE_MS;
+  const expiresAt = Timestamp.fromMillis(expiresAtMs);
   setStatus("يرسل...");
 
   try {
@@ -970,6 +973,14 @@ btnRequest.addEventListener("click", async () => {
       updatedAt: serverTimestamp(),
     }).catch(() => {});
 
+    const nearestMeta = await findNearestDriversMeta({
+      governorate: pGov.value,
+      center: pCenter.value,
+      vehicleType: passengerVehicle,
+      pickupPoint: pickup,
+      limit: 8,
+    });
+
     const rideRef = await addDoc(collection(db, "rides"), {
       passengerId: user.uid,
       passengerName: myData.name || "",
@@ -977,7 +988,10 @@ btnRequest.addEventListener("click", async () => {
       driverId: null,
       status: "requested",
       createdAt: serverTimestamp(),
+      createdAtMs,
+      clientCreatedAtMs: createdAtMs,
       expiresAt,
+      expiresAtMs,
       governorate: pGov.value,
       center: pCenter.value,
       vehicleType: passengerVehicle,
@@ -990,6 +1004,9 @@ btnRequest.addEventListener("click", async () => {
       price,
       archived: false,
       passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
+      nearestDriverId: nearestMeta.nearestDriverId || null,
+      nearestDriverIds: nearestMeta.nearestDriverIds || [],
+      nearestDrivers: nearestMeta.nearestDrivers || [],
     });
 
     currentRideId = rideRef.id;
@@ -1063,6 +1080,15 @@ btnRejectOffer.addEventListener("click", async () => {
   if (!currentRideId) return;
   setStatus("يرفض...");
   try {
+    const refreshedCreatedAtMs = Date.now();
+    const refreshedExpiresAtMs = refreshedCreatedAtMs + REQUEST_EXPIRE_MS;
+    const nearestMeta = await findNearestDriversMeta({
+      governorate: pGov.value,
+      center: pCenter.value,
+      vehicleType: passengerVehicle,
+      pickupPoint: pickup,
+      limit: 8,
+    });
     await updateDoc(doc(db, "rides", currentRideId), {
       status: "requested",
       driverId: null,
@@ -1072,6 +1098,12 @@ btnRejectOffer.addEventListener("click", async () => {
       driverPhone: null,
       driverVehicleType: null,
       driverVehicleCode: null,
+      createdAtMs: refreshedCreatedAtMs,
+      expiresAt: Timestamp.fromMillis(refreshedExpiresAtMs),
+      expiresAtMs: refreshedExpiresAtMs,
+      nearestDriverId: nearestMeta.nearestDriverId || null,
+      nearestDriverIds: nearestMeta.nearestDriverIds || [],
+      nearestDrivers: nearestMeta.nearestDrivers || [],
     });
     notify({ title: "تم رفض العرض", body: "عاد الطلب لقائمة الطلبات.", tag: "offer-rejected" });
   } catch {

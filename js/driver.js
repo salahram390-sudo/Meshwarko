@@ -7,7 +7,7 @@ import {
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, isActiveRideStatus, normalizeArabicDigits } from "./utils.js";
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, isActiveRideStatus, normalizeArabicDigits, getRideFreshMaxAgeMs } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
   createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
@@ -52,6 +52,7 @@ let ridesUnsub = null;
 let acceptedRideUnsub = null;
 let heartbeatInterval = null;
 let ownDriverPosDocRef = null;
+const MAX_VISIBLE_RIDE_DISTANCE_M = 8000;
 
 function setDriverStatus(t) { setText(driverStatus, t); }
 
@@ -68,20 +69,32 @@ function clampPrice(v) {
 
 function isRideVisibleForDriver(ride) {
   if (!ride || !isActiveRideStatus(ride.status) || ride.archived === true) return false;
-  if (isRideExpired(ride)) return false;
-  if (ride.driverId && ride.driverId !== auth.currentUser?.uid) return false;
+  if (isRideExpired(ride, getRideFreshMaxAgeMs(ride.status))) return false;
+
+  const myUid = auth.currentUser?.uid || null;
+  if (ride.driverId && ride.driverId !== myUid) return false;
   if (myUser?.vehicleType && ride.vehicleType && myUser.vehicleType !== ride.vehicleType) return false;
+
   if (ride.status === "requested" && ride.driverId == null) {
     const nearestId = ride.nearestDriverId || null;
     const nearestIds = Array.isArray(ride.nearestDriverIds) ? ride.nearestDriverIds : [];
-    if (nearestId && nearestId !== auth.currentUser?.uid && nearestIds.length) {
-      return nearestIds.includes(auth.currentUser?.uid);
-    }
+    if (nearestIds.length) return nearestIds.includes(myUid);
+    if (nearestId) return nearestId === myUid;
+
+    const distanceToMe = getRideDistanceToMe(ride);
+    if (Number.isFinite(distanceToMe) && distanceToMe > MAX_VISIBLE_RIDE_DISTANCE_M) return false;
   }
+
   return true;
 }
 
 function getRideDistanceToMe(ride) {
+  const myUid = auth.currentUser?.uid || null;
+  const nearestRows = Array.isArray(ride?.nearestDrivers) ? ride.nearestDrivers : [];
+  const match = nearestRows.find((row) => row?.uid === myUid);
+  const cachedDistance = Number(match?.distanceToPickupM);
+  if (Number.isFinite(cachedDistance)) return cachedDistance;
+
   if (!myLocation || !ride?.pickup) return Infinity;
   return haversineMeters(myLocation, { lat: ride.pickup.lat, lon: ride.pickup.lon });
 }
@@ -260,12 +273,14 @@ async function selectRide(id, ride) {
   if (ride?.pickup?.lat != null && ride?.pickup?.lon != null) pickupMarker = addMarker(map, [ride.pickup.lat, ride.pickup.lon], { icon: createPickupIcon() });
   if (ride?.dropoff?.lat != null && ride?.dropoff?.lon != null) dropMarker = addMarker(map, [ride.dropoff.lat, ride.dropoff.lon], { icon: createDropoffIcon() });
 
+  const distanceToMe = getRideDistanceToMe(ride);
   selectedRideEl.innerHTML = `
     <div class="row-between"><b>السعر</b><span>${moneyEGP(ride.price)}</span></div>
     ${ride.offerPrice ? `<div class="row-between"><b>عرض حالي</b><span>${moneyEGP(ride.offerPrice)}</span></div>` : ""}
     <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")} • مركبة: ${escapeHtml(ride.vehicleType || "-")}</div>
     <div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>
     <div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>
+    <div class="muted small">${Number.isFinite(distanceToMe) ? `يبعد عنك ${(distanceToMe / 1000).toFixed(1)} كم` : ""}</div>
     <div class="muted small">بيانات الراكب تظهر بعد القبول.</div>
   `;
 
@@ -342,6 +357,15 @@ function watchRidesForDriver() {
     if (!rides.length) {
       ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
       return;
+    }
+
+    const preferredRide =
+      rides.find((r) => r.driverId === driverUid && (r.status === "accepted" || r.status === "arrived")) ||
+      rides.find((r) => r.id === selectedRideId) ||
+      rides[0];
+
+    if (preferredRide && preferredRide.id !== selectedRideId) {
+      selectRide(preferredRide.id, preferredRide).catch((e) => console.warn("auto-select ride failed", e));
     }
 
     rides.forEach((r) => {
@@ -486,7 +510,10 @@ btnAccept.addEventListener("click", async () => {
       driverPhone: myUser.phone || "",
       driverVehicleType: myUser.vehicleType || "",
       driverVehicleCode: myUser.vehicleCode || "",
+      price: liveRide.offerPrice || liveRide.price || 0,
       acceptedAt: serverTimestamp(),
+      expiresAt: null,
+      expiresAtMs: null,
     });
 
     btnAccept.disabled = true;
@@ -497,6 +524,7 @@ btnAccept.addEventListener("click", async () => {
     btnTrackToggle.disabled = false;
     trackingEnabled = false;
     setTrackBtn();
+    startLiveTracking(selectedRideId);
     await showAcceptedDetails(selectedRideId);
     watchPassengerEndRequest(selectedRideId);
     notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });

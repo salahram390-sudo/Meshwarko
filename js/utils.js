@@ -42,16 +42,32 @@ export function timestampToMillis(ts) {
       return 0;
     }
   }
+  if (typeof ts?.seconds === "number") {
+    const nanos = Number(ts.nanoseconds || 0);
+    return ts.seconds * 1000 + Math.floor(nanos / 1e6);
+  }
   if (ts instanceof Date) return ts.getTime();
   return 0;
 }
 
-export function isRideExpired(ride, maxAgeMs = 15 * 60 * 1000, now = Date.now()) {
-  const expiresAt = timestampToMillis(ride?.expiresAt);
+export function getRideFreshMaxAgeMs(status) {
+  if (status === "requested" || status === "offered") return 3 * 60 * 1000;
+  if (status === "accepted" || status === "arrived") return 6 * 60 * 60 * 1000;
+  return 15 * 60 * 1000;
+}
+
+export function isRideExpired(ride, maxAgeMs = null, now = Date.now()) {
+  const expiresAt = timestampToMillis(ride?.expiresAt) || Number(ride?.expiresAtMs || 0);
   if (expiresAt) return expiresAt <= now;
-  const createdAt = timestampToMillis(ride?.createdAt);
+
+  const createdAt =
+    timestampToMillis(ride?.createdAt) ||
+    Number(ride?.createdAtMs || 0) ||
+    Number(ride?.clientCreatedAtMs || 0);
+
   if (!createdAt) return false;
-  return now - createdAt > maxAgeMs;
+  const ageLimit = Number.isFinite(maxAgeMs) ? maxAgeMs : getRideFreshMaxAgeMs(ride?.status);
+  return now - createdAt > ageLimit;
 }
 
 export function isActiveRideStatus(status) {
