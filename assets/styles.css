@@ -67,12 +67,11 @@ html, body{
 .map-fabs{
   position:absolute;
   left:12px;
-  top:140px;   /* نزّلها شوية كمان */
-  z-index: 5000;  /* أعلى من leaflet */
-}
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  top:140px;
+  z-index:5000;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 .map{ height:100%; width:100%; }
 .fab{
@@ -1124,4 +1123,56 @@ body:before{
   width: 18px;
   height: 18px;
   display:block;
+}
+
+
+/* ===== Search suggestions fix ===== */
+.search-results {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 9999;
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: 14px;
+  background: rgba(10, 14, 20, 0.97) !important;
+  border: 1px solid rgba(255, 215, 0, 0.18) !important;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.search-results.hidden {
+  display: none !important;
+}
+
+.search-item {
+  display: block;
+  width: 100%;
+  padding: 14px 16px;
+  color: #ffffff !important;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  text-align: right;
+  line-height: 1.5;
+  font-size: 15px;
+  opacity: 1 !important;
+}
+
+.search-item:last-child {
+  border-bottom: none;
+}
+
+.search-item:hover,
+.search-item:active,
+.search-item.active {
+  background: rgba(255, 215, 0, 0.12) !important;
+  color: #ffd54a !important;
+}
+
+.input-group,
+.form-row,
+.search-wrap {
+  position: relative;
 }
