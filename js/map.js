@@ -4,6 +4,9 @@
 let routeLayer = null;
 let myLocMarker = null;
 
+const DEFAULT_TIMEOUT_MS = 12000; // network timeout for fetches (ms)
+
+
 export function createMap(el, opts = {}) {
   const {
     center = [26.8206, 30.8025], // Egypt
