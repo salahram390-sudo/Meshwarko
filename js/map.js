@@ -123,13 +123,30 @@ function withTimeout(ms = 8000) {
 }
 
 async function fetchJson(url) {
-  const { signal, done } = withTimeout(9000);
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+
   try {
-    const r = await fetch(url, { method: "GET", signal, headers: { "Accept": "application/json" } });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return await r.json();
+    const res = await fetch(url, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      signal: controller.signal,
+      cache: "no-store",
+    });
+
+    // If CORS blocks, fetch() throws before this line.
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      throw new Error(`HTTP ${res.status} ${res.statusText} — ${txt.slice(0, 120)}`);
+    }
+
+    return await res.json();
+  } catch (e) {
+    // Normalize browser/network errors (e.g., "Failed to fetch")
+    const msg = (e && (e.message || e.toString())) ? (e.message || e.toString()) : "Unknown fetch error";
+    throw new Error(`FETCH_ERROR: ${msg} @ ${url}`);
   } finally {
-    done();
+    clearTimeout(t);
   }
 }
 
@@ -152,6 +169,8 @@ export async function geocodeNominatim(q, limit = 5) {
   const query = String(q || "").trim();
   if (!query) return [];
 
+  const errs = [];
+
   // 1) Nominatim
   const url1 =
     `https://nominatim.openstreetmap.org/search?` +
@@ -161,16 +180,33 @@ export async function geocodeNominatim(q, limit = 5) {
     const j = await fetchJson(url1);
     if (Array.isArray(j)) return j.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
   } catch (e) {
-    // fall through to fallback
+    errs.push(e?.message || String(e));
   }
 
   // 2) Fallback: Photon (Komoot) – usually CORS-friendly
-  const url2 =
-    `https://photon.komoot.io/api/?limit=${limit}&q=${encodeURIComponent(query)}`;
+  const url2 = `https://photon.komoot.io/api/?limit=${limit}&q=${encodeURIComponent(query)}`;
 
-  const j2 = await fetchJson(url2);
-  const feats = j2?.features || [];
-  return feats.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+  try {
+    const j2 = await fetchJson(url2);
+    const feats = j2?.features || [];
+    const out = feats.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+    if (out.length) return out;
+  } catch (e) {
+    errs.push(e?.message || String(e));
+  }
+
+  // 3) Fallback: maps.co (public geocoder proxy)
+  const url3 = `https://geocode.maps.co/search?q=${encodeURIComponent(query)}`;
+
+  try {
+    const j3 = await fetchJson(url3);
+    if (Array.isArray(j3)) return j3.map(normItem).filter(x => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+  } catch (e) {
+    errs.push(e?.message || String(e));
+  }
+
+  // Nothing worked: throw a helpful error message for UI
+  throw new Error("SEARCH_FAILED: " + errs.slice(0, 3).join(" | "));
 }
 
 export async function geocodeEG(q, limit = 5) {
