@@ -841,34 +841,36 @@ async function handleRideSnapshot(rideSnap) {
     return;
   }
 
+  if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
   if (ride.status === "completed" && !ride.passengerRating) {
-
-  stopDriverTracking();
-  removeRouteLayer(routeLayerRef);
-  removeRouteLayer(driverRouteLayerRef);
-
-  currentRideId = rideSnap.id;
-
-  renderStars(0);
-  setText(rateHint, "");
-  showRatingModal();
-
-  return;
-}
-
-    if (currentRideDocUnsub) {
-      currentRideDocUnsub();
-      currentRideDocUnsub = null;
-    }
+    stopDriverTracking();
     removeRouteLayer(routeLayerRef);
-removeRouteLayer(driverRouteLayerRef);
-setText(distanceValue, "");
-setText(routeEta, "");
-setText(routeMeta, "");
-stopDriverTracking();
-    hardResetPassengerUI();
+    removeRouteLayer(driverRouteLayerRef);
+    setText(distanceValue, "");
+    setText(routeMeta, "");
+
+    currentRideId = rideSnap.id;
+
+    renderStars(0);
+    setText(rateHint, "");
+    showRatingModal();
     return;
   }
+
+  if (currentRideDocUnsub) {
+    currentRideDocUnsub();
+    currentRideDocUnsub = null;
+  }
+
+  removeRouteLayer(routeLayerRef);
+  removeRouteLayer(driverRouteLayerRef);
+  setText(distanceValue, "");
+  setText(routeMeta, "");
+  stopDriverTracking();
+
+  hardResetPassengerUI();
+  return;
+}
 
   currentRideId = rideSnap.id;
   currentPickup = ride.pickup?.lat && ride.pickup?.lon
