@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>مشوارك - لوحة الإدارة</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">M</div>
+        <div>
+          <div class="brand-title">مشوارك</div>
+          <div class="brand-sub">لوحة إدارة سرية</div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span id="adminBadge" class="badge">...</span>
+        <button id="logoutBtn" class="btn ghost small" type="button">خروج</button>
+      </div>
+    </header>
+
+    <main class="auth-container" style="padding:16px; display:block;">
+      <section class="card" style="max-width:1200px; margin:0 auto;">
+        <div class="panel-title">إحصائيات عامة</div>
+        <div id="adminStats" class="grid2" style="margin-top:12px"></div>
+
+        <div class="divider"></div>
+        <div class="panel-title">المستخدمون</div>
+        <div id="usersList" class="list" style="margin-top:12px"></div>
+
+        <div class="divider"></div>
+        <div class="panel-title">الرحلات</div>
+        <div id="ridesList" class="list" style="margin-top:12px"></div>
+      </section>
+    </main>
+    <div id="toastRoot"></div>
+  </div>
+  <script type="module" src="./js/admin.js"></script>
+</body>
+</html>
