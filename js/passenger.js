@@ -1299,14 +1299,15 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
     const u = auth.currentUser;
     if (!u) throw new Error("لا يوجد مستخدم مسجل.");
     await updateDoc(doc(db, "users", u.uid), {
-      role: "driver",
-      governorate: gov,
-      center,
-      vehicleType,
-      vehicleCode,
-      address,
-      updatedAt: serverTimestamp(),
-    });
+  uid: u.uid,
+  role: "driver",
+  governorate: gov,
+  center,
+  vehicleType,
+  vehicleCode,
+  address,
+  updatedAt: serverTimestamp(),
+});
     location.href = "./driver.html?ts=" + Date.now();
   } catch (e) {
     console.error("SWITCH DRIVER ERROR:", e);
