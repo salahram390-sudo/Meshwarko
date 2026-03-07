@@ -841,14 +841,20 @@ async function handleRideSnapshot(rideSnap) {
     return;
   }
 
-  if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
-    if (ride.status === "completed" && !ride.passengerRating) {
-      currentRideId = rideSnap.id;
-      renderStars(0);
-      setText(rateHint, "");
-      showRatingModal();
-      return;
-    }
+  if (ride.status === "completed" && !ride.passengerRating) {
+
+  stopDriverTracking();
+  removeRouteLayer(routeLayerRef);
+  removeRouteLayer(driverRouteLayerRef);
+
+  currentRideId = rideSnap.id;
+
+  renderStars(0);
+  setText(rateHint, "");
+  showRatingModal();
+
+  return;
+}
 
     if (currentRideDocUnsub) {
       currentRideDocUnsub();
