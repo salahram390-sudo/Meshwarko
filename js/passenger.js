@@ -854,6 +854,12 @@ async function handleRideSnapshot(rideSnap) {
       currentRideDocUnsub();
       currentRideDocUnsub = null;
     }
+    removeRouteLayer(routeLayerRef);
+removeRouteLayer(driverRouteLayerRef);
+setText(distanceValue, "");
+setText(routeEta, "");
+setText(routeMeta, "");
+stopDriverTracking();
     hardResetPassengerUI();
     return;
   }
