@@ -186,7 +186,20 @@ registerForm.addEventListener("submit", async (e) => {
 
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
 
-    const common = { role, name, phone, email, createdAt: serverTimestamp(), status: "active", walletBalance: 0, totalEarnings: 0, completedTrips: 0, ratingAvg: 0, ratingCount: 0 };
+    const common = {
+  uid: cred.user.uid,
+  role,
+  name,
+  phone,
+  email,
+  createdAt: serverTimestamp(),
+  status: "active",
+  walletBalance: 0,
+  totalEarnings: 0,
+  completedTrips: 0,
+  ratingAvg: 0,
+  ratingCount: 0
+};
 
     let profile = {};
     if (role === "passenger") {
