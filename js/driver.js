@@ -7,7 +7,7 @@ import {
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, isActiveRideStatus, normalizeArabicDigits, getRideFreshMaxAgeMs } from "./utils.js";
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, isActiveRideStatus, normalizeArabicDigits, getRideFreshMaxAgeMs, formatRideDate } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
   createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
@@ -33,6 +33,8 @@ const btnTrackToggle = $("#btnTrackToggle");
 const btnArrived = $("#btnArrived");
 const driverStatus = $("#driverStatus");
 const subText = $("#subText");
+const driverWalletStats = $("#driverWalletStats");
+const driverHistoryList = $("#driverHistoryList");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
@@ -65,6 +67,36 @@ function clampPrice(v) {
   const n = Number(normalizeArabicDigits(v));
   if (!Number.isFinite(n)) return null;
   return Math.min(3000, Math.max(15, Math.round(n / 5) * 5));
+}
+function renderDriverWallet() {
+  if (!driverWalletStats || !myUser) return;
+  driverWalletStats.innerHTML = `
+    <div class="card-lite"><div class="muted small">الرصيد</div><div class="price" style="font-size:22px">${moneyEGP(myUser.walletBalance || 0)}</div></div>
+    <div class="card-lite"><div class="muted small">إجمالي الأرباح</div><div class="price" style="font-size:22px">${moneyEGP(myUser.totalEarnings || 0)}</div></div>
+    <div class="card-lite"><div class="muted small">الرحلات المكتملة</div><div class="price" style="font-size:22px">${escapeHtml(String(myUser.completedTrips || 0))}</div></div>
+    <div class="card-lite"><div class="muted small">التقييم</div><div class="price" style="font-size:22px">${Number(myUser.ratingAvg || 0).toFixed(1)}</div></div>
+  `;
+}
+
+function renderDriverHistory(rides) {
+  if (!driverHistoryList) return;
+  driverHistoryList.innerHTML = "";
+  if (!rides.length) {
+    driverHistoryList.innerHTML = `<div class="muted small">لا يوجد سجل رحلات بعد.</div>`;
+    return;
+  }
+  rides.slice(0, 10).forEach((r) => {
+    const item = document.createElement("div");
+    item.className = "list-item";
+    item.innerHTML = `
+      <div class="row-between"><b>${moneyEGP(r.price)}</b><span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span></div>
+      <div class="muted small">الراكب: ${escapeHtml(r.passengerName || '-')} • ${escapeHtml(r.passengerPhone || '-')}</div>
+      <div class="muted small">قيام: ${escapeHtml(r.pickupText || '-')}</div>
+      <div class="muted small">وصول: ${escapeHtml(r.dropoffText || '-')}</div>
+      <div class="muted small">تقييم الراكب لك: ${r.passengerRating ? `⭐ ${r.passengerRating}` : '—'}</div>
+    `;
+    driverHistoryList.appendChild(item);
+  });
 }
 
 function isRideVisibleForDriver(ride) {
@@ -376,6 +408,7 @@ function watchRidesForDriver() {
 
     ridesList.innerHTML = "";
 
+    renderDriverHistory(mineRows.filter((r) => r.status === "completed"));
     if (!rides.length) {
       ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`;
       return;
@@ -601,11 +634,39 @@ btnComplete.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("ينهي...");
   try {
-    await updateDoc(doc(db, "rides", selectedRideId), {
+    const rideRef = doc(db, "rides", selectedRideId);
+    const rideSnap = await getDoc(rideRef);
+    const ride = rideSnap.exists() ? rideSnap.data() : null;
+    await updateDoc(rideRef, {
       status: "completed",
       completedAt: serverTimestamp(),
       archived: true,
     });
+
+    if (ride && myUser) {
+      const price = Number(ride.price || 0);
+      const walletBalance = Number(myUser.walletBalance || 0) + price;
+      const totalEarnings = Number(myUser.totalEarnings || 0) + price;
+      const completedTrips = Number(myUser.completedTrips || 0) + 1;
+      await updateDoc(doc(db, "users", myUser.uid), { walletBalance, totalEarnings, completedTrips, updatedAt: serverTimestamp() }).catch(() => {});
+      myUser = { ...myUser, walletBalance, totalEarnings, completedTrips };
+      renderDriverWallet();
+
+      const passengerRate = Number(prompt("قيّم الراكب من 1 إلى 5 (اختياري)", "5") || 0);
+      if (passengerRate >= 1 && passengerRate <= 5 && ride.passengerId) {
+        await updateDoc(rideRef, { driverRating: passengerRate, driverRatedAt: serverTimestamp() }).catch(() => {});
+        const passengerRef = doc(db, "users", ride.passengerId);
+        const passengerSnap = await getDoc(passengerRef);
+        if (passengerSnap.exists()) {
+          const pData = passengerSnap.data();
+          const prevCount = Number(pData.ratingCount || 0);
+          const prevAvg = Number(pData.ratingAvg || 0);
+          const nextCount = prevCount + 1;
+          const nextAvg = ((prevAvg * prevCount) + passengerRate) / nextCount;
+          await updateDoc(passengerRef, { ratingCount: nextCount, ratingAvg: Number(nextAvg.toFixed(2)), updatedAt: serverTimestamp() }).catch(() => {});
+        }
+      }
+    }
     stopLiveTracking();
     btnComplete.disabled = true;
     btnCancel.disabled = true;
@@ -687,8 +748,11 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   myUser = { uid: user.uid, ...me.data() };
+  if (myUser.role === "admin") { location.href = "./admin.html"; return; }
+  if (myUser.status === "blocked") { await signOut(auth); alert("هذا الحساب محظور من الإدارة."); location.href = "./index.html"; return; }
   ownDriverPosDocRef = doc(db, "driversOnline", user.uid);
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
+  renderDriverWallet();
   setDriverStatus("متصل");
 
   locateOnce(map, async (loc) => {

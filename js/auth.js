@@ -154,12 +154,20 @@ if (role === "driver") {
 }
 
 const snap = await getDoc(doc(db, "users", u.uid));
-const r = snap.exists() ? snap.data().role : "passenger";
+const profile = snap.exists() ? snap.data() : {};
+const r = profile?.role || "passenger";
+if (profile?.status === "blocked") {
+  await signOut(auth);
+  setText(loginHint, "هذا الحساب محظور من الإدارة.");
+  return;
+}
 await ensureNotificationPermission(true);
 
-location.href = r === "driver"
-  ? "./driver.html"
-  : "./passenger.html";
+location.href = r === "admin"
+  ? "./admin.html"
+  : r === "driver"
+    ? "./driver.html"
+    : "./passenger.html";
 
 } catch (err) {
   console.log("LOGIN ERROR:", err.code, err.message, err);
@@ -178,7 +186,7 @@ registerForm.addEventListener("submit", async (e) => {
 
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
 
-    const common = { role, name, phone, email, createdAt: serverTimestamp() };
+    const common = { role, name, phone, email, createdAt: serverTimestamp(), status: "active", walletBalance: 0, totalEarnings: 0, completedTrips: 0, ratingAvg: 0, ratingCount: 0 };
 
     let profile = {};
     if (role === "passenger") {

@@ -95,3 +95,14 @@ export function haversineMeters(a, b) {
   const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
   return R * c;
 }
+
+
+export function formatRideDate(ts) {
+  const ms = timestampToMillis(ts);
+  if (!ms) return "—";
+  try {
+    return new Date(ms).toLocaleString("ar-EG");
+  } catch (_) {
+    return new Date(ms).toString();
+  }
+}

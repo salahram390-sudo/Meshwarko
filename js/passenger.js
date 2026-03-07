@@ -7,7 +7,7 @@ import {
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, timestampToMillis, getRideFreshMaxAgeMs } from "./utils.js";
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, timestampToMillis, getRideFreshMaxAgeMs, formatRideDate } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
   geocodeNominatim, bindSearch, createCarIcon, moveCarMarkerSmooth,
@@ -87,6 +87,8 @@ const rateComment = $("#rateComment");
 const rateSend = $("#rateSend");
 const rateSkip = $("#rateSkip");
 const rateHint = $("#rateHint");
+const passengerStats = $("#passengerStats");
+const passengerHistoryList = $("#passengerHistoryList");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
@@ -214,6 +216,48 @@ function clampPrice(v) {
   const n = Number(v);
   if (!Number.isFinite(n)) return 15;
   return Math.min(3000, Math.max(15, Math.round(n / 5) * 5));
+}
+function buildPricingSummary(distanceMeters, durationSec, manualPrice) {
+  const km = Number(distanceMeters || 0) / 1000;
+  const mins = Number(durationSec || 0) / 60;
+  const surge = Number(surgeMultiplier().toFixed(2));
+  const baseFare = 15;
+  const perKm = 8;
+  const perMin = 0.35;
+  const estimated = Math.round((baseFare + km * perKm + mins * perMin) * surge);
+  return {
+    baseFare,
+    perKm,
+    perMin,
+    surge,
+    distanceKm: Number(km.toFixed(2)),
+    durationMin: Number(mins.toFixed(1)),
+    estimatedPrice: estimated,
+    finalPrice: clampPrice(manualPrice),
+  };
+}
+
+function renderPassengerHistory(rides) {
+  if (!passengerHistoryList || !passengerStats) return;
+  const completed = rides.filter((r) => r.status === "completed");
+  const total = completed.reduce((sum, r) => sum + Number(r.price || 0), 0);
+  passengerStats.textContent = `رحلات مكتملة: ${completed.length} • إجمالي المدفوع: ${moneyEGP(total)}`;
+  passengerHistoryList.innerHTML = "";
+  if (!completed.length) {
+    passengerHistoryList.innerHTML = `<div class="muted small">لا يوجد سجل رحلات بعد.</div>`;
+    return;
+  }
+  completed.slice(0, 10).forEach((r) => {
+    const item = document.createElement("div");
+    item.className = "list-item";
+    item.innerHTML = `
+      <div class="row-between"><b>${moneyEGP(r.price)}</b><span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span></div>
+      <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
+      <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
+      <div class="muted small">السائق: ${escapeHtml(r.driverName || "-")} • تقييمك: ${r.passengerRating ? `⭐ ${r.passengerRating}` : "—"}</div>
+    `;
+    passengerHistoryList.appendChild(item);
+  });
 }
 function canUseDriverOnlineRow(d) {
   const lat = Number(d?.lat);
@@ -1001,6 +1045,7 @@ btnRequest.addEventListener("click", async () => {
       dropoffText: dropText.value.trim(),
       distanceMeters: lastDistanceMeters,
       durationSec: lastDurationSec,
+      pricing: buildPricingSummary(lastDistanceMeters, lastDurationSec, price),
       price,
       archived: false,
       passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
@@ -1144,12 +1189,29 @@ rateSend?.addEventListener("click", async () => {
   setText(rateHint, "جارٍ الإرسال...");
 
   try {
-    await updateDoc(doc(db, "rides", currentRideId), {
+    const rideRef = doc(db, "rides", currentRideId);
+    const rideSnap = await getDoc(rideRef);
+    const ride = rideSnap.exists() ? rideSnap.data() : null;
+
+    await updateDoc(rideRef, {
       passengerRating: ratingValue,
       passengerComment: (rateComment?.value || "").trim(),
       ratedAt: serverTimestamp(),
       archived: true,
     });
+
+    if (ride?.driverId) {
+      const driverRef = doc(db, "users", ride.driverId);
+      const driverSnap = await getDoc(driverRef);
+      if (driverSnap.exists()) {
+        const d = driverSnap.data();
+        const prevCount = Number(d.ratingCount || 0);
+        const prevAvg = Number(d.ratingAvg || 0);
+        const nextCount = prevCount + 1;
+        const nextAvg = ((prevAvg * prevCount) + ratingValue) / nextCount;
+        await updateDoc(driverRef, { ratingCount: nextCount, ratingAvg: Number(nextAvg.toFixed(2)), updatedAt: serverTimestamp() }).catch(() => {});
+      }
+    }
 
     hideRatingModal();
 
@@ -1258,6 +1320,8 @@ onAuthStateChanged(auth, async (user) => {
 
   const me = await getDoc(doc(db, "users", user.uid));
   myData = me.exists() ? me.data() : {};
+  if (myData.role === "admin") { location.href = "./admin.html"; return; }
+  if (myData.status === "blocked") { await signOut(auth); alert("هذا الحساب محظور من الإدارة."); location.href = "./index.html"; return; }
   setText(meBadge, `${myData.name || "مستخدم"} • راكب`);
 
   await initAdmin().catch(() => {});
