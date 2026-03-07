@@ -257,11 +257,24 @@ async function initAdmin() {
 }
 
 function watchPassengerEndRequest(rideId) {
-  if (acceptedRideUnsub) { acceptedRideUnsub(); acceptedRideUnsub = null; }
+
+  if (!rideId) {
+    console.warn("watchPassengerEndRequest skipped: rideId missing");
+    return;
+  }
+
+  if (acceptedRideUnsub) {
+    acceptedRideUnsub();
+    acceptedRideUnsub = null;
+  }
+
   acceptedRideUnsub = onSnapshot(doc(db, "rides", rideId), (snap) => {
+
     if (!snap.exists()) return;
+
     const ride = snap.data();
     selectedRideData = { ...ride, id: rideId };
+
     refreshSelectedRideButtons(selectedRideData);
 
     if ((ride.status === "accepted" || ride.status === "arrived") && ride.passengerEndRequested === true) {
@@ -269,10 +282,21 @@ function watchPassengerEndRequest(rideId) {
     }
 
     if (ride.status === "completed" || ride.status === "canceled") {
-      if (acceptedRideUnsub) { acceptedRideUnsub(); acceptedRideUnsub = null; }
-      resetSelectedRideUi(ride.status === "completed" ? "تم إنهاء الرحلة." : "تم إلغاء الرحلة.");
+
+      if (acceptedRideUnsub) {
+        acceptedRideUnsub();
+        acceptedRideUnsub = null;
+      }
+
+      resetSelectedRideUI(
+        ride.status === "completed"
+          ? "تم إنهاء الرحلة"
+          : "تم إلغاء الرحلة"
+      );
     }
+
   });
+
 }
 
 async function drawRideRoute(ride) {
