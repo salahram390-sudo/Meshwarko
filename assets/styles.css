@@ -1216,3 +1216,9 @@ body:before{
   flex-direction: column;
   gap: 8px;
 }
+
+
+.admin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:900px){.admin-grid{grid-template-columns:1fr}}
+.stat-box{padding:12px;border:1px solid var(--line);border-radius:14px;background:rgba(10,14,20,.55)}
+.ride-card,.list-item{display:flex;flex-direction:column;gap:6px}
