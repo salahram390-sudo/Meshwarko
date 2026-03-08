@@ -588,7 +588,9 @@ btnAccept.addEventListener("click", async () => {
       selectedRideData = { ...liveRide, id: selectedRideId };
       refreshSelectedRideButtons(selectedRideData);
       await showAcceptedDetails(selectedRideId);
-      watchPassengerEndRequest(selectedRideId);
+      if (selectedRideId) {
+  watchPassengerEndRequest(selectedRideId);
+}
       notify({ title: "الرحلة مقبولة بالفعل", body: "الطلب مسجل باسمك بالفعل.", tag: "ride-already-accepted" });
       setDriverStatus("على الطريق");
       return;
@@ -626,8 +628,11 @@ btnAccept.addEventListener("click", async () => {
     };
     refreshSelectedRideButtons(selectedRideData);
     startLiveTracking(selectedRideId);
-    await showAcceptedDetails(selectedRideId);
-    watchPassengerEndRequest(selectedRideId);
+await showAcceptedDetails(selectedRideId);
+
+if (selectedRideId) {
+  watchPassengerEndRequest(selectedRideId);
+}
     notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });
     setDriverStatus("على الطريق");
   } catch (e) {
