@@ -627,10 +627,10 @@ btnAccept.addEventListener("click", async () => {
       expiresAtMs: null,
     };
     refreshSelectedRideButtons(selectedRideData);
-    startLiveTracking(selectedRideId);
-await showAcceptedDetails(selectedRideId);
+    await showAcceptedDetails(selectedRideId);
 
 if (selectedRideId) {
+  startLiveTracking(selectedRideId);
   watchPassengerEndRequest(selectedRideId);
 }
     notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });
