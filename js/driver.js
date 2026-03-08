@@ -288,7 +288,7 @@ function watchPassengerEndRequest(rideId) {
         acceptedRideUnsub = null;
       }
 
-      resetSelectedRideUI(
+      resetSelectedRideUi(
         ride.status === "completed"
           ? "تم إنهاء الرحلة"
           : "تم إلغاء الرحلة"
