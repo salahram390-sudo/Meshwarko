@@ -254,7 +254,13 @@ export async function routeOSRM(from, to) {
 "?overview=full&geometries=geojson&steps=false&alternatives=true";
   
   const j = await fetchJson(url, { timeoutMs: 15000 });
-  const route = j?.routes?.[0];
+  let route = j?.routes?.[0];
+
+if (j?.routes?.length > 1) {
+  route = j.routes.reduce((best, r) =>
+    r.distance < best.distance ? r : best
+  );
+}
   if (!route?.geometry) throw new Error("OSRM route missing geometry");
 
   return {
