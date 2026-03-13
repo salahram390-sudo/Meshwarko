@@ -249,10 +249,10 @@ export async function routeOSRM(from, to) {
   }
 
   const url =
-    "https://router.project-osrm.org/route/v1/driving/" +
-    `${from.lon},${from.lat};${to.lon},${to.lat}` +
-    "?overview=full&geometries=geojson&steps=false";
-
+"https://router.project-osrm.org/route/v1/driving/" +
+`${from.lon},${from.lat};${to.lon},${to.lat}` +
+"?overview=full&geometries=geojson&steps=false&alternatives=true";
+  
   const j = await fetchJson(url, { timeoutMs: 15000 });
   const route = j?.routes?.[0];
   if (!route?.geometry) throw new Error("OSRM route missing geometry");
