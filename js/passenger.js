@@ -700,8 +700,15 @@ function getRideStatusLabel(status) {
 }
 
 function renderRideCard(ride, driverProfile) {
+  clearRideSearchTimer();
+
   if (!ride) {
     rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
+    return;
+  }
+
+  if (ride.status === "requested") {
+    renderSearchingRideCard(ride);
     return;
   }
 
