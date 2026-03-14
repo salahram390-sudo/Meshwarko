@@ -779,6 +779,7 @@ function getRideStatusLabel(status) {
     case "offered": return "وصل عرض";
     case "accepted": return "السائق في الطريق";
     case "arrived": return "السائق وصل";
+    case "started": return "الرحلة بدأت";
     case "completed": return "الرحلة انتهت";
     case "canceled": return "تم الإلغاء";
     default: return status || "-";
