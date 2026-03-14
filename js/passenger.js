@@ -557,6 +557,15 @@ function hardResetPassengerUI() {
   stopDriverTracking();
   stopLiveDrivers();
 
+  if (btnChatPassenger) btnChatPassenger.disabled = true;
+if (chatUnsubPassenger) {
+  chatUnsubPassenger();
+  chatUnsubPassenger = null;
+}
+closePassengerChatModal();
+if (chatMessagesPassenger) chatMessagesPassenger.innerHTML = "";
+if (chatInputPassenger) chatInputPassenger.value = "";
+
   if (pickupMarker) {
     try { map.removeLayer(pickupMarker); } catch (_) {}
     pickupMarker = null;
