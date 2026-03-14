@@ -329,9 +329,9 @@ function watchPassengerEndRequest(rideId) {
 
     refreshSelectedRideButtons(selectedRideData);
 
-    if ((ride.status === "accepted" || ride.status === "arrived") && ride.passengerEndRequested === true) {
-      btnComplete.disabled = false;
-    }
+    if ((ride.status === "accepted" || ride.status === "arrived" || ride.status === "started") && ride.passengerEndRequested === true) {
+  btnComplete.disabled = false;
+}
 
     if (ride.status === "completed" || ride.status === "canceled") {
 
