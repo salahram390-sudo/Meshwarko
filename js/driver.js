@@ -35,6 +35,11 @@ const driverStatus = $("#driverStatus");
 const subText = $("#subText");
 const driverWalletStats = $("#driverWalletStats");
 const driverHistoryList = $("#driverHistoryList");
+const driverHistoryBtn = $("#driverHistoryBtn");
+const driverHistoryCount = $("#driverHistoryCount");
+const driverHistoryModal = $("#driverHistoryModal");
+const driverHistoryClose = $("#driverHistoryClose");
+const driverHistoryBackdrop = $("#driverHistoryBackdrop");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
