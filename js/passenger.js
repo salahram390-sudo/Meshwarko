@@ -267,6 +267,82 @@ function renderPassengerHistory(rides) {
     passengerHistoryList.appendChild(item);
   });
 }
+function openPassengerChatModal() {
+  if (!chatModalPassenger) return;
+  chatModalPassenger.classList.remove("hidden");
+}
+
+function closePassengerChatModal() {
+  if (!chatModalPassenger) return;
+  chatModalPassenger.classList.add("hidden");
+}
+
+function renderPassengerChatMessages(rows = []) {
+  if (!chatMessagesPassenger) return;
+
+  if (!rows.length) {
+    chatMessagesPassenger.innerHTML = `<div class="chat-empty">لا توجد رسائل بعد.</div>`;
+    return;
+  }
+
+  chatMessagesPassenger.innerHTML = "";
+  const myUid = auth.currentUser?.uid || null;
+
+  rows.forEach((msg) => {
+    const mine = msg.senderId === myUid;
+    const item = document.createElement("div");
+    item.className = `chat-msg ${mine ? "mine" : "other"}`;
+    item.innerHTML = `
+      <div>${escapeHtml(msg.text || "")}</div>
+      <span class="chat-meta">${escapeHtml(msg.senderName || "")}</span>
+    `;
+    chatMessagesPassenger.appendChild(item);
+  });
+
+  chatMessagesPassenger.scrollTop = chatMessagesPassenger.scrollHeight;
+}
+
+function watchPassengerChat(rideId) {
+  if (chatUnsubPassenger) {
+    chatUnsubPassenger();
+    chatUnsubPassenger = null;
+  }
+
+  if (!rideId) {
+    renderPassengerChatMessages([]);
+    return;
+  }
+
+  const q = query(
+    collection(db, "rides", rideId, "messages"),
+    orderBy("createdAt", "asc")
+  );
+
+  chatUnsubPassenger = onSnapshot(q, (snap) => {
+    const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderPassengerChatMessages(rows);
+  });
+}
+
+async function sendPassengerChatMessage() {
+  const text = String(chatInputPassenger?.value || "").trim();
+  if (!text || !currentRideId || !myData?.uid) return;
+
+  try {
+    await addDoc(collection(db, "rides", currentRideId, "messages"), {
+      text,
+      senderId: myData.uid,
+      senderRole: "passenger",
+      senderName: myData.name || "الراكب",
+      createdAt: serverTimestamp(),
+    });
+
+    chatInputPassenger.value = "";
+  } catch (e) {
+    console.error("sendPassengerChatMessage error", e);
+    notify({ title: "تعذر الإرسال", body: "فشل إرسال الرسالة.", tag: "chat-send-failed" });
+  }
+}
 function clearRideSearchTimer() {
   if (rideSearchTimer) {
     clearInterval(rideSearchTimer);
