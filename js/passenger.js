@@ -3,7 +3,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import {
   doc, getDoc, updateDoc,
   collection, addDoc, getDocs,
-  onSnapshot, query, where,
+  onSnapshot, query, where, orderBy,
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
