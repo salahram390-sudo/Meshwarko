@@ -80,7 +80,13 @@ const btnTrack = $("#btnTrack");
 const btnComplete = $("#btnComplete");
 const btnCall = $("#btnCall");
 const btnWhats = $("#btnWhats");
-
+const btnChatPassenger = $("#btnChatPassenger");
+const chatModalPassenger = $("#chatModalPassenger");
+const chatBackdropPassenger = $("#chatBackdropPassenger");
+const chatClosePassenger = $("#chatClosePassenger");
+const chatMessagesPassenger = $("#chatMessagesPassenger");
+const chatInputPassenger = $("#chatInputPassenger");
+const chatSendPassenger = $("#chatSendPassenger");
 const rateModal = $("#rateModal");
 const rateClose = $("#rateClose");
 const starsRoot = $("#stars");
