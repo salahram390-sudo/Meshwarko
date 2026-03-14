@@ -41,6 +41,13 @@ const driverHistoryCount = $("#driverHistoryCount");
 const driverHistoryModal = $("#driverHistoryModal");
 const driverHistoryClose = $("#driverHistoryClose");
 const driverHistoryBackdrop = $("#driverHistoryBackdrop");
+const btnChatDriver = $("#btnChatDriver");
+const chatModalDriver = $("#chatModalDriver");
+const chatBackdropDriver = $("#chatBackdropDriver");
+const chatCloseDriver = $("#chatCloseDriver");
+const chatMessagesDriver = $("#chatMessagesDriver");
+const chatInputDriver = $("#chatInputDriver");
+const chatSendDriver = $("#chatSendDriver");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
