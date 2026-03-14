@@ -95,20 +95,38 @@ function closeDriverHistoryModal() {
 
 function renderDriverHistory(rides) {
   if (!driverHistoryList) return;
+
+  const rows = [...(rides || [])].sort((a, b) => {
+    const aTime = a?.completedAt?.toMillis?.() || a?.createdAt?.toMillis?.() || a?.createdAtMs || 0;
+    const bTime = b?.completedAt?.toMillis?.() || b?.createdAt?.toMillis?.() || b?.createdAtMs || 0;
+    return bTime - aTime;
+  });
+
+  if (driverHistoryCount) {
+    driverHistoryCount.textContent = String(rows.length);
+  }
+
   driverHistoryList.innerHTML = "";
-  if (!rides.length) {
+
+  if (!rows.length) {
     driverHistoryList.innerHTML = `<div class="muted small">لا يوجد سجل رحلات بعد.</div>`;
     return;
   }
-  rides.slice(0, 10).forEach((r) => {
+
+  rows.slice(0, 20).forEach((r) => {
     const item = document.createElement("div");
-    item.className = "list-item";
+    item.className = "list-item history-item";
     item.innerHTML = `
-      <div class="row-between"><b>${moneyEGP(r.price)}</b><span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span></div>
-      <div class="muted small">الراكب: ${escapeHtml(r.passengerName || '-')} • ${escapeHtml(r.passengerPhone || '-')}</div>
-      <div class="muted small">قيام: ${escapeHtml(r.pickupText || '-')}</div>
-      <div class="muted small">وصول: ${escapeHtml(r.dropoffText || '-')}</div>
-      <div class="muted small">تقييم الراكب لك: ${r.passengerRating ? `⭐ ${r.passengerRating}` : '—'}</div>
+      <div class="row-between">
+        <b>${moneyEGP(r.price || 0)}</b>
+        <span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span>
+      </div>
+
+      <div class="muted small">الراكب: ${escapeHtml(r.passengerName || "-")} • ${escapeHtml(r.passengerPhone || "-")}</div>
+      <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
+      <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
+      <div class="muted small">الحالة: ${escapeHtml(r.status || "-")}</div>
+      <div class="muted small">تقييم الراكب لك: ${r.passengerRating ? `⭐ ${r.passengerRating}` : "—"}</div>
     `;
     driverHistoryList.appendChild(item);
   });
