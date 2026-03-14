@@ -711,6 +711,28 @@ btnArrived.addEventListener("click", async () => {
   }
 });
 
+if (driverStartRideBtn) {
+  driverStartRideBtn.addEventListener("click", async () => {
+
+    if (!currentRideId) return;
+
+    try {
+
+      await updateDoc(doc(db, "rides", currentRideId), {
+        status: "started",
+        startedAt: serverTimestamp()
+      });
+
+      toast("تم بدء الرحلة");
+
+    } catch (err) {
+      console.error(err);
+      toast("فشل بدء الرحلة");
+    }
+
+  });
+}
+
 btnComplete.addEventListener("click", async () => {
   if (!selectedRideId) return;
   setDriverStatus("ينهي...");
