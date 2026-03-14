@@ -334,6 +334,14 @@ function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   btnArrived.disabled = true;
   btnComplete.disabled = true;
   driverStartRideBtn.disabled = true;
+  if (btnChatDriver) btnChatDriver.disabled = true;
+if (chatUnsubDriver) {
+  chatUnsubDriver();
+  chatUnsubDriver = null;
+}
+closeDriverChatModal();
+if (chatMessagesDriver) chatMessagesDriver.innerHTML = "";
+if (chatInputDriver) chatInputDriver.value = "";
   offerInput.value = "";
   stopLiveTracking();
 }
