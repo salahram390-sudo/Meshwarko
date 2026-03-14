@@ -219,6 +219,7 @@ function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   btnCancel.disabled = true;
   btnArrived.disabled = true;
   btnComplete.disabled = true;
+  driverStartRideBtn.disabled = true;
   offerInput.value = "";
   stopLiveTracking();
 }
