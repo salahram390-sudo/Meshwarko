@@ -812,7 +812,7 @@ function renderRideCard(ride, driverProfile) {
     lines.push(`<div class="muted small">يمكنك قبول العرض أو رفضه.</div>`);
   }
 
-  if (ride.status === "accepted" || ride.status === "arrived" || ride.status === "completed") {
+  if (ride.status === "accepted" || ride.status === "arrived" || ride.status === "started" || ride.status === "completed") {
     lines.push(`<div class="divider"></div>`);
     lines.push(`<div><b>السائق</b></div>`);
     lines.push(`<div class="muted small">الاسم: ${escapeHtml(driverProfile?.name || ride.driverName || "-")}</div>`);
