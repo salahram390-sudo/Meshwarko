@@ -67,6 +67,7 @@ let ridesUnsub = null;
 let acceptedRideUnsub = null;
 let heartbeatInterval = null;
 let ownDriverPosDocRef = null;
+let chatUnsubDriver = null;
 const MAX_VISIBLE_RIDE_DISTANCE_M = 8000;
 
 function setDriverStatus(t) { setText(driverStatus, t); }
