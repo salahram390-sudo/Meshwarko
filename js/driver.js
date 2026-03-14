@@ -494,6 +494,7 @@ const canArrive = mine && status === "accepted";
 const canStart = mine && status === "arrived";
 const canComplete = mine && (status === "started" || ride?.passengerEndRequested === true);
 const canCancel = mine && (status === "accepted" || status === "arrived" || status === "started" || status === "offered");
+  const canChat = mine && (status === "accepted" || status === "arrived" || status === "started");
   driverStartRideBtn.disabled = !canStart;
   btnSendOffer.disabled = !canOffer;
   btnAccept.disabled = !canAccept;
