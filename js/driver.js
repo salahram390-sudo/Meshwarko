@@ -83,6 +83,16 @@ function renderDriverWallet() {
   `;
 }
 
+function openDriverHistoryModal() {
+  if (!driverHistoryModal) return;
+  driverHistoryModal.classList.remove("hidden");
+}
+
+function closeDriverHistoryModal() {
+  if (!driverHistoryModal) return;
+  driverHistoryModal.classList.add("hidden");
+}
+
 function renderDriverHistory(rides) {
   if (!driverHistoryList) return;
   driverHistoryList.innerHTML = "";
