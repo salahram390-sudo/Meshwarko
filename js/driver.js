@@ -34,6 +34,7 @@ const btnArrived = $("#btnArrived");
 const driverStatus = $("#driverStatus");
 const subText = $("#subText");
 const driverWalletStats = $("#driverWalletStats");
+const driverStartRideBtn = $("#driverStartRideBtn");
 const driverHistoryList = $("#driverHistoryList");
 const driverHistoryBtn = $("#driverHistoryBtn");
 const driverHistoryCount = $("#driverHistoryCount");
