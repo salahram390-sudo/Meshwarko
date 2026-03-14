@@ -451,6 +451,7 @@ function clearAll() {
 }
 
 function cleanupRideState() {
+  clearRideSearchTimer();
   currentRideId = null;
   currentPickup = null;
   arrivedToastShownFor = null;
