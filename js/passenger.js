@@ -1074,10 +1074,11 @@ async function handleRideSnapshot(rideSnap) {
   btnCancel.disabled = !(ride.status === "requested" || ride.status === "offered");
   btnAcceptOffer.disabled = ride.status !== "offered";
   btnRejectOffer.disabled = ride.status !== "offered";
-  btnTrack.disabled = !(ride.status === "accepted" || ride.status === "arrived");
-  btnComplete.disabled = !(ride.status === "accepted" || ride.status === "arrived");
-  btnCall.disabled = !(ride.status === "accepted" || ride.status === "arrived");
-  btnWhats.disabled = !(ride.status === "accepted" || ride.status === "arrived");
+  btnTrack.disabled = !(ride.status === "accepted" || ride.status === "arrived" || ride.status === "started");
+btnComplete.disabled = !(ride.status === "accepted" || ride.status === "arrived" || ride.status === "started");
+btnCall.disabled = !(ride.status === "accepted" || ride.status === "arrived" || ride.status === "started");
+btnWhats.disabled = !(ride.status === "accepted" || ride.status === "arrived" || ride.status === "started");
+if (btnChatPassenger) btnChatPassenger.disabled = !(ride.status === "accepted" || ride.status === "arrived" || ride.status === "started");
 
   if (ride.status === "requested") {
     setText(routeMeta, "جاري البحث عن سائق...");
