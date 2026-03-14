@@ -1094,10 +1094,14 @@ if (btnChatPassenger) btnChatPassenger.disabled = !(ride.status === "accepted" |
     setStatus("السائق في الطريق");
     if (ride.driverId) startDriverTracking(ride.driverId);
   } else if (ride.status === "arrived") {
-    setText(routeMeta, "السائق وصل لمكان القيام ✅");
-    setStatus("السائق وصل");
-    if (ride.driverId) startDriverTracking(ride.driverId);
-  }
+  setText(routeMeta, "السائق وصل لمكان القيام ✅");
+  setStatus("السائق وصل");
+  if (ride.driverId) startDriverTracking(ride.driverId);
+} else if (ride.status === "started") {
+  setText(routeMeta, "بدأت الرحلة ✅");
+  setStatus("الرحلة بدأت");
+  if (ride.driverId) startDriverTracking(ride.driverId);
+}
 
   if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) {
     arrivedToastShownFor = currentRideId;
