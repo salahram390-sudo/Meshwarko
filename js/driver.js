@@ -2,8 +2,8 @@ import { auth, db } from "./firebase.js";
 console.log("driver.js loaded ✅");
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
-  doc, getDoc, updateDoc, setDoc, deleteDoc,
-  collection, onSnapshot, query, where,
+  doc, getDoc, updateDoc, setDoc, deleteDoc, addDoc,
+  collection, onSnapshot, query, where, orderBy,
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
