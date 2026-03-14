@@ -275,6 +275,35 @@ if (driverHistoryBackdrop) {
   driverHistoryBackdrop.addEventListener("click", closeDriverHistoryModal);
 }
 
+if (btnChatDriver) {
+  btnChatDriver.addEventListener("click", () => {
+    if (!selectedRideId) return;
+    openDriverChatModal();
+    watchDriverChat(selectedRideId);
+  });
+}
+
+if (chatCloseDriver) {
+  chatCloseDriver.addEventListener("click", closeDriverChatModal);
+}
+
+if (chatBackdropDriver) {
+  chatBackdropDriver.addEventListener("click", closeDriverChatModal);
+}
+
+if (chatSendDriver) {
+  chatSendDriver.addEventListener("click", sendDriverChatMessage);
+}
+
+if (chatInputDriver) {
+  chatInputDriver.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendDriverChatMessage();
+    }
+  });
+}
+
 function clearRouteAndMarkers() {
   try {
     if (routeLayerRef.current) {
