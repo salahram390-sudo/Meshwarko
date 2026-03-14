@@ -102,6 +102,83 @@ function closeDriverHistoryModal() {
   driverHistoryModal.classList.add("hidden");
 }
 
+function openDriverChatModal() {
+  if (!chatModalDriver) return;
+  chatModalDriver.classList.remove("hidden");
+}
+
+function closeDriverChatModal() {
+  if (!chatModalDriver) return;
+  chatModalDriver.classList.add("hidden");
+}
+
+function renderDriverChatMessages(rows = []) {
+  if (!chatMessagesDriver) return;
+
+  if (!rows.length) {
+    chatMessagesDriver.innerHTML = `<div class="chat-empty">لا توجد رسائل بعد.</div>`;
+    return;
+  }
+
+  chatMessagesDriver.innerHTML = "";
+  const myUid = auth.currentUser?.uid || null;
+
+  rows.forEach((msg) => {
+    const mine = msg.senderId === myUid;
+    const item = document.createElement("div");
+    item.className = `chat-msg ${mine ? "mine" : "other"}`;
+    item.innerHTML = `
+      <div>${escapeHtml(msg.text || "")}</div>
+      <span class="chat-meta">${escapeHtml(msg.senderName || "")}</span>
+    `;
+    chatMessagesDriver.appendChild(item);
+  });
+
+  chatMessagesDriver.scrollTop = chatMessagesDriver.scrollHeight;
+}
+
+function watchDriverChat(rideId) {
+  if (chatUnsubDriver) {
+    chatUnsubDriver();
+    chatUnsubDriver = null;
+  }
+
+  if (!rideId) {
+    renderDriverChatMessages([]);
+    return;
+  }
+
+  const q = query(
+    collection(db, "rides", rideId, "messages"),
+    orderBy("createdAt", "asc")
+  );
+
+  chatUnsubDriver = onSnapshot(q, (snap) => {
+    const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderDriverChatMessages(rows);
+  });
+}
+
+async function sendDriverChatMessage() {
+  const text = String(chatInputDriver?.value || "").trim();
+  if (!text || !selectedRideId || !myUser) return;
+
+  try {
+    await addDoc(collection(db, "rides", selectedRideId, "messages"), {
+      text,
+      senderId: myUser.uid,
+      senderRole: "driver",
+      senderName: myUser.name || "السائق",
+      createdAt: serverTimestamp(),
+    });
+
+    chatInputDriver.value = "";
+  } catch (e) {
+    console.error("sendDriverChatMessage error", e);
+    notify({ title: "تعذر الإرسال", body: "فشل إرسال الرسالة.", tag: "chat-send-failed" });
+  }
+}
+
 function renderDriverHistory(rides) {
   if (!driverHistoryList) return;
 
