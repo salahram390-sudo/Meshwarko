@@ -460,6 +460,7 @@ function cleanupRideState() {
 }
 
 function hardResetPassengerUI() {
+  clearRideSearchTimer();
   if (currentRideDocUnsub) {
     currentRideDocUnsub();
     currentRideDocUnsub = null;
