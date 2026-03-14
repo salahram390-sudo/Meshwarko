@@ -41,6 +41,7 @@ let pickMode = null;
 let lastDistanceMeters = null;
 let lastDurationSec = null;
 let rideWatcherToken = 0;
+let rideSearchTimer = null;
 const REQUEST_EXPIRE_MS = 3 * 60 * 1000;
 const ACTIVE_RIDE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
 const DRIVER_ONLINE_MAX_AGE_MS = 2 * 60 * 1000;
