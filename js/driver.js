@@ -506,6 +506,7 @@ const canCancel = mine && (status === "accepted" || status === "arrived" || stat
   if (!canTrack) {
     trackingEnabled = false;
     setTrackBtn();
+    if (btnChatDriver) btnChatDriver.disabled = !canChat;
   }
 }
 
