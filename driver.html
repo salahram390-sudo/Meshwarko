@@ -118,7 +118,26 @@
     <div id="driverHistoryList" class="list" style="margin-top:12px"></div>
   </div>
 </div>
-    
+    <div id="chatModalDriver" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" id="chatBackdropDriver"></div>
+
+  <div class="modal-card chat-sheet">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">محادثة الرحلة</div>
+        <div class="panel-sub">تواصل مباشر مع الراكب</div>
+      </div>
+      <button id="chatCloseDriver" class="btn ghost small" type="button">✖</button>
+    </div>
+
+    <div id="chatMessagesDriver" class="chat-messages"></div>
+
+    <div class="chat-compose">
+      <input id="chatInputDriver" class="input" type="text" placeholder="اكتب رسالتك..." />
+      <button id="chatSendDriver" class="btn success" type="button">إرسال</button>
+    </div>
+  </div>
+</div>
     <div id="toastRoot"></div>
 
   </div>
