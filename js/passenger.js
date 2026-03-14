@@ -1399,6 +1399,35 @@ btnComplete.addEventListener("click", async () => {
   }
 });
 
+if (btnChatPassenger) {
+  btnChatPassenger.addEventListener("click", () => {
+    if (!currentRideId) return;
+    openPassengerChatModal();
+    watchPassengerChat(currentRideId);
+  });
+}
+
+if (chatClosePassenger) {
+  chatClosePassenger.addEventListener("click", closePassengerChatModal);
+}
+
+if (chatBackdropPassenger) {
+  chatBackdropPassenger.addEventListener("click", closePassengerChatModal);
+}
+
+if (chatSendPassenger) {
+  chatSendPassenger.addEventListener("click", sendPassengerChatMessage);
+}
+
+if (chatInputPassenger) {
+  chatInputPassenger.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendPassengerChatMessage();
+    }
+  });
+}
+
 rateSend?.addEventListener("click", async () => {
   if (!currentRideId) return;
 
