@@ -1108,7 +1108,7 @@ if (btnChatPassenger) btnChatPassenger.disabled = !(ride.status === "accepted" |
     notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
   }
 
-  const driverProfile = (ride.status === "accepted" || ride.status === "arrived")
+  const driverProfile = (ride.status === "accepted" || ride.status === "arrived" || ride.status === "started")
     ? {
         name: ride.driverName || "",
         phone: ride.driverPhone || "",
