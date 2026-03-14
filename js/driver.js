@@ -374,11 +374,12 @@ function refreshSelectedRideButtons(ride) {
     (status === "requested" && !ride?.driverId) ||
     (status === "offered" && (!ride?.driverId || mine)) ||
     (status === "accepted" && mine);
-  const canTrack = mine && (status === "accepted" || status === "arrived");
-  const canArrive = mine && status === "accepted";
-  const canComplete = mine && (status === "arrived" || ride?.passengerEndRequested === true);
-  const canCancel = mine && (status === "accepted" || status === "arrived" || status === "offered");
-
+  const canTrack = mine && (status === "accepted" || status === "arrived" || status === "started");
+const canArrive = mine && status === "accepted";
+const canStart = mine && status === "arrived";
+const canComplete = mine && (status === "started" || ride?.passengerEndRequested === true);
+const canCancel = mine && (status === "accepted" || status === "arrived" || status === "started" || status === "offered");
+  driverStartRideBtn.disabled = !canStart;
   btnSendOffer.disabled = !canOffer;
   btnAccept.disabled = !canAccept;
   btnTrackToggle.disabled = !canTrack;
