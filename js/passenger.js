@@ -520,6 +520,7 @@ function hardResetPassengerUI() {
 }
 
 function rideUiNone() {
+  clearRideSearchTimer();
   hardResetPassengerUI();
 
   cleanupRideState();
