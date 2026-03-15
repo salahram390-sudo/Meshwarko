@@ -769,12 +769,14 @@ function updateRideActionVisibility(ride) {
   }
 
   if (ride.status === "requested") {
-    hideEl(btnAcceptOffer);
-    hideEl(btnRejectOffer);
-    hideEl(btnTrack);
-    hideEl(btnComplete);
-    hideEl(btnCall);
-    hideEl(btnWhats);
+  hideEl(btnAcceptOffer);
+  hideEl(btnRejectOffer);
+  hideEl(btnTrack);
+  hideEl(btnComplete);
+  hideEl(btnCall);
+  hideEl(btnWhats);
+  hideEl(btnChatPassenger);
+}
   } else if (ride.status === "offered") {
     hideEl(btnTrack);
     hideEl(btnComplete);
