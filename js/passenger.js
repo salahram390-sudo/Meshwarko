@@ -331,6 +331,12 @@ function watchPassengerChat(rideId) {
 
   chatUnsubPassenger = onSnapshot(q, (snap) => {
     const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    if (rows.length > lastMsgCount) {
+  const audio = new Audio("/assets/msg.mp3");
+  audio.play().catch(()=>{});
+}
+
+lastMsgCount = rows.length;
     snap.docs.forEach(async (docSnap) => {
   const msg = docSnap.data();
   if (msg.senderRole === "driver" && msg.read !== true) {
