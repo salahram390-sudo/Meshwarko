@@ -357,13 +357,13 @@ async function sendPassengerChatMessage() {
   if (!text || !currentRideId || !myData?.uid) return;
 
   try {
-    await addDoc(collection(db, "rides", currentRideId, "messages"), {
+  await addDoc(collection(db, "rides", currentRideId, "messages"), {
   text,
   senderId: myData.uid,
   senderRole: "passenger",
   senderName: myData.name || "الراكب",
   createdAt: serverTimestamp(),
-  ,typing:false
+  typing: false,
   read: false
 });
 
