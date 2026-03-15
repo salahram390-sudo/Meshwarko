@@ -763,39 +763,39 @@ async function updateRouteIfReady() {
 
 function updateRideActionVisibility(ride) {
   resetActionVisibility();
+
   if (!ride) {
     rideUiNone();
     return;
   }
 
   if (ride.status === "requested") {
-  hideEl(btnAcceptOffer);
-  hideEl(btnRejectOffer);
-  hideEl(btnTrack);
-  hideEl(btnComplete);
-  hideEl(btnCall);
-  hideEl(btnWhats);
-  hideEl(btnChatPassenger);
-}
+    hideEl(btnAcceptOffer);
+    hideEl(btnRejectOffer);
+    hideEl(btnTrack);
+    hideEl(btnComplete);
+    hideEl(btnCall);
+    hideEl(btnWhats);
+    hideEl(btnChatPassenger);
   } else if (ride.status === "offered") {
-  hideEl(btnTrack);
-  hideEl(btnComplete);
-  hideEl(btnCall);
-  hideEl(btnWhats);
-  hideEl(btnChatPassenger);
-}
-  } else if (ride.status === "accepted" || ride.status === "arrived") {
+    hideEl(btnTrack);
+    hideEl(btnComplete);
+    hideEl(btnCall);
+    hideEl(btnWhats);
+    hideEl(btnChatPassenger);
+  } else if (ride.status === "accepted" || ride.status === "arrived" || ride.status === "started") {
     hideEl(btnAcceptOffer);
     hideEl(btnRejectOffer);
   } else if (ride.status === "completed" || ride.status === "canceled") {
-  hideEl(btnAcceptOffer);
-  hideEl(btnRejectOffer);
-  hideEl(btnCancel);
-  hideEl(btnComplete);
-  hideEl(btnTrack);
-  hideEl(btnCall);
-  hideEl(btnWhats);
-  hideEl(btnChatPassenger);
+    hideEl(btnAcceptOffer);
+    hideEl(btnRejectOffer);
+    hideEl(btnCancel);
+    hideEl(btnComplete);
+    hideEl(btnTrack);
+    hideEl(btnCall);
+    hideEl(btnWhats);
+    hideEl(btnChatPassenger);
+  }
 }
 
 function getRideStatusLabel(status) {
