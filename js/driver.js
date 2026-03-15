@@ -512,10 +512,11 @@ const canCancel = mine && (status === "accepted" || status === "arrived" || stat
   btnComplete.disabled = !canComplete;
 
   if (!canTrack) {
-    trackingEnabled = false;
-    setTrackBtn();
-    if (btnChatDriver) btnChatDriver.disabled = !canChat;
-  }
+  trackingEnabled = false;
+  setTrackBtn();
+}
+
+if (btnChatDriver) btnChatDriver.disabled = !canChat;
 }
 
 async function selectRide(id, ride) {
