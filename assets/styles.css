@@ -1446,10 +1446,10 @@ body:before{
   bottom: 0;
   transform: translateX(-50%);
   width: min(760px, calc(100vw - 20px));
-  max-height: 80vh;
+  height: min(78vh, 680px);
   display: flex;
   flex-direction: column;
-  border-radius: 22px 22px 0 0;
+  border-radius: 24px 24px 0 0;
   padding: 16px;
   background:
     radial-gradient(900px 300px at 20% 0%, rgba(59,130,246,.08), transparent 55%),
@@ -1457,59 +1457,99 @@ body:before{
   border: 1px solid rgba(255,255,255,.08);
   box-shadow: 0 -10px 40px rgba(0,0,0,.45);
   z-index: 10000;
+  overflow: hidden;
+}
+
+.chat-sheet .modal-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+  flex: 0 0 auto;
 }
 
 .chat-messages{
-  flex: 1;
-  min-height: 260px;
-  max-height: 48vh;
-  overflow: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 12px 0;
-  padding: 4px;
+  margin: 8px 0 12px;
+  padding: 4px 2px;
 }
 
 .chat-msg{
   max-width: 82%;
-  padding: 10px 12px;
+  padding: 11px 13px;
   border-radius: 16px;
   line-height: 1.5;
-  font-size: 14px;
+  font-size: 15px;
   word-break: break-word;
 }
 
 .chat-msg.mine{
-  align-self: flex-end;
-  background: #16a34a;
-  color: #fff;
-  border-bottom-right-radius: 6px;
-}
-
-.chat-msg.other{
   align-self: flex-start;
-  background: rgba(255,255,255,.08);
+  background: #22c55e;
   color: #fff;
   border-bottom-left-radius: 6px;
 }
 
+.chat-msg.other{
+  align-self: flex-end;
+  background: rgba(255,255,255,.09);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+}
+
 .chat-meta{
-  display: block;
-  margin-top: 6px;
-  font-size: 11px;
-  opacity: .8;
+  display:block;
+  margin-top:6px;
+  font-size:11px;
+  opacity:.8;
 }
 
 .chat-compose{
-  display: grid;
+  flex: 0 0 auto;
+  display:grid;
   grid-template-columns: 1fr auto;
-  gap: 10px;
-  align-items: center;
+  gap:10px;
+  align-items:center;
+  padding-top:10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  background: transparent;
+}
+
+.chat-compose .input{
+  height: 46px;
+}
+
+.chat-compose .btn{
+  height: 46px;
+  min-width: 92px;
 }
 
 .chat-empty{
   color: var(--muted);
-  text-align: center;
-  padding: 24px 10px;
+  text-align:center;
+  padding:24px 10px;
+}
+
+@media (max-width: 640px){
+  .chat-sheet{
+    width: calc(100vw - 12px);
+    height: 72vh;
+    padding: 12px;
+    border-radius: 20px 20px 0 0;
+  }
+
+  .chat-msg{
+    max-width: 88%;
+    font-size: 14px;
+  }
+
+  .chat-compose{
+    grid-template-columns: 1fr 88px;
+  }
 }
