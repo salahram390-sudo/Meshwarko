@@ -797,7 +797,6 @@ function updateRideActionVisibility(ride) {
   hideEl(btnWhats);
   hideEl(btnChatPassenger);
 }
-}
 
 function getRideStatusLabel(status) {
   switch (status) {
