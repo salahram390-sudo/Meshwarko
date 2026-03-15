@@ -1490,7 +1490,7 @@ body:before{
 }
 
 .chat-msg.mine{
-  align-self: flex-start;
+  align-self: flex-end;
   background: #22c55e;
   color: #fff;
   border-bottom-left-radius: 6px;
