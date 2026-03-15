@@ -1532,6 +1532,11 @@ body:before{
   min-width: 92px;
 }
 
+.chat-compose{
+  position: relative;
+  z-index: 2;
+}
+
 .chat-empty{
   color: var(--muted);
   text-align:center;
