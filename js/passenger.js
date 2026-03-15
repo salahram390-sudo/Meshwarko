@@ -328,6 +328,14 @@ function watchPassengerChat(rideId) {
 
   chatUnsubPassenger = onSnapshot(q, (snap) => {
     const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    snap.docs.forEach(async (docSnap) => {
+  const msg = docSnap.data();
+  if (msg.senderRole === "driver" && msg.read !== true) {
+    await updateDoc(doc(db, "rides", rideId, "messages", docSnap.id), {
+      read: true
+    });
+  }
+});
     renderPassengerChatMessages(rows);
   });
 }
