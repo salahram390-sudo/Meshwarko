@@ -542,6 +542,15 @@ function cleanupRideState() {
   stopDriverTracking();
   setDriverContactButtons(null);
   resetActionVisibility();
+
+  if (btnChatPassenger) btnChatPassenger.disabled = true;
+  if (chatUnsubPassenger) {
+    chatUnsubPassenger();
+    chatUnsubPassenger = null;
+  }
+  closePassengerChatModal();
+  if (chatMessagesPassenger) chatMessagesPassenger.innerHTML = "";
+  if (chatInputPassenger) chatInputPassenger.value = "";
 }
 
 function hardResetPassengerUI() {
