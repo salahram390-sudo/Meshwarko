@@ -332,8 +332,11 @@ function watchPassengerChat(rideId) {
   chatUnsubPassenger = onSnapshot(q, (snap) => {
     const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     if (rows.length > lastMsgCount) {
-  const audio = new Audio("./assets/msg.mp3");
-  audio.play().catch(()=>{});
+  const lastMsg = rows[rows.length - 1];
+  if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) {
+    const audio = new Audio("./assets/msg.mp3");
+    audio.play().catch(() => {});
+  }
 }
 
 lastMsgCount = rows.length;
