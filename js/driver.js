@@ -678,6 +678,11 @@ logoutBtn.addEventListener("click", async () => {
   stopLiveTracking();
   stopDriverHeartbeat();
   await cleanupDriverOnline();
+  if (chatUnsubDriver) {
+  chatUnsubDriver();
+  chatUnsubDriver = null;
+}
+closeDriverChatModal();
   await signOut(auth);
   location.href = "./index.html";
 });
