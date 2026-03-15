@@ -778,10 +778,12 @@ function updateRideActionVisibility(ride) {
   hideEl(btnChatPassenger);
 }
   } else if (ride.status === "offered") {
-    hideEl(btnTrack);
-    hideEl(btnComplete);
-    hideEl(btnCall);
-    hideEl(btnWhats);
+  hideEl(btnTrack);
+  hideEl(btnComplete);
+  hideEl(btnCall);
+  hideEl(btnWhats);
+  hideEl(btnChatPassenger);
+}
   } else if (ride.status === "accepted" || ride.status === "arrived") {
     hideEl(btnAcceptOffer);
     hideEl(btnRejectOffer);
