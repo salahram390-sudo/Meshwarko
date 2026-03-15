@@ -301,7 +301,9 @@ item.innerHTML = `
   <div class="chat-text">${escapeHtml(msg.text || "")}</div>
   <div class="chat-meta">
     <span class="chat-name">${escapeHtml(msg.senderName || "")}</span>
-    <span class="chat-time">${time}</span>
+    <span class="chat-time">
+${time} ${mine ? (msg.read ? "✔✔" : "✔") : ""}
+</span>
   </div>
 `;
     chatMessagesPassenger.appendChild(item);
