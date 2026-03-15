@@ -788,14 +788,15 @@ function updateRideActionVisibility(ride) {
     hideEl(btnAcceptOffer);
     hideEl(btnRejectOffer);
   } else if (ride.status === "completed" || ride.status === "canceled") {
-    hideEl(btnAcceptOffer);
-    hideEl(btnRejectOffer);
-    hideEl(btnCancel);
-    hideEl(btnComplete);
-    hideEl(btnTrack);
-    hideEl(btnCall);
-    hideEl(btnWhats);
-  }
+  hideEl(btnAcceptOffer);
+  hideEl(btnRejectOffer);
+  hideEl(btnCancel);
+  hideEl(btnComplete);
+  hideEl(btnTrack);
+  hideEl(btnCall);
+  hideEl(btnWhats);
+  hideEl(btnChatPassenger);
+}
 }
 
 function getRideStatusLabel(status) {
