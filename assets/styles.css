@@ -1564,3 +1564,23 @@ body:before{
   justify-content: center;
   padding: 0;
 }
+.chat-text{
+  font-size:14px;
+}
+
+.chat-meta{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:6px;
+  font-size:11px;
+  opacity:.8;
+}
+
+.chat-name{
+  font-weight:600;
+}
+
+.chat-time{
+  opacity:.7;
+}
