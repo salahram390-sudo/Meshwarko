@@ -1466,11 +1466,16 @@ if (chatInputPassenger) {
     if (e.key === "Enter") {
       e.preventDefault();
       sendPassengerChatMessage();
-      chatInputPassenger.addEventListener("input",()=>{
-updateDoc(doc(db,"rides",currentRideId),{
-passengerTyping:true
-});
     }
+  });
+
+  chatInputPassenger.addEventListener("input", async () => {
+    if (!currentRideId) return;
+    try {
+      await updateDoc(doc(db, "rides", currentRideId), {
+        passengerTyping: true
+      });
+    } catch (_) {}
   });
 }
 
