@@ -312,7 +312,7 @@ ${time} ${mine ? (msg.read ? "✔✔" : "✔") : ""}
 
   chatMessagesPassenger.scrollTop = chatMessagesPassenger.scrollHeight;
 }
-let lastMsgCount = 0;
+
 function watchPassengerChat(rideId) {
   if (chatUnsubPassenger) {
     chatUnsubPassenger();
