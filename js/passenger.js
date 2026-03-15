@@ -1466,6 +1466,10 @@ if (chatInputPassenger) {
     if (e.key === "Enter") {
       e.preventDefault();
       sendPassengerChatMessage();
+      chatInputPassenger.addEventListener("input",()=>{
+updateDoc(doc(db,"rides",currentRideId),{
+passengerTyping:true
+});
     }
   });
 }
