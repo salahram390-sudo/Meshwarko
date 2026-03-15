@@ -618,9 +618,9 @@ function watchRidesForDriver() {
     }
 
     const preferredRide =
-      rides.find((r) => r.driverId === driverUid && (r.status === "accepted" || r.status === "arrived")) ||
-      rides.find((r) => r.id === selectedRideId) ||
-      rides[0];
+  rides.find((r) => r.driverId === driverUid && (r.status === "accepted" || r.status === "arrived" || r.status === "started")) ||
+  rides.find((r) => r.id === selectedRideId) ||
+  rides[0];
 
     if (preferredRide && preferredRide.id !== selectedRideId) {
       selectRide(preferredRide.id, preferredRide).catch((e) => console.warn("auto-select ride failed", e));
