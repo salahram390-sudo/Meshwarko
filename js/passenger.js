@@ -338,12 +338,13 @@ async function sendPassengerChatMessage() {
 
   try {
     await addDoc(collection(db, "rides", currentRideId, "messages"), {
-      text,
-      senderId: myData.uid,
-      senderRole: "passenger",
-      senderName: myData.name || "الراكب",
-      createdAt: serverTimestamp(),
-    });
+  text,
+  senderId: myData.uid,
+  senderRole: "passenger",
+  senderName: myData.name || "الراكب",
+  createdAt: serverTimestamp(),
+  read: false
+});
 
     chatInputPassenger.value = "";
   } catch (e) {
