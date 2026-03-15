@@ -277,6 +277,7 @@ function closePassengerChatModal() {
   if (!chatModalPassenger) return;
   chatModalPassenger.classList.add("hidden");
 }
+let lastMsgCount = 0;
 
 function renderPassengerChatMessages(rows = []) {
   if (!chatMessagesPassenger) return;
