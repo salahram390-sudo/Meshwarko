@@ -157,6 +157,7 @@ function resetActionVisibility() {
   showEl(btnTrack);
   showEl(btnCall);
   showEl(btnWhats);
+  showEl(btnChatPassenger);
 }
 
 function normalizePhoneEG(phone) {
