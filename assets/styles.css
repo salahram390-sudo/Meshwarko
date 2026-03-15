@@ -1523,6 +1523,8 @@ body:before{
 
 .chat-compose .input{
   height: 46px;
+  min-width: 0;
+  width: 100%;
 }
 
 .chat-compose .btn{
