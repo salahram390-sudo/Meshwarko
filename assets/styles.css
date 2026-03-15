@@ -1497,7 +1497,7 @@ body:before{
 }
 
 .chat-msg.other{
-  align-self: flex-end;
+  align-self: flex-start;
   background: rgba(255,255,255,.09);
   color: #fff;
   border-bottom-right-radius: 6px;
