@@ -261,5 +261,46 @@
     document.body.appendChild(s);
   })();
 </script>
+  <!-- Chat Modal Passenger -->
+<div id="chatModalPassenger" class="modal hidden" role="dialog" aria-modal="true">
+
+  <div class="modal-backdrop" id="chatBackdropPassenger"></div>
+
+  <div class="modal-card chat-sheet">
+
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">محادثة الرحلة</div>
+        <div class="panel-sub">تواصل مباشر مع السائق</div>
+      </div>
+
+      <button id="chatClosePassenger" class="btn ghost small" type="button">✖</button>
+    </div>
+
+    <div id="chatMessagesPassenger" class="chat-messages">
+      <div class="chat-empty">لا توجد رسائل بعد.</div>
+    </div>
+
+    <div class="chat-compose">
+      <input
+        id="chatInputPassenger"
+        class="input"
+        type="text"
+        placeholder="اكتب رسالتك..."
+        autocomplete="off"
+      />
+
+      <button
+        id="chatSendPassenger"
+        class="btn success"
+        type="button"
+      >
+        إرسال
+      </button>
+    </div>
+
+  </div>
+
+</div>
 </body>
 </html>
