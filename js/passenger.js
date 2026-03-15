@@ -360,6 +360,7 @@ async function sendPassengerChatMessage() {
   senderRole: "passenger",
   senderName: myData.name || "الراكب",
   createdAt: serverTimestamp(),
+  typing:false
   read: false
 });
 
