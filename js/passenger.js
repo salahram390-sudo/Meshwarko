@@ -643,6 +643,7 @@ function rideUiNone() {
   hideEl(btnTrack);
   hideEl(btnCall);
   hideEl(btnWhats);
+  hideEl(btnChatPassenger);
 
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
   setStatus("جاهز");
