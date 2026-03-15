@@ -619,6 +619,7 @@ if (chatInputPassenger) chatInputPassenger.value = "";
   hideEl(btnTrack);
   hideEl(btnCall);
   hideEl(btnWhats);
+  hideEl(btnChatPassenger);
 }
 
 function rideUiNone() {
