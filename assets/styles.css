@@ -1026,6 +1026,105 @@ input[type="range"]{
   color: rgba(255,255,255,.78) !important;
   opacity: 1 !important;
 }
+/* FIX: search suggestions readability */
+.search-results{
+  background: rgba(10,14,20,.92) !important;
+  border: 1px solid rgba(255,215,0,.18) !important;
+}
+
+.search-item{
+  color: rgba(255,255,255,.92) !important;
+  opacity: 1 !important;
+}
+
+.search-item:hover{
+  background: rgba(255,255,255,.08) !important;
+}
+/* ===================== */
+   paste at VERY END of styles.css
+================================ */
+/* Page background */
+html, body{
+background:
+radial-gradient(circle at 20% 20%, rgba(255,215,0,.08), transparent 40%),
+radial-gradient(circle at 80% 10%, rgba(255,215,0,.05), transparent 40%),
+linear-gradient(180deg,#050607,#0b0f14,#07090c);
+background-attachment: fixed;
+color: rgba(255,255,255,.92);
+}
+
+/* لو عندك wrapper بيعمل خلفية */
+.app-shell{
+  background: transparent !important;
+}
+:root{
+  --gold: #FFD700;
+  --gold2:#FFC400;
+  --bg: #0b0f14;
+  --panel: rgba(12,18,28,.78);
+  --line: rgba(255,215,0,.12);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.68);
+}
+.topbar{
+  background: rgba(0,0,0,.28) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255,215,0,.08) !important;
+}
+
+.brand-title{ font-weight: 800; letter-spacing: .4px; }
+.brand-sub{ color: rgba(255,255,255,.72) !important; }
+/* subtle stone/noise effect */
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 30% 10%, rgba(255,255,255,.04), transparent 55%),
+    radial-gradient(circle at 70% 80%, rgba(255,255,255,.03), transparent 60%);
+  mix-blend-mode: overlay;
+  opacity: .22;
+}
+/* =========================
+   LIVE DRIVERS (UBER STYLE)
+   ========================= */
+.car-marker{
+  width: 34px;
+  height: 34px;
+  border-radius: 18px;
+  background: rgba(10,14,20,.9);
+  border: 2px solid rgba(255,215,0,.85);
+  box-shadow: 0 10px 22px rgba(0,0,0,.35), 0 0 0 6px rgba(255,215,0,.10);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transform-origin: 50% 50%;
+}
+
+.car-marker::after{
+  content:"";
+  position:absolute;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255,215,0,.14);
+  animation: carPulse 1.6s infinite;
+  z-index: -1;
+}
+
+@keyframes carPulse{
+  0%{ transform: scale(.7); opacity:.85; }
+  70%{ transform: scale(1.6); opacity:0; }
+  100%{ opacity:0; }
+}
+
+.car-marker svg{
+  width: 18px;
+  height: 18px;
+  display:block;
+}
+
 
 /* ===== Search suggestions fix ===== */
 .search-results {
