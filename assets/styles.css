@@ -267,107 +267,8 @@ min-height: 0;
     0 12px 28px rgba(0,0,0,.45);
 }
 
-/* ============================= */
-/*        PRIMARY (VIP)         */
-/* ============================= */
+/* تم حذف تكرار تعريفات ألوان الأزرار هنا والإبقاء على التعريف الموحد لاحقًا لتفادي التعارض. */
 
-.btn.primary{
-  background: linear-gradient(145deg, #FFD700, #FFB800);
-  color: #111;
-  border: 1px solid #FFD700;
-  box-shadow:
-    0 0 18px rgba(255,215,0,.55),
-    0 16px 35px rgba(0,0,0,.55);
-}
-
-.btn.primary:hover{
-  background: linear-gradient(145deg, #FFE34D, #FFC400);
-  box-shadow:
-    0 0 28px rgba(255,215,0,.85),
-    0 22px 45px rgba(0,0,0,.65);
-  transform: translateY(-2px);
-}
-
-/* ============================= */
-/*          SUCCESS             */
-/* ============================= */
-
-.btn.success{
-  background: linear-gradient(145deg, #00d084, #00a86b);
-  border: 1px solid #00d084;
-  box-shadow:
-    0 0 16px rgba(0,208,132,.45),
-    0 14px 30px rgba(0,0,0,.45);
-}
-
-.btn.success:hover{
-  box-shadow:
-    0 0 24px rgba(0,208,132,.75),
-    0 20px 40px rgba(0,0,0,.55);
-}
-
-/* ============================= */
-/*           DANGER             */
-/* ============================= */
-
-.btn.danger{
-  background: linear-gradient(145deg, #ff4d4d, #c40000);
-  border: 1px solid #ff4d4d;
-  box-shadow:
-    0 0 16px rgba(255,77,77,.45),
-    0 14px 30px rgba(0,0,0,.45);
-}
-
-.btn.danger:hover{
-  box-shadow:
-    0 0 26px rgba(255,77,77,.75),
-    0 20px 40px rgba(0,0,0,.55);
-}
-
-/* ============================= */
-/*            GHOST             */
-/* ============================= */
-
-.btn.ghost{
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,215,0,.25);
-  box-shadow: none;
-}
-
-.btn.ghost:hover{
-  background: rgba(255,215,0,.08);
-  border: 1px solid rgba(255,215,0,.55);
-  box-shadow: 0 0 18px rgba(255,215,0,.35);
-}
-
-/* Ghost => يخلي (تحويل سائق / خروج / أزرار شبيهة) شكلها Premium */
-.btn.ghost{
-  background: rgba(255,255,255,.03);
-  border-color: rgba(255,215,0,.18);
-  box-shadow: 0 10px 26px rgba(0,0,0,.32);
-}
-
-.btn.ghost:hover{
-  background: rgba(255,215,0,.08);
-  border-color: rgba(255,215,0,.35);
-}
-.top-actions .btn.ghost{
-  opacity:.8;
-}
-/* Disabled */
-.btn:disabled,
-.btn.disabled{
-  opacity: .55;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-  filter: grayscale(.2);
-}
-
-/* =========================
-   EXCEPTION: Search icon buttons (keep old/simple)
-   only the 🔍 next to pickup/dropoff
-   ========================= */
 .btn.search-btn{
   width: 42px;
   padding: 0;
@@ -1503,13 +1404,6 @@ body:before{
   border-bottom-right-radius: 6px;
 }
 
-.chat-meta{
-  display:block;
-  margin-top:6px;
-  font-size:11px;
-  opacity:.8;
-}
-
 .chat-compose{
   flex: 0 0 auto;
   display: grid;
@@ -1533,11 +1427,6 @@ body:before{
 .chat-compose .btn{
   height: 46px;
   min-width: 92px;
-}
-
-.chat-compose{
-  position: relative;
-  z-index: 2;
 }
 
 .chat-empty{
@@ -1576,11 +1465,13 @@ body:before{
 }
 .chat-text{
   font-size:14px;
+  overflow-wrap:anywhere;
 }
 
 .chat-meta{
   display:flex;
   justify-content:space-between;
+  align-items:center;
   gap:8px;
   margin-top:6px;
   font-size:11px;
@@ -1594,4 +1485,15 @@ body:before{
 .chat-time{
   opacity:.7;
   font-size:11px;
+  white-space:nowrap;
+}
+
+#driverStartRideBtn:not(:disabled){
+  background: linear-gradient(180deg, rgba(34,197,94,.34), rgba(16,40,26,.96));
+  border-color: rgba(34,197,94,.55);
+}
+
+#btnComplete:not(:disabled){
+  background: linear-gradient(180deg, rgba(239,68,68,.32), rgba(40,14,16,.96));
+  border-color: rgba(239,68,68,.58);
 }
