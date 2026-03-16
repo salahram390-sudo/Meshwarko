@@ -1439,7 +1439,7 @@ body:before{
 @media (max-width: 640px){
   .chat-sheet{
     width: calc(100vw - 12px);
-    height: 72vh;
+    height: 78vh;
     padding: 12px;
     border-radius: 20px 20px 0 0;
   }
