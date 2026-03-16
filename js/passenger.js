@@ -888,13 +888,20 @@ async function drawDriverToPickupRoute(driverLat, driverLon, pickupLat, pickupLo
     const end = { lat: Number(pickupLat), lon: Number(pickupLon) };
     if (![start.lat, start.lon, end.lat, end.lon].every(Number.isFinite)) return;
 
-    const r = await routeOSRM(start, end);
-    drawRoute(map, r.geojson, driverRouteLayerRef);
-    const mins = Math.max(1, Math.round((Number(r.durationSec) || 0) / 60));
-    const meters = Math.round(Number(r.distanceMeters) || 0);
-    const distanceText = meters < 1000 ? `${meters} متر` : `${(meters / 1000).toFixed(1)} كم`;
-    setText(distanceValue, `🚗 السائق يبعد ${distanceText} • يصل خلال ${mins} دقيقة`);
-    setStatus(rideStatus.textContent === "السائق وصل" ? "السائق وصل" : `السائق سيصل خلال ${mins} دقيقة`);
+const r = await routeOSRM(start, end);
+drawRoute(map, r.geojson, driverRouteLayerRef);
+
+const mins = Math.max(1, Math.round((Number(r.durationSec) || 0) / 60));
+const meters = Math.round(Number(r.distanceMeters) || 0);
+const distanceText = meters < 1000 ? `${meters} متر` : `${(meters / 1000).toFixed(1)} كم`;
+
+if (r.isFallbackStraightLine) {
+  setText(distanceValue, `🚗 السائق يبعد ${distanceText}`);
+  setStatus(rideStatus.textContent === "السائق وصل" ? "السائق وصل" : "جارٍ تتبع السائق");
+} else {
+  setText(distanceValue, `🚗 السائق يبعد ${distanceText} • يصل خلال ${mins} دقيقة`);
+  setStatus(rideStatus.textContent === "السائق وصل" ? "السائق وصل" : `السائق سيصل خلال ${mins} دقيقة`);
+}
   } catch (e) {
     console.error("drawDriverToPickupRoute ERROR", e);
   }
