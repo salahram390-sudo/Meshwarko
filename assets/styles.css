@@ -1471,7 +1471,7 @@ body:before{
 
 .chat-messages{
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: 120px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
@@ -1512,13 +1512,16 @@ body:before{
 
 .chat-compose{
   flex: 0 0 auto;
-  display:grid;
-  grid-template-columns: 1fr auto;
-  gap:10px;
-  align-items:center;
-  padding-top:10px;
+  display: grid;
+  grid-template-columns: 1fr 88px;
+  gap: 10px;
+  align-items: center;
+  padding-top: 10px;
+  margin-top: auto;
   border-top: 1px solid rgba(255,255,255,.08);
-  background: transparent;
+  background: rgba(10,14,20,.98);
+  position: relative;
+  z-index: 2;
 }
 
 .chat-compose .input{
