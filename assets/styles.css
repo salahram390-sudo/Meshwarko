@@ -1568,10 +1568,8 @@ body:before{
 
 /* سائق: وصلت = أزرق أوبر */
 #btnArrived{
-  background: linear-gradient(180deg, #2563eb, #1d4ed8) !important;
-  border-color: #2563eb !important;
-  color: #ffffff !important;
-  box-shadow: 0 10px 24px rgba(37,99,235,.20) !important;
+  background: linear-gradient(180deg,#3b82f6,#1d4ed8) !important;
+  border-color:#3b82f6 !important;
 }
 
 /* سائق: بدء الرحلة = أخضر */
