@@ -1525,3 +1525,161 @@ body:before{
     height: 78vh !important;
   }
 }
+
+/* =========================================
+   MESHWARKO — UBER-LIKE ACTION BUTTON COLORS
+   ضع هذا البلوك في آخر styles.css فقط
+========================================= */
+
+/* سائق: إرسال عرض سعر = أسود/رمادي أوبر */
+#btnSendOffer{
+  background: linear-gradient(180deg, #2a2f36, #171b20) !important;
+  border-color: rgba(255,255,255,.10) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.30) !important;
+}
+
+/* سائق: قبول = أخضر واضح */
+#btnAccept{
+  background: linear-gradient(180deg, #22c55e, #15803d) !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(34,197,94,.22) !important;
+}
+
+/* سائق: بدء التتبع / تتبع الرحلة = أزرق هادئ */
+#btnTrackToggle,
+#btnTrack{
+  background: linear-gradient(180deg, #3b82f6, #1d4ed8) !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(59,130,246,.20) !important;
+}
+
+/* سائق + راكب: إلغاء / رفض / إنهاء = أحمر */
+#btnCancel,
+#btnRejectOffer,
+#btnComplete{
+  background: linear-gradient(180deg, #ef4444, #b91c1c) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(239,68,68,.20) !important;
+}
+
+/* سائق: وصلت = أزرق أوبر */
+#btnArrived{
+  background: linear-gradient(180deg, #2563eb, #1d4ed8) !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(37,99,235,.20) !important;
+}
+
+/* سائق: بدء الرحلة = أخضر */
+#driverStartRideBtn{
+  background: linear-gradient(180deg, #22c55e, #15803d) !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(34,197,94,.22) !important;
+}
+
+/* راكب: إرسال الطلب = أسود أوبر */
+#btnRequest{
+  background: linear-gradient(180deg, #20242b, #111418) !important;
+  border-color: rgba(255,255,255,.12) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(0,0,0,.30) !important;
+}
+
+/* راكب: قبول سعر السائق = أخضر */
+#btnAcceptOffer{
+  background: linear-gradient(180deg, #22c55e, #15803d) !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(34,197,94,.22) !important;
+}
+
+/* محادثة = أزرق الدردشة */
+#btnChatDriver,
+#btnChatPassenger,
+#chatSendDriver,
+#chatSendPassenger{
+  background: linear-gradient(180deg, #3b82f6, #2563eb) !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(59,130,246,.22) !important;
+}
+
+/* اتصال = أخضر هاتف */
+#btnCall{
+  background: linear-gradient(180deg, #10b981, #047857) !important;
+  border-color: #10b981 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(16,185,129,.20) !important;
+}
+
+/* واتساب = أخضر واتساب */
+#btnWhats{
+  background: linear-gradient(180deg, #25D366, #128C7E) !important;
+  border-color: #25D366 !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 24px rgba(37,211,102,.20) !important;
+}
+
+/* أزرار الإغلاق الصغيرة تبقى هادئة */
+#chatCloseDriver,
+#chatClosePassenger,
+#driverHistoryClose,
+#rateClose,
+#switchDriverClose,
+#switchDriverCancel{
+  box-shadow: none !important;
+}
+
+/* شكل hover موحد */
+#btnSendOffer:hover,
+#btnAccept:hover,
+#btnTrackToggle:hover,
+#btnTrack:hover,
+#btnCancel:hover,
+#btnRejectOffer:hover,
+#btnComplete:hover,
+#btnArrived:hover,
+#driverStartRideBtn:hover,
+#btnRequest:hover,
+#btnAcceptOffer:hover,
+#btnChatDriver:hover,
+#btnChatPassenger:hover,
+#chatSendDriver:hover,
+#chatSendPassenger:hover,
+#btnCall:hover,
+#btnWhats:hover{
+  filter: brightness(1.06) !important;
+  transform: translateY(-1px);
+}
+
+/* disabled يظل رمادي مهما كان نوع الزر */
+#btnSendOffer:disabled,
+#btnAccept:disabled,
+#btnTrackToggle:disabled,
+#btnTrack:disabled,
+#btnCancel:disabled,
+#btnRejectOffer:disabled,
+#btnComplete:disabled,
+#btnArrived:disabled,
+#driverStartRideBtn:disabled,
+#btnRequest:disabled,
+#btnAcceptOffer:disabled,
+#btnChatDriver:disabled,
+#btnChatPassenger:disabled,
+#chatSendDriver:disabled,
+#chatSendPassenger:disabled,
+#btnCall:disabled,
+#btnWhats:disabled{
+  background: linear-gradient(180deg, #3a3f46, #262b31) !important;
+  border-color: rgba(255,255,255,.08) !important;
+  color: rgba(255,255,255,.65) !important;
+  box-shadow: none !important;
+  filter: grayscale(.12) !important;
+  opacity: .72 !important;
+  transform: none !important;
+}
