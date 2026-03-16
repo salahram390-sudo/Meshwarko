@@ -1603,10 +1603,28 @@ body:before{
 
 /* راكب: إرسال الطلب = أسود أوبر */
 #btnRequest{
-  background: linear-gradient(180deg, #20242b, #111418) !important;
-  border-color: rgba(255,255,255,.12) !important;
-  color: #ffffff !important;
-  box-shadow: 0 10px 24px rgba(0,0,0,.30) !important;
+  height:54px !important;
+  font-size:18px !important;
+  font-weight:800 !important;
+  border-radius:20px !important;
+
+  background: linear-gradient(180deg,#2a2f36,#14181d) !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  color:#fff !important;
+
+  box-shadow:
+    0 14px 30px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.05) !important;
+
+  letter-spacing:.4px;
+}
+
+#btnRequest:hover{
+  filter:brightness(1.05);
+}
+
+#btnRequest:active{
+  transform:scale(.98);
 }
 
 /* راكب: قبول سعر السائق = أخضر */
