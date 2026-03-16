@@ -1086,3 +1086,31 @@ input[type="range"]{
 #btnRequest:active{
   transform: scale(.98);
 }
+
+/* زر ارسال الطلب - احترافي */
+#btnRequest{
+  height:50px;
+  font-size:18px;
+  font-weight:800;
+  border-radius:16px;
+  letter-spacing:.3px;
+
+  background: linear-gradient(180deg,#ffd54a,#ffb300);
+  color:#111;
+
+  border:none;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.45),
+    0 0 15px rgba(255,215,0,.25);
+
+  transition:.2s;
+}
+
+#btnRequest:hover{
+  transform:translateY(-1px);
+}
+
+#btnRequest:active{
+  transform:scale(.97);
+}
