@@ -1062,31 +1062,6 @@ input[type="range"]{
   *{ animation:none !important; transition:none !important; }
 }
 
-/* زر ارسال الطلب */
-#btnRequest{
-  height:54px !important;
-  font-size:18px !important;
-  font-weight:800 !important;
-  border-radius:20px !important;
-  letter-spacing:.4px;
-
-  background: linear-gradient(180deg,#20242b,#111418) !important;
-  border:1px solid rgba(255,255,255,.12) !important;
-  color:#fff !important;
-
-  box-shadow:
-    0 14px 30px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.05) !important;
-}
-
-#btnRequest:hover{
-  filter: brightness(1.05);
-}
-
-#btnRequest:active{
-  transform: scale(.98);
-}
-
 /* زر ارسال الطلب - احترافي */
 #btnRequest{
   height:50px;
