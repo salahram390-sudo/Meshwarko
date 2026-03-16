@@ -1498,3 +1498,30 @@ body:before{
   background: linear-gradient(180deg, rgba(239,68,68,.32), rgba(40,14,16,.96));
   border-color: rgba(239,68,68,.58);
 }
+
+/* ===== FINAL CHAT FIX ===== */
+.modal-card.chat-sheet{
+  top: auto !important;
+  bottom: 0 !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  margin: 0 !important;
+  min-height: 0;
+}
+
+.modal-card.chat-sheet .chat-messages{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.modal-card.chat-sheet .chat-compose{
+  flex: 0 0 auto;
+  margin-top: 0;
+}
+
+@media (max-width: 640px){
+  .modal-card.chat-sheet{
+    height: 78vh !important;
+  }
+}
