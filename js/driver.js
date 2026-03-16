@@ -127,9 +127,16 @@ function renderDriverChatMessages(rows = []) {
     const mine = msg.senderId === myUid;
     const item = document.createElement("div");
     item.className = `chat-msg ${mine ? "mine" : "other"}`;
+    const time = msg.createdAt?.toDate?.()
+      ? msg.createdAt.toDate().toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })
+      : "";
+
     item.innerHTML = `
-      <div>${escapeHtml(msg.text || "")}</div>
-      <span class="chat-meta">${escapeHtml(msg.senderName || "")}</span>
+      <div class="chat-text">${escapeHtml(msg.text || "")}</div>
+      <div class="chat-meta">
+        <span class="chat-name">${escapeHtml(msg.senderName || "")}</span>
+        <span class="chat-time">${time}</span>
+      </div>
     `;
     chatMessagesDriver.appendChild(item);
   });
