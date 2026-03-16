@@ -231,17 +231,19 @@ export function drawRoute(map, geojsonLine, routeRefOrFit = true) {
 
 export async function routeOSRM(from, to) {
   const straightMeters = haversineMeters(from, to);
+
+  const straightLine = {
+    type: "LineString",
+    coordinates: [
+      [Number(from.lon), Number(from.lat)],
+      [Number(to.lon), Number(to.lat)],
+    ],
+  };
+
   if (Number.isFinite(straightMeters) && straightMeters < 60) {
-    const geojson = {
-      type: "LineString",
-      coordinates: [
-        [Number(from.lon), Number(from.lat)],
-        [Number(to.lon), Number(to.lat)],
-      ],
-    };
     return {
-      geojson,
-      line: geojson,
+      geojson: straightLine,
+      line: straightLine,
       distanceMeters: straightMeters,
       durationSec: Math.max(10, straightMeters / 3),
       isFallbackStraightLine: true,
@@ -249,29 +251,45 @@ export async function routeOSRM(from, to) {
   }
 
   const url =
-"https://router.project-osrm.org/route/v1/driving/" +
-`${from.lon},${from.lat};${to.lon},${to.lat}` +
-"?overview=full&geometries=geojson&steps=false&alternatives=true";
-  
-  const j = await fetchJson(url, { timeoutMs: 15000 });
-  let route = j?.routes?.[0];
+    "https://router.project-osrm.org/route/v1/driving/" +
+    `${from.lon},${from.lat};${to.lon},${to.lat}` +
+    "?overview=full&geometries=geojson&steps=false&alternatives=true";
 
-if (j?.routes?.length > 1) {
-  route = j.routes.reduce((best, r) =>
-    r.distance < best.distance ? r : best
-  );
+  try {
+    const j = await fetchJson(url, { timeoutMs: 15000 });
+    let route = j?.routes?.[0];
+
+    if (j?.routes?.length > 1) {
+      route = j.routes.reduce((best, r) =>
+        r.distance < best.distance ? r : best
+      );
+    }
+
+    if (!route?.geometry) {
+      throw new Error("OSRM route missing geometry");
+    }
+
+    return {
+      geojson: route.geometry,
+      line: route.geometry,
+      distanceMeters: Number(route.distance || straightMeters || 0),
+      durationSec: Number(route.duration || 0),
+      isFallbackStraightLine: false,
+    };
+  } catch (err) {
+    console.warn("OSRM failed, using straight line fallback", err);
+
+    return {
+      geojson: straightLine,
+      line: straightLine,
+      distanceMeters: Number.isFinite(straightMeters) ? straightMeters : 0,
+      durationSec: Number.isFinite(straightMeters)
+        ? Math.max(60, Math.round(straightMeters / 8))
+        : 0,
+      isFallbackStraightLine: true,
+    };
+  }
 }
-  if (!route?.geometry) throw new Error("OSRM route missing geometry");
-
-  return {
-    geojson: route.geometry,
-    line: route.geometry,
-    distanceMeters: Number(route.distance || 0),
-    durationSec: Number(route.duration || 0),
-    isFallbackStraightLine: false,
-  };
-}
-
 export function locateOnce(map, onLoc, onErr) {
   map.locate({ setView: false, watch: false, enableHighAccuracy: true, maxZoom: 18 });
 
