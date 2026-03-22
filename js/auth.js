@@ -279,7 +279,6 @@ secret?.addEventListener("click", async () => {
 });
 
 alert("🔥 تم تحويلك إلى Admin");
-      });
   }
 });
 
