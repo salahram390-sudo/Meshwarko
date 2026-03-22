@@ -1071,58 +1071,58 @@ gps-marker,
 @media (prefers-reduced-motion:reduce){
   *{ animation:none !important; transition:none !important; }
 }
-/* SPLASH PRO */
+
+/* =========================
+   APP SPLASH SCREEN
+========================= */
 .splash-screen{
   position: fixed;
   inset: 0;
   z-index: 999999;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#000;
-  transition: opacity .6s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  opacity: 1;
+  transition: opacity .55s ease;
 }
 
 .splash-screen.hide{
-  opacity:0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .splash-logo{
-  width:min(65vw,260px);
-  opacity:0;
-  transform:scale(.8);
-  animation:logoIn 1.2s ease forwards;
+  width: min(62vw, 250px);
+  max-width: 250px;
+  height: auto;
+  display: block;
+  opacity: 0;
+  transform: scale(.88);
+  filter: drop-shadow(0 0 0 rgba(255,215,0,0));
+  animation: splashLogoIn 1.6s ease forwards;
 }
 
-/* دخول */
-@keyframes logoIn{
-  0%{opacity:0; transform:scale(.8);}
-  60%{opacity:1; transform:scale(1.05);}
-  100%{transform:scale(1);}
+@keyframes splashLogoIn{
+  0%{
+    opacity: 0;
+    transform: scale(.88);
+    filter: drop-shadow(0 0 0 rgba(255,215,0,0));
+  }
+  60%{
+    opacity: 1;
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 18px rgba(255,215,0,.16));
+  }
+  100%{
+    opacity: 1;
+    transform: scale(1);
+    filter: drop-shadow(0 0 10px rgba(255,215,0,.10));
+  }
 }
 
-/* لمعة دهبية */
-.splash-logo::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:linear-gradient(120deg, transparent, rgba(255,215,0,.4), transparent);
-  transform:translateX(-100%);
-  animation:shine 1.5s 1.2s forwards;
-}
-
-@keyframes shine{
-  to{ transform:translateX(100%); }
-}
-
-/* خروج */
-.splash-screen.hide .splash-logo{
-  animation:logoOut .6s ease forwards;
-}
-
-@keyframes logoOut{
-  to{
-    opacity:0;
-    transform:scale(.95) translateY(-10px);
+@media (max-width: 520px){
+  .splash-logo{
+    width: min(70vw, 220px);
   }
 }
