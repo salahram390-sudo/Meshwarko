@@ -182,5 +182,19 @@
     document.body.appendChild(s);
   })();
 </script>
+  <script>
+  window.addEventListener("load", function () {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+
+    setTimeout(() => {
+      splash.classList.add("hide");
+    }, 1800);
+
+    setTimeout(() => {
+      splash.remove();
+    }, 2400);
+  });
+  </script>
 </body>
 </html>
