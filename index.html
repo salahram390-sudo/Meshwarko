@@ -185,15 +185,23 @@
   <script>
 window.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash");
-  if (!splash) return;
+  const logo = splash?.querySelector(".splash-logo");
+  if (!splash || !logo) return;
 
+  // بعد ما اللوجو يظهر ويثبت شوية
+  setTimeout(() => {
+    logo.classList.add("hide");
+  }, 2200);
+
+  // الخلفية السودا تفضل لوحدها ثانيتين
   setTimeout(() => {
     splash.classList.add("hide");
-  }, 2300);
+  }, 4200);
 
+  // إزالة السبلاتش نهائيًا
   setTimeout(() => {
     splash.remove();
-  }, 2900);
+  }, 4900);
 });
 </script>
 </body>
