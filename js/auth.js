@@ -253,3 +253,32 @@ console.log("AUTH LOADED OK");
 window.addEventListener("error", (e) => {
   alert(`JS Error: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`);
 });
+
+let tapCount = 0;
+
+const secret = document.getElementById("secretAdmin");
+
+secret?.addEventListener("click", async () => {
+  tapCount++;
+
+  if (tapCount >= 5) {
+    tapCount = 0;
+
+    if (!auth.currentUser) {
+      alert("سجل دخول الأول");
+      return;
+    }
+
+    const uid = auth.currentUser.uid;
+
+    await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js")
+      .then(async ({ doc, updateDoc }) => {
+        await updateDoc(doc(db, "users", uid), {
+          role: "admin",
+          status: "active"
+        });
+
+        alert("🔥 تم تحويلك إلى Admin");
+      });
+  }
+});
