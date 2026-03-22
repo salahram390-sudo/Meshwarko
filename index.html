@@ -186,14 +186,24 @@
 window.addEventListener("load", () => {
   const splash = document.getElementById("splash");
 
+  // لو شافه قبل كده
+  if(localStorage.getItem("seenSplash")) {
+    splash?.remove();
+    return;
+  }
+
+  localStorage.setItem("seenSplash", "1");
+
+  // مدة العرض
   setTimeout(() => {
     splash.classList.add("hide");
-  }, 2000);
+  }, 3000); // ⏳ خليها 3 ثواني
 
+  // الحذف بعد الاختفاء
   setTimeout(() => {
     splash.remove();
-  }, 2600);
+  }, 3600);
 });
-  </script>
+</script>
 </body>
 </html>
