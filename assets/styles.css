@@ -619,13 +619,6 @@ input[type="range"]{
 .star{ cursor:pointer; opacity:.45; user-select:none; }
 .star.active{ opacity:1; }
 
-gps-marker,
-.car-marker{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
 .gps-marker,
 .car-marker{
   display:flex;
@@ -1035,6 +1028,76 @@ gps-marker,
   transform:none !important;
 }
 
+/* Splash Screen */
+.app-hidden{
+  opacity:0;
+  visibility:hidden;
+}
+
+.app-ready{
+  opacity:1;
+  visibility:visible;
+  transition:opacity .5s ease;
+}
+
+.splash-screen{
+  position:fixed;
+  inset:0;
+  z-index:999999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#000;
+  opacity:1;
+  transition:opacity .6s ease;
+}
+
+.splash-screen.hide{
+  opacity:0;
+  pointer-events:none;
+}
+
+.splash-logo-wrap{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.splash-logo{
+  width:min(62vw, 250px);
+  max-width:250px;
+  height:auto;
+  display:block;
+  opacity:0;
+  transform:scale(.88);
+  filter:drop-shadow(0 0 0 rgba(255,215,0,0));
+  animation:splashLogoIn 1.6s ease forwards;
+}
+
+.splash-logo.hide{
+  opacity:0;
+  transform:scale(.95) translateY(-8px);
+  transition:opacity .55s ease, transform .55s ease;
+}
+
+@keyframes splashLogoIn{
+  0%{
+    opacity:0;
+    transform:scale(.88);
+    filter:drop-shadow(0 0 0 rgba(255,215,0,0));
+  }
+  60%{
+    opacity:1;
+    transform:scale(1.03);
+    filter:drop-shadow(0 0 18px rgba(255,215,0,.16));
+  }
+  100%{
+    opacity:1;
+    transform:scale(1);
+    filter:drop-shadow(0 0 10px rgba(255,215,0,.10));
+  }
+}
+
 @media (max-width:640px){
   .chat-sheet{
     width:calc(100vw - 12px);
@@ -1065,147 +1128,13 @@ gps-marker,
     opacity:.18 !important;
   }
 
+  .splash-logo{
+    width:min(70vw, 220px);
+  }
+
   *{ transition:none !important; }
 }
 
 @media (prefers-reduced-motion:reduce){
   *{ animation:none !important; transition:none !important; }
-}
-
-/* =========================
-   APP SPLASH SCREEN
-========================= */
-.splash-screen{
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  opacity: 1;
-  transition: opacity .6s ease;
-}
-
-.splash-screen.hide{
-  opacity: 0;
-  pointer-events: none;
-}
-
-.splash-logo{
-  width: min(62vw, 250px);
-  max-width: 250px;
-  height: auto;
-  display: block;
-  opacity: 0;
-  transform: scale(.88);
-  filter: drop-shadow(0 0 0 rgba(255,215,0,0));
-  animation: splashLogoIn 1.6s ease forwards;
-}
-
-.splash-logo.hide{
-  opacity: 0;
-  transform: scale(.95) translateY(-8px);
-  transition: opacity .55s ease, transform .55s ease;
-}
-
-@keyframes splashLogoIn{
-  0%{
-    opacity: 0;
-    transform: scale(.88);
-    filter: drop-shadow(0 0 0 rgba(255,215,0,0));
-  }
-  60%{
-    opacity: 1;
-    transform: scale(1.03);
-    filter: drop-shadow(0 0 18px rgba(255,215,0,.16));
-  }
-  100%{
-    opacity: 1;
-    transform: scale(1);
-    filter: drop-shadow(0 0 10px rgba(255,215,0,.10));
-  }
-}
-
-@media (max-width: 520px){
-  .splash-logo{
-    width: min(70vw, 220px);
-  }
-}
-/* إخفاء التطبيق لحد انتهاء السبلاتش */
-.app-hidden{
-  opacity: 0;
-  visibility: hidden;
-}
-
-.app-ready{
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .45s ease;
-}
-/* إخفاء التطبيق لحد ما نقرر نظهره */
-.app-hidden{
-  opacity: 0;
-  visibility: hidden;
-}
-
-.app-ready{
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .5s ease;
-}
-
-/* السبلاتش */
-.splash-screen{
-  position: fixed;
-  inset: 0;
-  z-index: 999999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .6s ease;
-}
-
-.splash-screen.hide{
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-.splash-logo{
-  width: min(62vw, 250px);
-  max-width: 250px;
-  height: auto;
-  display: block;
-  opacity: 0;
-  transform: scale(.88);
-  filter: drop-shadow(0 0 0 rgba(255,215,0,0));
-  animation: splashLogoIn 1.6s ease forwards;
-}
-
-.splash-logo.hide{
-  opacity: 0;
-  transform: scale(.95) translateY(-8px);
-  transition: opacity .55s ease, transform .55s ease;
-}
-
-@keyframes splashLogoIn{
-  0%{
-    opacity: 0;
-    transform: scale(.88);
-    filter: drop-shadow(0 0 0 rgba(255,215,0,0));
-  }
-  60%{
-    opacity: 1;
-    transform: scale(1.03);
-    filter: drop-shadow(0 0 18px rgba(255,215,0,.16));
-  }
-  100%{
-    opacity: 1;
-    transform: scale(1);
-    filter: drop-shadow(0 0 10px rgba(255,215,0,.10));
-  }
 }
