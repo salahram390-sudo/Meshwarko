@@ -1084,7 +1084,7 @@ gps-marker,
   justify-content: center;
   background: #000;
   opacity: 1;
-  transition: opacity .55s ease;
+  transition: opacity .6s ease;
 }
 
 .splash-screen.hide{
@@ -1101,6 +1101,12 @@ gps-marker,
   transform: scale(.88);
   filter: drop-shadow(0 0 0 rgba(255,215,0,0));
   animation: splashLogoIn 1.6s ease forwards;
+}
+
+.splash-logo.hide{
+  opacity: 0;
+  transform: scale(.95) translateY(-8px);
+  transition: opacity .55s ease, transform .55s ease;
 }
 
 @keyframes splashLogoIn{
