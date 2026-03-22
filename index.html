@@ -6,7 +6,7 @@
   <title>مشوارك - تسجيل</title>
   <link rel="stylesheet" href="./assets/styles.css" />
 </head>
-<body>
+<body class="splash-active">
   <div id="splash" class="splash-screen">
     <div class="splash-logo-wrap">
       <img src="./assets/logo.png" alt="مشوارك" class="splash-logo" />
@@ -178,30 +178,28 @@
   </script>
 
   <script>
-window.addEventListener("DOMContentLoaded", () => {
-  const splash = document.getElementById("splash");
-  const logo = splash?.querySelector(".splash-logo");
-  const appRoot = document.getElementById("appRoot");
+  window.addEventListener("DOMContentLoaded", () => {
+    const splash = document.getElementById("splash");
+    const logo = splash?.querySelector(".splash-logo");
+    const appRoot = document.getElementById("appRoot");
 
-  if (!splash || !logo || !appRoot) return;
+    if (!splash || !logo || !appRoot) return;
 
-  // 1) اللوجو يختفي
-  setTimeout(() => {
-    logo.classList.add("hide");
-  }, 2200);
+    setTimeout(() => {
+      logo.classList.add("hide");
+    }, 2200);
 
-  // 2) تفضل الخلفية السوداء وحدها
-  setTimeout(() => {
-    splash.classList.add("hide");
-  }, 4200);
+    setTimeout(() => {
+      splash.classList.add("hide");
+    }, 4200);
 
-  // 3) بعد ما السبلاتش يختفي تمامًا نظهر التطبيق
-  setTimeout(() => {
-    splash.remove();
-    appRoot.classList.remove("app-hidden");
-    appRoot.classList.add("app-ready");
-  }, 4900);
-});
+    setTimeout(() => {
+      splash.remove();
+      document.body.classList.remove("splash-active");
+      appRoot.classList.remove("app-hidden");
+      appRoot.classList.add("app-ready");
+    }, 4900);
+  });
   </script>
 </body>
 </html>
