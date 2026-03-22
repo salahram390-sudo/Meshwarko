@@ -233,8 +233,22 @@ btnLogout?.addEventListener("click", async () => {
 });
 
 onAuthStateChanged(auth, async (user) => {
-  if (user) btnLogout?.classList.remove("hidden");
-  else btnLogout?.classList.add("hidden");
+  if (user) {
+    btnLogout?.classList.remove("hidden");
+
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      const profile = snap.exists() ? snap.data() : null;
+
+      const isAdmin = !!profile && profile.role === "admin" && profile.status !== "blocked";
+      adminEntryBtn?.classList.toggle("hidden", !isAdmin);
+    } catch (err) {
+      adminEntryBtn?.classList.add("hidden");
+    }
+  } else {
+    btnLogout?.classList.add("hidden");
+    adminEntryBtn?.classList.add("hidden");
+  }
 });
 
 initAdmin().catch(() => {});
