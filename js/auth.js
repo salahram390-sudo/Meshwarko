@@ -273,14 +273,12 @@ secret?.addEventListener("click", async () => {
 
     const uid = auth.currentUser.uid;
 
-    await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js")
-      .then(async ({ doc, updateDoc }) => {
-        await updateDoc(doc(db, "users", uid), {
-          role: "admin",
-          status: "active"
-        });
+    await updateDoc(doc(db, "users", uid), {
+  role: "admin",
+  status: "active"
+});
 
-        alert("🔥 تم تحويلك إلى Admin");
+alert("🔥 تم تحويلك إلى Admin");
       });
   }
 });
