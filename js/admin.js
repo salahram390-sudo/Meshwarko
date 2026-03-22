@@ -1,111 +1,331 @@
 import { auth, db } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { collection, doc, getDoc, onSnapshot, query, updateDoc, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import {
+  collection, doc, getDoc, onSnapshot, updateDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { $, escapeHtml, moneyEGP, formatRideDate } from "./utils.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
 
 const adminBadge = $("#adminBadge");
+const adminStats = $("#adminStats");
 const usersList = $("#usersList");
 const ridesList = $("#ridesList");
-const adminStats = $("#adminStats");
+const recentUsersList = $("#recentUsersList");
+const recentRidesList = $("#recentRidesList");
+const driversOnlineList = $("#driversOnlineList");
+
+const adminSearch = $("#adminSearch");
+const adminUserFilter = $("#adminUserFilter");
+const adminRideFilter = $("#adminRideFilter");
 const logoutBtn = $("#logoutBtn");
+
+const tabs = [...document.querySelectorAll(".admin-tab")];
+const panes = [...document.querySelectorAll(".admin-pane")];
+
+let allUsers = [];
+let allRides = [];
+let allDriversOnline = [];
 
 logoutBtn?.addEventListener("click", async () => {
   await signOut(auth);
   location.href = "./index.html";
 });
 
-function renderStats(users, rides) {
-  const drivers = users.filter((u) => u.role === "driver");
-  const blocked = users.filter((u) => u.status === "blocked");
-  const activeRides = rides.filter((r) => ["requested","offered","accepted","arrived"].includes(r.status));
-  const completed = rides.filter((r) => r.status === "completed");
-  const totalRevenue = completed.reduce((sum, r) => sum + Number(r.price || 0), 0);
-  adminStats.innerHTML = [
-    ["إجمالي المستخدمين", users.length],
-    ["إجمالي السائقين", drivers.length],
-    ["الحسابات المحظورة", blocked.length],
-    ["الرحلات النشطة", activeRides.length],
-    ["الرحلات المكتملة", completed.length],
-    ["إجمالي قيمة الرحلات", moneyEGP(totalRevenue)],
-  ].map(([label,val]) => `<div class="card-lite"><div class="muted small">${label}</div><div class="price" style="font-size:22px">${escapeHtml(String(val))}</div></div>`).join("");
+tabs.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const tab = btn.dataset.tab;
+    tabs.forEach((b) => b.classList.toggle("active", b === btn));
+    panes.forEach((p) => p.classList.toggle("active", p.id === `pane-${tab}`));
+  });
+});
+
+adminSearch?.addEventListener("input", rerenderAll);
+adminUserFilter?.addEventListener("change", rerenderAll);
+adminRideFilter?.addEventListener("change", rerenderAll);
+
+function activeRideStatuses() {
+  return ["requested", "offered", "accepted", "arrived"];
 }
 
-function renderUsers(users) {
-  usersList.innerHTML = "";
-  users.sort((a,b) => String(a.name||"").localeCompare(String(b.name||""), 'ar'));
-  users.forEach((u) => {
-    const item = document.createElement('div');
-    item.className = 'list-item';
-    item.innerHTML = `
-      <div class="row-between"><b>${escapeHtml(u.name || 'بدون اسم')}</b><span class="muted small">${escapeHtml(u.role || '-')}</span></div>
-      <div class="muted small">${escapeHtml(u.email || '-')}</div>
-      <div class="muted small">${escapeHtml(u.phone || '-')} • ${escapeHtml(u.governorate || '-')} / ${escapeHtml(u.center || '-')}</div>
-      <div class="muted small">الحالة: ${escapeHtml(u.status || 'active')} • التقييم: ${Number(u.ratingAvg || 0).toFixed(1)} (${Number(u.ratingCount || 0)}) • المحفظة: ${moneyEGP(Number(u.walletBalance || 0))}</div>
-      <div class="actions">
-        <button class="btn ${u.status === 'blocked' ? 'success' : 'danger'} small">${u.status === 'blocked' ? 'فك الحظر' : 'حظر'}</button>
+function renderStats(users, rides, driversOnline) {
+  const drivers = users.filter((u) => u.role === "driver");
+  const passengers = users.filter((u) => u.role === "passenger");
+  const blocked = users.filter((u) => u.status === "blocked");
+  const activeRides = rides.filter((r) => activeRideStatuses().includes(r.status));
+  const completed = rides.filter((r) => r.status === "completed");
+  const totalRevenue = completed.reduce((sum, r) => sum + Number(r.price || 0), 0);
+
+  adminStats.innerHTML = `
+    <div class="admin-stat">
+      <div class="label">إجمالي المستخدمين</div>
+      <div class="value">${escapeHtml(String(users.length))}</div>
+    </div>
+    <div class="admin-stat">
+      <div class="label">إجمالي السائقين</div>
+      <div class="value">${escapeHtml(String(drivers.length))}</div>
+    </div>
+    <div class="admin-stat">
+      <div class="label">إجمالي الركاب</div>
+      <div class="value">${escapeHtml(String(passengers.length))}</div>
+    </div>
+    <div class="admin-stat">
+      <div class="label">الحسابات المحظورة</div>
+      <div class="value">${escapeHtml(String(blocked.length))}</div>
+    </div>
+    <div class="admin-stat">
+      <div class="label">الرحلات النشطة</div>
+      <div class="value">${escapeHtml(String(activeRides.length))}</div>
+    </div>
+    <div class="admin-stat">
+      <div class="label">الرحلات المكتملة</div>
+      <div class="value">${escapeHtml(String(completed.length))}</div>
+    </div>
+    <div class="admin-stat">
+      <div class="label">السائقون المتصلون الآن</div>
+      <div class="value">${escapeHtml(String(driversOnline.length))}</div>
+    </div>
+    <div class="admin-stat">
+      <div class="label">إجمالي قيمة الرحلات</div>
+      <div class="value">${escapeHtml(String(moneyEGP(totalRevenue)))}</div>
+    </div>
+  `;
+}
+
+function userMatchesSearch(u, q) {
+  if (!q) return true;
+  const s = `${u.name || ""} ${u.email || ""} ${u.phone || ""} ${u.governorate || ""} ${u.center || ""}`.toLowerCase();
+  return s.includes(q);
+}
+
+function rideMatchesSearch(r, q) {
+  if (!q) return true;
+  const s = `${r.passengerName || ""} ${r.driverName || ""} ${r.pickupText || ""} ${r.dropoffText || ""} ${r.vehicleType || ""} ${r.status || ""}`.toLowerCase();
+  return s.includes(q);
+}
+
+function getFilteredUsers() {
+  const q = String(adminSearch?.value || "").trim().toLowerCase();
+  const filter = adminUserFilter?.value || "all";
+
+  let arr = [...allUsers].filter((u) => userMatchesSearch(u, q));
+
+  if (filter === "driver") arr = arr.filter((u) => u.role === "driver");
+  if (filter === "passenger") arr = arr.filter((u) => u.role === "passenger");
+  if (filter === "blocked") arr = arr.filter((u) => u.status === "blocked");
+
+  arr.sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "ar"));
+  return arr;
+}
+
+function getFilteredRides() {
+  const q = String(adminSearch?.value || "").trim().toLowerCase();
+  const filter = adminRideFilter?.value || "all";
+
+  let arr = [...allRides].filter((r) => rideMatchesSearch(r, q));
+
+  if (filter === "active") arr = arr.filter((r) => activeRideStatuses().includes(r.status));
+  if (filter === "completed") arr = arr.filter((r) => r.status === "completed");
+  if (filter === "canceled") arr = arr.filter((r) => r.status === "canceled");
+
+  arr.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+  return arr;
+}
+
+function userCard(u) {
+  const statusClass = u.status === "blocked" ? "warn" : "ok";
+  const roleText = u.role === "driver" ? "سائق" : (u.role === "passenger" ? "راكب" : (u.role || "-"));
+
+  return `
+    <div class="list-item">
+      <div class="admin-card-head">
+        <b>${escapeHtml(u.name || "بدون اسم")}</b>
+        <span class="admin-badge ${statusClass}">${escapeHtml(u.status || "active")}</span>
       </div>
-    `;
-    item.querySelector('button').onclick = async () => {
-      await updateDoc(doc(db, 'users', u.id), { status: u.status === 'blocked' ? 'active' : 'blocked', moderatedAt: serverTimestamp() });
-      notify({ title: 'الإدارة', body: u.status === 'blocked' ? 'تم فك الحظر' : 'تم الحظر', tag: 'moderation' });
-    };
-    usersList.appendChild(item);
+
+      <div class="admin-meta">
+        <div class="admin-mini">النوع: ${escapeHtml(roleText)}</div>
+        <div class="admin-mini">الإيميل: ${escapeHtml(u.email || "-")}</div>
+        <div class="admin-mini">الهاتف: ${escapeHtml(u.phone || "-")}</div>
+        <div class="admin-mini">المنطقة: ${escapeHtml(u.governorate || "-")} / ${escapeHtml(u.center || "-")}</div>
+        <div class="admin-mini">التقييم: ${Number(u.ratingAvg || 0).toFixed(1)} (${Number(u.ratingCount || 0)})</div>
+        <div class="admin-mini">المحفظة: ${moneyEGP(Number(u.walletBalance || 0))}</div>
+      </div>
+
+      <div class="admin-actions">
+        <button class="btn ${u.status === "blocked" ? "success" : "danger"} small" data-action="toggle-user" data-id="${u.id}">
+          ${u.status === "blocked" ? "فك الحظر" : "حظر"}
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function rideCard(r) {
+  const statusClass =
+    r.status === "completed" ? "ok" :
+    r.status === "canceled" ? "warn" : "info";
+
+  const canCancel = activeRideStatuses().includes(r.status);
+
+  return `
+    <div class="list-item">
+      <div class="admin-card-head">
+        <b>${escapeHtml(r.passengerName || "راكب")}</b>
+        <span class="admin-badge ${statusClass}">${escapeHtml(r.status || "-")}</span>
+      </div>
+
+      <div class="admin-meta">
+        <div class="admin-mini">السعر: ${moneyEGP(r.price)}</div>
+        <div class="admin-mini">المركبة: ${escapeHtml(r.vehicleType || "-")}</div>
+        <div class="admin-mini">القيام: ${escapeHtml(r.pickupText || "-")}</div>
+        <div class="admin-mini">الوصول: ${escapeHtml(r.dropoffText || "-")}</div>
+        <div class="admin-mini">السائق: ${escapeHtml(r.driverName || "-")}</div>
+        <div class="admin-mini">التاريخ: ${escapeHtml(formatRideDate(r.createdAt || r.createdAtMs))}</div>
+      </div>
+
+      <div class="admin-actions">
+        ${canCancel ? `<button class="btn danger small" data-action="cancel-ride" data-id="${r.id}">إلغاء الرحلة</button>` : ""}
+      </div>
+    </div>
+  `;
+}
+
+function onlineDriverCard(d) {
+  return `
+    <div class="list-item">
+      <div class="admin-card-head">
+        <b>${escapeHtml(d.name || "سائق")}</b>
+        <span class="admin-badge ok">متصل الآن</span>
+      </div>
+      <div class="admin-meta">
+        <div class="admin-mini">المنطقة: ${escapeHtml(d.governorate || "-")} / ${escapeHtml(d.center || "-")}</div>
+        <div class="admin-mini">المركبة: ${escapeHtml(d.vehicleType || "-")}</div>
+        <div class="admin-mini">الهاتف: ${escapeHtml(d.phone || "-")}</div>
+        <div class="admin-mini">آخر تحديث: ${escapeHtml(formatRideDate(d.updatedAt || d.lastSeenAt || d.createdAt))}</div>
+      </div>
+    </div>
+  `;
+}
+
+async function handleUsersClick(e) {
+  const btn = e.target.closest('[data-action="toggle-user"]');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const u = allUsers.find((x) => x.id === id);
+  if (!u) return;
+
+  await updateDoc(doc(db, "users", id), {
+    status: u.status === "blocked" ? "active" : "blocked",
+    moderatedAt: serverTimestamp()
   });
+
+  notify({
+    title: "الإدارة",
+    body: u.status === "blocked" ? "تم فك الحظر" : "تم الحظر",
+    tag: "moderation"
+  });
+}
+
+async function handleRidesClick(e) {
+  const btn = e.target.closest('[data-action="cancel-ride"]');
+  if (!btn) return;
+  const id = btn.dataset.id;
+
+  await updateDoc(doc(db, "rides", id), {
+    status: "canceled",
+    archived: true,
+    canceledAt: serverTimestamp(),
+    canceledByAdmin: true
+  });
+
+  notify({
+    title: "الإدارة",
+    body: "تم إلغاء الرحلة",
+    tag: "admin-cancel"
+  });
+}
+
+usersList?.addEventListener("click", handleUsersClick);
+recentUsersList?.addEventListener("click", handleUsersClick);
+ridesList?.addEventListener("click", handleRidesClick);
+recentRidesList?.addEventListener("click", handleRidesClick);
+
+function renderUsers(users) {
+  if (!users.length) {
+    usersList.innerHTML = `<div class="admin-empty">لا يوجد مستخدمون مطابقون.</div>`;
+    return;
+  }
+  usersList.innerHTML = users.map(userCard).join("");
 }
 
 function renderRides(rides) {
-  ridesList.innerHTML = "";
-  rides.sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-  rides.slice(0, 120).forEach((r) => {
-    const item = document.createElement('div');
-    item.className = 'list-item';
-    item.innerHTML = `
-      <div class="row-between"><b>${escapeHtml(r.passengerName || 'راكب')}</b><span class="muted small">${escapeHtml(r.status || '-')}</span></div>
-      <div class="muted small">سعر: ${moneyEGP(r.price)} • ${escapeHtml(r.vehicleType || '-')}</div>
-      <div class="muted small">قيام: ${escapeHtml(r.pickupText || '-')}</div>
-      <div class="muted small">وصول: ${escapeHtml(r.dropoffText || '-')}</div>
-      <div class="muted small">التاريخ: ${escapeHtml(formatRideDate(r.createdAt || r.createdAtMs))}</div>
-      <div class="actions">
-        ${["requested","offered","accepted","arrived"].includes(r.status) ? '<button class="btn danger small">إلغاء الرحلة</button>' : ''}
-      </div>
-    `;
-    const btn = item.querySelector('button');
-    if (btn) btn.onclick = async () => {
-      await updateDoc(doc(db, 'rides', r.id), { status: 'canceled', archived: true, canceledAt: serverTimestamp(), canceledByAdmin: true });
-      notify({ title: 'الإدارة', body: 'تم إلغاء الرحلة', tag: 'admin-cancel' });
-    };
-    ridesList.appendChild(item);
-  });
+  const limited = rides.slice(0, 120);
+  if (!limited.length) {
+    ridesList.innerHTML = `<div class="admin-empty">لا توجد رحلات مطابقة.</div>`;
+    return;
+  }
+  ridesList.innerHTML = limited.map(rideCard).join("");
+}
+
+function renderOverview(users, rides) {
+  const recentUsers = [...users].slice(0, 6);
+  const recentRides = [...rides].slice(0, 6);
+
+  recentUsersList.innerHTML = recentUsers.length
+    ? recentUsers.map(userCard).join("")
+    : `<div class="admin-empty">لا يوجد مستخدمون.</div>`;
+
+  recentRidesList.innerHTML = recentRides.length
+    ? recentRides.map(rideCard).join("")
+    : `<div class="admin-empty">لا توجد رحلات.</div>`;
+}
+
+function renderOnline(driversOnline) {
+  const arr = [...driversOnline].sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0));
+  driversOnlineList.innerHTML = arr.length
+    ? arr.map(onlineDriverCard).join("")
+    : `<div class="admin-empty">لا يوجد سائقون متصلون الآن.</div>`;
+}
+
+function rerenderAll() {
+  const filteredUsers = getFilteredUsers();
+  const filteredRides = getFilteredRides();
+
+  renderStats(allUsers, allRides, allDriversOnline);
+  renderUsers(filteredUsers);
+  renderRides(filteredRides);
+  renderOverview(filteredUsers, filteredRides);
+  renderOnline(allDriversOnline);
 }
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    location.href = './index.html';
+    location.href = "./index.html";
     return;
   }
+
   await ensureNotificationPermission(true);
-  const me = await getDoc(doc(db, 'users', user.uid));
-  if (!me.exists() || me.data().role !== 'admin' || me.data().status === 'blocked') {
-    location.href = './index.html';
+
+  const me = await getDoc(doc(db, "users", user.uid));
+  if (!me.exists() || me.data().role !== "admin" || me.data().status === "blocked") {
+    location.href = "./index.html";
     return;
   }
-  adminBadge.textContent = `${me.data().name || 'Admin'} • إدارة`;
 
-  let users = [];
-  let rides = [];
-  const rerender = () => {
-    renderStats(users, rides);
-    renderUsers(users);
-    renderRides(rides);
-  };
+  adminBadge.textContent = `${me.data().name || "Admin"} • إدارة`;
 
-  onSnapshot(collection(db, 'users'), (snap) => {
-    users = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    rerender();
+  onSnapshot(collection(db, "users"), (snap) => {
+    allUsers = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    rerenderAll();
   });
-  onSnapshot(collection(db, 'rides'), (snap) => {
-    rides = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    rerender();
+
+  onSnapshot(collection(db, "rides"), (snap) => {
+    allRides = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    rerenderAll();
+  });
+
+  onSnapshot(collection(db, "driversOnline"), (snap) => {
+    allDriversOnline = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    rerenderAll();
   });
 });
