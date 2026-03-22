@@ -1084,7 +1084,7 @@ gps-marker,
   background: #000;
   opacity: 1;
   visibility: visible;
-  transition: opacity .55s ease, visibility .55s ease;
+  transition: opacity .65s ease, visibility .65s ease;
 }
 
 .splash-screen.hide{
@@ -1104,26 +1104,43 @@ gps-marker,
   height: auto;
   display: block;
   opacity: 0;
-  transform: scale(.78) translateY(10px);
-  filter: drop-shadow(0 0 18px rgba(255,215,0,.10));
-  animation: splashLogoIn 1.2s ease forwards;
+  transform: scale(.82) translateY(14px);
+  filter: drop-shadow(0 0 0 rgba(255,215,0,0));
+  animation: splashLogoIn 1.35s cubic-bezier(.22,.9,.2,1) forwards;
+}
+
+.splash-screen.hide .splash-logo{
+  animation: splashLogoOut .65s cubic-bezier(.4,0,.2,1) forwards;
 }
 
 @keyframes splashLogoIn{
   0%{
     opacity: 0;
-    transform: scale(.78) translateY(10px);
+    transform: scale(.82) translateY(14px);
     filter: drop-shadow(0 0 0 rgba(255,215,0,0));
   }
-  55%{
+  60%{
     opacity: 1;
-    transform: scale(1.04) translateY(0);
-    filter: drop-shadow(0 0 18px rgba(255,215,0,.18));
+    transform: scale(1.045) translateY(0);
+    filter: drop-shadow(0 0 22px rgba(255,215,0,.18));
   }
   100%{
     opacity: 1;
     transform: scale(1) translateY(0);
-    filter: drop-shadow(0 0 10px rgba(255,215,0,.10));
+    filter: drop-shadow(0 0 12px rgba(255,215,0,.10));
+  }
+}
+
+@keyframes splashLogoOut{
+  0%{
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 0 12px rgba(255,215,0,.10));
+  }
+  100%{
+    opacity: 0;
+    transform: scale(.96) translateY(-10px);
+    filter: drop-shadow(0 0 0 rgba(255,215,0,0));
   }
 }
 
@@ -1132,3 +1149,4 @@ gps-marker,
     width: min(70vw, 230px);
   }
 }
+ 
