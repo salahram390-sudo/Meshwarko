@@ -40,6 +40,7 @@
     .admin-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
     .admin-actions .btn{min-width:110px}
     .admin-mini{font-size:12px;color:var(--muted)}
+    .admin-row-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
     @media (max-width:900px){
       .admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
       .admin-grid-2{grid-template-columns:1fr}
@@ -79,6 +80,7 @@
               <option value="all">كل المستخدمين</option>
               <option value="driver">السائقون</option>
               <option value="passenger">الركاب</option>
+              <option value="admin">الأدمنز</option>
               <option value="blocked">المحظورون</option>
             </select>
             <select id="adminRideFilter" class="input">
@@ -97,6 +99,7 @@
           <button class="admin-tab" data-tab="users" type="button">المستخدمون</button>
           <button class="admin-tab" data-tab="rides" type="button">الرحلات</button>
           <button class="admin-tab" data-tab="online" type="button">السائقون المتصلون</button>
+          <button class="admin-tab" data-tab="admins" type="button">إدارة الأدمنز</button>
         </div>
 
         <div id="pane-overview" class="admin-pane active">
@@ -125,6 +128,16 @@
         <div id="pane-online" class="admin-pane">
           <div class="panel-title">السائقون المتصلون الآن</div>
           <div id="driversOnlineList" class="list" style="margin-top:12px"></div>
+        </div>
+
+        <div id="pane-admins" class="admin-pane">
+          <div class="panel-title">إدارة الأدمنز</div>
+
+          <div class="admin-row-tools" style="margin-top:12px">
+            <button id="makeAdminBtn" class="btn success small" type="button">➕ إضافة أدمن بالإيميل</button>
+          </div>
+
+          <div id="adminsList" class="list" style="margin-top:12px"></div>
         </div>
 
       </section>
