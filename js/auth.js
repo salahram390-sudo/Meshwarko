@@ -1,4 +1,5 @@
 import { auth, db } from "./firebase.js";
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -282,8 +283,6 @@ secret?.addEventListener("click", async () => {
       });
   }
 });
-
-import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const resetBtn = document.getElementById("resetPasswordBtn");
 
