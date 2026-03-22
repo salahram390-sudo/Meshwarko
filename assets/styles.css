@@ -1056,7 +1056,7 @@ body.splash-active::before{
   justify-content:center;
   background:#000 !important;
   opacity:1;
-  transition:opacity .6s ease;
+  transition:opacity 1s cubic-bezier(.4,0,.2,1);
 }
 
 .splash-screen.hide{
