@@ -1132,3 +1132,14 @@ gps-marker,
     width: min(70vw, 220px);
   }
 }
+/* إخفاء التطبيق لحد انتهاء السبلاتش */
+.app-hidden{
+  opacity: 0;
+  visibility: hidden;
+}
+
+.app-ready{
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .45s ease;
+}
