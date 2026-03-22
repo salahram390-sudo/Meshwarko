@@ -185,15 +185,6 @@
   <script>
 window.addEventListener("load", () => {
   const splash = document.getElementById("splash");
-
-  // لو شافه قبل كده
-  if(localStorage.getItem("seenSplash")) {
-    splash?.remove();
-    return;
-  }
-
-  localStorage.setItem("seenSplash", "1");
-
   // مدة العرض
   setTimeout(() => {
     splash.classList.add("hide");
