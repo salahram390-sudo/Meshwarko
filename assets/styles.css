@@ -1071,3 +1071,64 @@ gps-marker,
 @media (prefers-reduced-motion:reduce){
   *{ animation:none !important; transition:none !important; }
 }
+/* =========================
+   APP SPLASH SCREEN
+========================= */
+.splash-screen{
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .55s ease, visibility .55s ease;
+}
+
+.splash-screen.hide{
+  opacity: 0;
+  visibility: hidden;
+}
+
+.splash-logo-wrap{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-logo{
+  width: min(62vw, 260px);
+  max-width: 260px;
+  height: auto;
+  display: block;
+  opacity: 0;
+  transform: scale(.78) translateY(10px);
+  filter: drop-shadow(0 0 18px rgba(255,215,0,.10));
+  animation: splashLogoIn 1.2s ease forwards;
+}
+
+@keyframes splashLogoIn{
+  0%{
+    opacity: 0;
+    transform: scale(.78) translateY(10px);
+    filter: drop-shadow(0 0 0 rgba(255,215,0,0));
+  }
+  55%{
+    opacity: 1;
+    transform: scale(1.04) translateY(0);
+    filter: drop-shadow(0 0 18px rgba(255,215,0,.18));
+  }
+  100%{
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 0 10px rgba(255,215,0,.10));
+  }
+}
+
+@media (max-width: 520px){
+  .splash-logo{
+    width: min(70vw, 230px);
+  }
+}
