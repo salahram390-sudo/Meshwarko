@@ -27,7 +27,7 @@ const btnLogout = $("#btnLogout");
 const rolePassenger = $("#rolePassenger");
 const roleDriver = $("#roleDriver");
 const roleHint = $("#roleHint");
-
+const adminEntryBtn = $("#adminEntryBtn");
 const passengerExtras = $("#passengerExtras");
 const driverExtras = $("#driverExtras");
 
