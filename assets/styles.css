@@ -1030,14 +1030,13 @@ input[type="range"]{
 
 /* Splash Screen */
 .app-hidden{
-  opacity:0;
-  visibility:hidden;
+  display:none !important;
 }
 
 .app-ready{
+  display:flex !important;
   opacity:1;
   visibility:visible;
-  transition:opacity .5s ease;
 }
 
 .splash-screen{
