@@ -183,17 +183,17 @@
   })();
 </script>
   <script>
-window.addEventListener("load", () => {
+window.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash");
-  // مدة العرض
+  if (!splash) return;
+
   setTimeout(() => {
     splash.classList.add("hide");
-  }, 3200); // ⏳ خليها 3 ثواني
+  }, 2300);
 
-  // الحذف بعد الاختفاء
   setTimeout(() => {
     splash.remove();
-  }, 4100);
+  }, 2900);
 });
 </script>
 </body>
