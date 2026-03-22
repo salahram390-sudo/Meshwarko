@@ -178,27 +178,30 @@
   </script>
 
   <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const splash = document.getElementById("splash");
-    const logo = splash?.querySelector(".splash-logo");
-    const appRoot = document.getElementById("appRoot");
+window.addEventListener("DOMContentLoaded", () => {
+  const splash = document.getElementById("splash");
+  const logo = splash?.querySelector(".splash-logo");
+  const appRoot = document.getElementById("appRoot");
 
-    if (!splash || !logo || !appRoot) return;
+  if (!splash || !logo || !appRoot) return;
 
-    setTimeout(() => {
-      logo.classList.add("hide");
-    }, 2200);
+  // 1) اللوجو يختفي
+  setTimeout(() => {
+    logo.classList.add("hide");
+  }, 2200);
 
-    setTimeout(() => {
-      splash.classList.add("hide");
-    }, 4200);
+  // 2) تفضل الخلفية السوداء وحدها
+  setTimeout(() => {
+    splash.classList.add("hide");
+  }, 4200);
 
-    setTimeout(() => {
-      splash.remove();
-      appRoot.classList.remove("app-hidden");
-      appRoot.classList.add("app-ready");
-    }, 4900);
-  });
+  // 3) بعد ما السبلاتش يختفي تمامًا نظهر التطبيق
+  setTimeout(() => {
+    splash.remove();
+    appRoot.classList.remove("app-hidden");
+    appRoot.classList.add("app-ready");
+  }, 4900);
+});
   </script>
 </body>
 </html>
