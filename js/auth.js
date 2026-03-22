@@ -256,32 +256,6 @@ window.addEventListener("error", (e) => {
   alert(`JS Error: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`);
 });
 
-let tapCount = 0;
-
-const secret = document.getElementById("secretAdmin");
-
-secret?.addEventListener("click", async () => {
-  tapCount++;
-
-  if (tapCount >= 5) {
-    tapCount = 0;
-
-    if (!auth.currentUser) {
-      alert("سجل دخول الأول");
-      return;
-    }
-
-    const uid = auth.currentUser.uid;
-
-    await updateDoc(doc(db, "users", uid), {
-  role: "admin",
-  status: "active"
-});
-
-alert("🔥 تم تحويلك إلى Admin");
-  }
-});
-
 const resetBtn = document.getElementById("resetPasswordBtn");
 
 resetBtn?.addEventListener("click", async () => {
