@@ -107,6 +107,7 @@ export function formatRideDate(ts) {
   }
 }
 
+import { auth } from "./firebase.js";
 import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
 const resetBtn = document.getElementById("resetPasswordBtn");
