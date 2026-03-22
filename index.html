@@ -183,18 +183,17 @@
   })();
 </script>
   <script>
-  window.addEventListener("load", function () {
-    const splash = document.getElementById("splash");
-    if (!splash) return;
+window.addEventListener("load", () => {
+  const splash = document.getElementById("splash");
 
-    setTimeout(() => {
-      splash.classList.add("hide");
-    }, 1900);
+  setTimeout(() => {
+    splash.classList.add("hide");
+  }, 2000);
 
-    setTimeout(() => {
-      splash.remove();
-    }, 2600);
-  });
+  setTimeout(() => {
+    splash.remove();
+  }, 2600);
+});
   </script>
 </body>
 </html>
