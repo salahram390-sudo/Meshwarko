@@ -106,20 +106,3 @@ export function formatRideDate(ts) {
     return new Date(ms).toString();
   }
 }
-
-import { auth } from "./firebase.js";
-import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-const resetBtn = document.getElementById("resetPasswordBtn");
-
-resetBtn?.addEventListener("click", async () => {
-  const email = prompt("اكتب الايميل بتاعك");
-  if (!email) return;
-
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("تم ارسال رابط تغيير الباسورد على ايميلك");
-  } catch (err) {
-    alert("خطأ: " + err.message);
-  }
-});
