@@ -186,23 +186,27 @@
 window.addEventListener("DOMContentLoaded", () => {
   const splash = document.getElementById("splash");
   const logo = splash?.querySelector(".splash-logo");
-  if (!splash || !logo) return;
+  const appRoot = document.getElementById("appRoot");
 
-  // بعد ما اللوجو يظهر ويثبت شوية
+  if (!splash || !logo || !appRoot) return;
+
+  // 1) اللوجو يظهر ويثبت
   setTimeout(() => {
     logo.classList.add("hide");
   }, 2200);
 
-  // الخلفية السودا تفضل لوحدها ثانيتين
+  // 2) الخلفية السودا تفضل بعد اختفاء اللوجو
   setTimeout(() => {
     splash.classList.add("hide");
   }, 4200);
 
-  // إزالة السبلاتش نهائيًا
+  // 3) بعد اختفاء السبلاتش نظهر التطبيق
   setTimeout(() => {
     splash.remove();
+    appRoot.classList.remove("app-hidden");
+    appRoot.classList.add("app-ready");
   }, 4900);
 });
-</script>
+  </script>
 </body>
 </html>
