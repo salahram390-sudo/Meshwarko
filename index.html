@@ -190,23 +190,28 @@ window.addEventListener("DOMContentLoaded", () => {
 
   if (!splash || !logo || !appRoot) return;
 
-  // 1) اللوجو يظهر ويثبت
+  // 1) اخفاء اللوجو فقط
   setTimeout(() => {
     logo.classList.add("hide");
   }, 2200);
 
-  // 2) الخلفية السودا تفضل بعد اختفاء اللوجو
+  // 2) بعد اختفاء اللوجو نظهر التطبيق،
+  // لكن السبلاتش نفسه يظل موجود بخلفيته السودا
   setTimeout(() => {
-    splash.classList.add("hide");
-  }, 4200);
-
-  // 3) بعد اختفاء السبلاتش نظهر التطبيق
-  setTimeout(() => {
-    splash.remove();
     appRoot.classList.remove("app-hidden");
     appRoot.classList.add("app-ready");
-  }, 4900);
+  }, 3000);
+
+  // 3) بعد شوية نخفي السبلاتش نفسه
+  setTimeout(() => {
+    splash.classList.add("hide");
+  }, 4600);
+
+  // 4) ثم نحذفه
+  setTimeout(() => {
+    splash.remove();
+  }, 5300);
 });
-  </script>
+</script>
 </body>
 </html>
