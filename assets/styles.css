@@ -1029,6 +1029,14 @@ input[type="range"]{
 }
 
 /* Splash Screen */
+body.splash-active{
+  background:#000 !important;
+}
+
+body.splash-active::before{
+  display:none !important;
+}
+
 .app-hidden{
   display:none !important;
 }
@@ -1042,11 +1050,11 @@ input[type="range"]{
 .splash-screen{
   position:fixed;
   inset:0;
-  z-index:999999;
+  z-index:2147483647;
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#000;
+  background:#000 !important;
   opacity:1;
   transition:opacity .6s ease;
 }
