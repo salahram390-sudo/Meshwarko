@@ -158,7 +158,27 @@ if (role === "driver") {
 }
 
 const snap = await getDoc(doc(db, "users", u.uid));
-const profile = snap.exists() ? snap.data() : {};
+
+if (!snap.exists()) {
+  // المستخدم اتحذف قبل كدا → نعيد إنشاؤه كأنه جديد
+  await setDoc(doc(db, "users", u.uid), {
+    uid: u.uid,
+    role: role,
+    name: "مستخدم جديد",
+    phone: "",
+    email: u.email,
+    createdAt: serverTimestamp(),
+    status: "active",
+    walletBalance: 0,
+    totalEarnings: 0,
+    completedTrips: 0,
+    ratingAvg: 0,
+    ratingCount: 0
+  });
+}
+
+const profileSnap = await getDoc(doc(db, "users", u.uid));
+const profile = profileSnap.data();
 const r = profile?.role || "passenger";
 if (profile?.status === "blocked") {
   await signOut(auth);
