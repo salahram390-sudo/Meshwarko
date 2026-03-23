@@ -386,40 +386,40 @@
     }
   ],
   "vehicleTypes": [
-    {
-      "id": "tuktuk",
-      "name": "توكتوك",
-      "icon": "🛺"
-    },
-    {
-      "id": "sedan",
-      "name": "ملاكي",
-      "icon": "🚗"
-    },
-    {
-      "id": "tricycle",
-      "name": "تروسيكل",
-      "icon": "🛵"
-    },
-    {
-      "id": "truck",
-      "name": "نقل",
-      "icon": "🚚"
-    },
-    {
-      "id": "microbus",
-      "name": "ميكروباص",
-      "icon": "🚐"
-    },
-    {
-      "id": "tmanya",
-      "name": "تمناية",
-      "icon": "🚐"
-    },
-    {
-      "id": "delivery_bike",
-      "name": "موتوسيكل دليفري",
-      "icon": "🏍️"
-    }
-  ]
+  {
+    "id": "tuktuk",
+    "name": "توكتوك",
+    "image": "assets/vehicles/tuktuk.png"
+  },
+  {
+    "id": "sedan",
+    "name": "ملاكي",
+    "image": "assets/vehicles/sedan.png"
+  },
+  {
+    "id": "tricycle",
+    "name": "تروسيكل",
+    "image": "assets/vehicles/tricycle.png"
+  },
+  {
+    "id": "truck",
+    "name": "نقل",
+    "image": "assets/vehicles/truck.png"
+  },
+  {
+    "id": "microbus",
+    "name": "ميكروباص",
+    "image": "assets/vehicles/microbus.png"
+  },
+  {
+    "id": "tmanya",
+    "name": "تمناية",
+    "image": "assets/vehicles/tmanya.png"
+  },
+  {
+    "id": "delivery_bike",
+    "name": "موتوسيكل دليفري",
+    "image": "assets/vehicles/delivery_bike.png"
+  }
+]
 }
