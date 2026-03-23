@@ -593,6 +593,7 @@ function hardResetPassengerUI() {
   currentRideId = null;
   currentPickup = null;
   arrivedToastShownFor = null;
+  completedToastShownFor = null;
 
   stopDriverTracking();
   stopLiveDrivers();
