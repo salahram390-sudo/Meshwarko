@@ -578,11 +578,6 @@ function watchPassengerEndRequest(rideId) {
     selectedRideData = { ...ride, id: rideId };
 
     refreshSelectedRideButtons(selectedRideData);
-    
-    const ride = snap.data();
-    selectedRideData = { ...ride, id: rideId };
-
-    refreshSelectedRideButtons(selectedRideData);
 
     if (ride.status === "started" && myLocation) {
       tryAutoCompleteCurrentRide().catch((e) => console.warn("auto complete check failed", e));
