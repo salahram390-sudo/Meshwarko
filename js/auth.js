@@ -75,6 +75,8 @@ roleDriver.addEventListener("click", () => setRole("driver"));
 
 tabLogin.addEventListener("click", () => showTab("login"));
 tabRegister.addEventListener("click", () => showTab("register"));
+setRole("passenger");
+showTab("login");
 
 async function initAdmin() {
   admin = await loadEgyptAdmin();
