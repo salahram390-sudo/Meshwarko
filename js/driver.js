@@ -540,6 +540,9 @@ function startLiveTracking(rideId) {
     updateOwnDriverMarker(lat, lon, false);
     await pushDriverOnline();
     if (trackingRideId) await pushRideLoc(lat, lon);
+
+    // فحص الإنهاء التلقائي أثناء الحركة
+    await tryAutoCompleteCurrentRide();
   }, () => {}, { enableHighAccuracy: true, maximumAge: 2000, timeout: 10000 });
 }
 
