@@ -70,6 +70,9 @@ let ownDriverPosDocRef = null;
 let chatUnsubDriver = null;
 const MAX_VISIBLE_RIDE_DISTANCE_M = 8000;
 
+const AUTO_COMPLETE_DISTANCE_M = 70;
+let autoCompletingRide = false;
+
 function setDriverStatus(t) { setText(driverStatus, t); }
 
 function setTrackBtn() {
