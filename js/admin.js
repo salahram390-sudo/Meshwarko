@@ -8,6 +8,7 @@ import {
   onSnapshot,
   query,
   updateDoc,
+  deleteDoc,
   where,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
