@@ -1314,7 +1314,9 @@ body.splash-active::before{
 
 .map-fabs{
   right:10px;
-  bottom:10px;
+  bottom:80px;
+  left:auto;
+  top:auto;
 }
 
 .topbar{
