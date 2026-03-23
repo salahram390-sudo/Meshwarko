@@ -227,21 +227,35 @@ function onlineDriverCard(d) {
 }
 
 async function deleteUserAppData(userId) {
-  // حذف المستخدم من users
+
+  // 1️⃣ حذف من users
   await deleteDoc(doc(db, "users", userId)).catch(() => {});
 
-  // حذف ظهوره من driversOnline
+  // 2️⃣ حذف من driversOnline
   await deleteDoc(doc(db, "driversOnline", userId)).catch(() => {});
 
-  // حذف الرحلات المرتبطة به
-  const ridesSnap = await getDocs(collection(db, "rides"));
-  const relatedRides = ridesSnap.docs.filter((d) => {
-    const r = d.data();
-    return r.passengerId === userId || r.driverId === userId;
-  });
+  // 3️⃣ هات الرحلات المرتبطة
+  const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", userId)));
+  const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", userId)));
 
-  for (const rideDoc of relatedRides) {
-    await deleteDoc(doc(db, "rides", rideDoc.id)).catch(() => {});
+  const allRides = [...r1.docs, ...r2.docs];
+
+  // 4️⃣ امسح الشات + الرحلة
+  for (const rideDoc of allRides) {
+    const rideId = rideDoc.id;
+
+    // 🧹 حذف messages (الشات)
+    try {
+      const msgs = await getDocs(collection(db, "rides", rideId, "messages"));
+      for (const m of msgs.docs) {
+        await deleteDoc(doc(db, "rides", rideId, "messages", m.id));
+      }
+    } catch (e) {
+      console.warn("messages delete fail", e);
+    }
+
+    // 🧹 حذف الرحلة
+    await deleteDoc(doc(db, "rides", rideId)).catch(() => {});
   }
 }
 
