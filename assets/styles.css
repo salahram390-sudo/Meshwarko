@@ -625,7 +625,7 @@ input[type="range"]{
 .vehicle.active{
   background: transparent !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(59,130,246,0.35) inset !important;
+  box-shadow: none !important;
 }
 
 .vehicle.active .vehicle-img{
