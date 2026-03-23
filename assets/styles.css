@@ -546,11 +546,13 @@ input[type="range"]{
 .vehicle-grid{
   display:flex;
   gap:12px;
+
   overflow-x:auto;
   overflow-y:hidden;
+
   padding:4px 2px 10px;
-  scroll-snap-type:x proximity;
-  -webkit-overflow-scrolling:touch;
+
+  max-width:100%; /* مهم 🔥 */
 }
 
 .vehicle-grid::-webkit-scrollbar{
@@ -1278,4 +1280,8 @@ body.splash-active::before{
 
 @media (prefers-reduced-motion:reduce){
   *{ animation:none !important; transition:none !important; }
+}
+
+html, body{
+  overflow-x: hidden !important;
 }
