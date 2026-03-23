@@ -162,14 +162,13 @@ body::before{
 .map-fabs{
   position:absolute;
   right:12px;
+  bottom:80px; /* أهم سطر 🔥 */
   left:auto;
-  bottom:14px;
   top:auto;
   z-index:5000;
   display:flex;
   flex-direction:column;
   gap:10px;
-  max-width:calc(100% - 24px);
 }
 
 .fab{
