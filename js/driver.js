@@ -1015,76 +1015,7 @@ if (driverStartRideBtn) {
 
 btnComplete.addEventListener("click", async () => {
   if (!selectedRideId) return;
-  setDriverStatus("ينهي...");
-  try {
-    const rideRef = doc(db, "rides", selectedRideId);
-    const rideSnap = await getDoc(rideRef);
-    const ride = rideSnap.exists() ? rideSnap.data() : null;
-    await updateDoc(rideRef, {
-      status: "completed",
-      completedAt: serverTimestamp(),
-      archived: true,
-    });
-
-    if (ride && myUser) {
-      const price = Number(ride.price || 0);
-      const walletBalance = Number(myUser.walletBalance || 0) + price;
-      const totalEarnings = Number(myUser.totalEarnings || 0) + price;
-      const completedTrips = Number(myUser.completedTrips || 0) + 1;
-      await updateDoc(doc(db, "users", myUser.uid), { walletBalance, totalEarnings, completedTrips, updatedAt: serverTimestamp() }).catch(() => {});
-      myUser = { ...myUser, walletBalance, totalEarnings, completedTrips };
-      renderDriverWallet();
-
-      const passengerRate = Number(prompt("قيّم الراكب من 1 إلى 5 (اختياري)", "5") || 0);
-      if (passengerRate >= 1 && passengerRate <= 5 && ride.passengerId) {
-        await updateDoc(rideRef, { driverRating: passengerRate, driverRatedAt: serverTimestamp() }).catch(() => {});
-        const passengerRef = doc(db, "users", ride.passengerId);
-        const passengerSnap = await getDoc(passengerRef);
-        if (passengerSnap.exists()) {
-          const pData = passengerSnap.data();
-          const prevCount = Number(pData.ratingCount || 0);
-          const prevAvg = Number(pData.ratingAvg || 0);
-          const nextCount = prevCount + 1;
-          const nextAvg = ((prevAvg * prevCount) + passengerRate) / nextCount;
-          await updateDoc(passengerRef, { ratingCount: nextCount, ratingAvg: Number(nextAvg.toFixed(2)), updatedAt: serverTimestamp() }).catch(() => {});
-        }
-      }
-    }
-    stopLiveTracking();
-    btnComplete.disabled = true;
-    btnCancel.disabled = true;
-    btnTrackToggle.disabled = true;
-    btnArrived.disabled = true;
-    resetSelectedRideUi("تم إنهاء الرحلة.");
-    notify({ title: "تم إنهاء الرحلة", body: "شكراً لك.", tag: "ride-complete" });
-    setDriverStatus("مكتمل");
-  } catch (e) {
-    console.error(e);
-    setDriverStatus("خطأ");
-  }
-});
-
-btnCancel.addEventListener("click", async () => {
-  if (!selectedRideId) return;
-  setDriverStatus("يلغي...");
-  try {
-    await updateDoc(doc(db, "rides", selectedRideId), {
-      status: "canceled",
-      canceledAt: serverTimestamp(),
-      archived: true,
-    });
-    stopLiveTracking();
-    btnComplete.disabled = true;
-    btnCancel.disabled = true;
-    btnTrackToggle.disabled = true;
-    btnArrived.disabled = true;
-    resetSelectedRideUi("تم إلغاء الرحلة.");
-    notify({ title: "تم إلغاء الطلب", body: "تم الإلغاء.", tag: "ride-cancel" });
-    setDriverStatus("ملغي");
-  } catch (e) {
-    console.error(e);
-    setDriverStatus("خطأ");
-  }
+  await completeRideCore({ auto: false });
 });
 
 editProfileBtn.addEventListener("click", async () => {
