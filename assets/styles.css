@@ -1170,8 +1170,6 @@ body.splash-active::before{
   transform:scale(.8) translateY(-30px);
   filter:blur(6px);
 }
-  filter:drop-shadow(0 0 18px rgba(255,215,0,.05));
-}
 
 .splash-glow{
   position:absolute;
