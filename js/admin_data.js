@@ -19,10 +19,16 @@ export function fillSelect(selectEl, items, placeholder = "اختر") {
 
 export function renderVehicleGrid(rootEl, vehicleTypes, selectedId, onSelect) {
   rootEl.innerHTML = "";
+
   vehicleTypes.forEach(v => {
     const div = document.createElement("div");
     div.className = "vehicle" + (v.id === selectedId ? " active" : "");
-    div.innerHTML = `<div class="ico">${v.icon}</div><div class="nm">${v.name}</div>`;
+    div.innerHTML = `
+      <div class="vehicle-thumb">
+        <img class="vehicle-img" src="${v.image}" alt="${v.name}">
+      </div>
+      <div class="nm">${v.name}</div>
+    `;
     div.onclick = () => onSelect(v.id);
     rootEl.appendChild(div);
   });
