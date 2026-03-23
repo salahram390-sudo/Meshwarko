@@ -1299,6 +1299,29 @@ body.splash-active::before{
     opacity:.18 !important;
   }
 
+  .map-area{
+  flex:0 0 32vh;
+  min-height:190px;
+}
+
+.map-fabs{
+  right:10px;
+  bottom:10px;
+}
+
+.topbar{
+  height:52px;
+  padding:8px 10px;
+}
+
+.panel-head{
+  padding:12px 14px 10px;
+}
+
+.panel-body{
+  padding:10px 14px 14px;
+}
+
   *{ transition:none !important; }
 }
 
