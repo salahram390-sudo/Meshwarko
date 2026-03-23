@@ -563,13 +563,13 @@ input[type="range"]{
 }
 
 .vehicle{
-  flex:0 0 120px;
-  min-width:120px;
+  flex:0 0 130px;
+  min-width:130px;
 
   border-radius:16px;
-  border:1px solid rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.06);
 
-  background: rgba(255,255,255,0.04);
+  background: rgba(255,255,255,0.03);
 
   padding:14px 10px;
 
@@ -585,22 +585,25 @@ input[type="range"]{
 }
 
 .vehicle-thumb{
-  width:90px;
-  height:70px;
+  width:100%;
+  height:80px;
+
+  background: rgba(255,255,255,0.03);
+  border-radius:12px;
+
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
 .vehicle-img{
-  width:100%;
-  height:100%;
+  max-width:85%;
+  max-height:100%;
+
   object-fit:contain;
 
   filter:grayscale(1);
-  opacity:0.8;
-
-  transition: all .2s ease;
+  opacity:0.85;
 }
 
 .vehicle .nm{
@@ -619,10 +622,8 @@ input[type="range"]{
 }
 
 .vehicle.active{
-  background: rgba(59,130,246,0.12);
-  border-color: rgba(59,130,246,0.5);
-
-  transform: scale(1.05);
+  background: rgba(59,130,246,0.15);
+  border-color:#3b82f6;
 }
 
 .vehicle.active .vehicle-img{
