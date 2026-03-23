@@ -583,6 +583,8 @@ input[type="range"]{
 }
 
 .vehicle-thumb{
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
   width:72px;
   height:72px;
   display:flex;
