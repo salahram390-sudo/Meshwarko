@@ -1282,7 +1282,3 @@ body.splash-active::before{
 @media (prefers-reduced-motion:reduce){
   *{ animation:none !important; transition:none !important; }
 }
-
-html, body{
-  overflow-x: hidden !important;
-}
