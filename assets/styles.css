@@ -205,9 +205,9 @@ body::before{
 }
 
 .panel:hover{
-  transform:translateY(-2px);
-  border-top-color:rgba(255,215,0,.28);
-  box-shadow:0 -14px 52px rgba(0,0,0,.6), 0 0 38px rgba(255,215,0,.08);
+  transform:none;
+  border-top-color:rgba(255,215,0,.22);
+  box-shadow:0 -12px 32px rgba(0,0,0,.45);
 }
 
 .panel::before{
