@@ -1104,7 +1104,8 @@ async function handleRideSnapshot(rideSnap) {
     removeRouteLayer(driverRouteLayerRef);
     setText(distanceValue, "");
     setText(routeMeta, "");
-
+    setStatus("تم الوصول");
+    
     currentRideId = rideSnap.id;
 
     renderStars(0);
