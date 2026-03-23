@@ -154,6 +154,10 @@ function userCard(u) {
         <button class="btn ${u.status === "blocked" ? "success" : "danger"} small" data-action="toggle-user" data-id="${u.id}">
           ${u.status === "blocked" ? "فك الحظر" : "حظر"}
         </button>
+        
+        <button class="btn danger small" data-action="delete-user" data-id="${u.id}">
+  حذف المستخدم
+</button>
 
         <button class="btn danger small" data-action="delete-user" data-id="${u.id}">
     حذف نهائي
