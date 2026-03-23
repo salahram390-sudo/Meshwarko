@@ -176,6 +176,14 @@ if (!snap.exists()) {
     ratingCount: 0
   });
 }
+    const snap = await getDoc(doc(db, "users", u.uid));
+
+if (!snap.exists()) {
+  // المستخدم اتحذف قبل كدا
+  alert("الحساب تم حذفه، يرجى إنشاء حساب جديد");
+  await signOut(auth);
+  return;
+}
 
 const profileSnap = await getDoc(doc(db, "users", u.uid));
 const profile = profileSnap.data();
