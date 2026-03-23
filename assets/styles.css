@@ -137,9 +137,27 @@ body::before{
   color:var(--muted);
 }
 
-.map-layout{ min-height:100vh; flex:1; display:flex; flex-direction:column; }
-.map-area{ position:relative; flex:0 0 45vh; min-height:220px; }
-.map{ height:100%; width:100%; }
+.map-layout{
+  min-height:100vh;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow-x:hidden;
+}
+
+.map-area{
+  position:relative;
+  flex:0 0 36vh;
+  min-height:210px;
+  max-width:100%;
+  overflow:hidden;
+}
+
+.map{
+  height:100%;
+  width:100%;
+  max-width:100%;
+}
 
 .map-fabs{
   position:absolute;
