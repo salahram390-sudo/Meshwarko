@@ -563,12 +563,12 @@ function clearAll() {
   setText(distanceValue, "—");
   setText(routeMeta, "اختر قيام/وصول لرسم المسار");
 }
-
 function cleanupRideState() {
   clearRideSearchTimer();
   currentRideId = null;
   currentPickup = null;
   arrivedToastShownFor = null;
+  completedToastShownFor = null;
   stopDriverTracking();
   setDriverContactButtons(null);
   resetActionVisibility();
