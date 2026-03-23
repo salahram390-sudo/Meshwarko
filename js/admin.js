@@ -265,6 +265,33 @@ async function handleUsersClick(e) {
     return;
   }
 
+  const deleteBtn = e.target.closest('[data-action="delete-user"]');
+  if (deleteBtn) {
+    const id = deleteBtn.dataset.id;
+    const u = allUsers.find((x) => x.id === id);
+    if (!u) return;
+
+    if (currentAdmin?.uid === id) {
+      alert("لا يمكنك حذف حسابك الحالي من لوحة الإدارة.");
+      return;
+    }
+
+    const ok1 = confirm(`هل أنت متأكد من حذف المستخدم "${u.name || u.email || id}" نهائيًا؟`);
+    if (!ok1) return;
+
+    const ok2 = confirm("سيتم حذف بياناته من التطبيق والرحلات المرتبطة به. هل تريد المتابعة؟");
+    if (!ok2) return;
+
+    await deleteUserAppData(id);
+
+    notify({
+      title: "الإدارة",
+      body: "تم حذف المستخدم من التطبيق",
+      tag: "delete-user"
+    });
+    return;
+  }
+
   const walletBtn = e.target.closest('[data-action="wallet-user"]');
   if (walletBtn) {
     const id = walletBtn.dataset.id;
