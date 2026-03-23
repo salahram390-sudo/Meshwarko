@@ -226,6 +226,25 @@ function onlineDriverCard(d) {
   `;
 }
 
+async function deleteUserAppData(userId) {
+  // حذف المستخدم من users
+  await deleteDoc(doc(db, "users", userId)).catch(() => {});
+
+  // حذف ظهوره من driversOnline
+  await deleteDoc(doc(db, "driversOnline", userId)).catch(() => {});
+
+  // حذف الرحلات المرتبطة به
+  const ridesSnap = await getDocs(collection(db, "rides"));
+  const relatedRides = ridesSnap.docs.filter((d) => {
+    const r = d.data();
+    return r.passengerId === userId || r.driverId === userId;
+  });
+
+  for (const rideDoc of relatedRides) {
+    await deleteDoc(doc(db, "rides", rideDoc.id)).catch(() => {});
+  }
+}
+
 async function handleUsersClick(e) {
   const toggleBtn = e.target.closest('[data-action="toggle-user"]');
   if (toggleBtn) {
