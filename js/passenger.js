@@ -36,6 +36,7 @@ let liveDriversUnsub = null;
 let driverMarker = null;
 let driverLastLoc = null;
 let arrivedToastShownFor = null;
+let completedToastShownFor = null;
 let ratingValue = 0;
 let pickMode = null;
 let lastDistanceMeters = null;
