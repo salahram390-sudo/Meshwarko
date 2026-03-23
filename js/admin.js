@@ -155,6 +155,10 @@ function userCard(u) {
           ${u.status === "blocked" ? "فك الحظر" : "حظر"}
         </button>
 
+        <button class="btn danger small" data-action="delete-user" data-id="${u.id}">
+    حذف نهائي
+  </button>
+
         <button class="btn ghost small" data-action="wallet-user" data-id="${u.id}">
           تعديل الرصيد
         </button>
