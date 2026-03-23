@@ -156,12 +156,8 @@ function userCard(u) {
         </button>
         
         <button class="btn danger small" data-action="delete-user" data-id="${u.id}">
-  حذف المستخدم
+   حذف المستخدم نهائى
 </button>
-
-        <button class="btn danger small" data-action="delete-user" data-id="${u.id}">
-    حذف نهائي
-  </button>
 
         <button class="btn ghost small" data-action="wallet-user" data-id="${u.id}">
           تعديل الرصيد
