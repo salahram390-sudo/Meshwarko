@@ -327,6 +327,120 @@ function clearRouteAndMarkers() {
   dropMarker = null;
 }
 
+function isDriverNearDropoff(ride) {
+  if (!ride || !myLocation || !ride.dropoff) return false;
+
+  const drop = {
+    lat: Number(ride.dropoff.lat),
+    lon: Number(ride.dropoff.lon),
+  };
+
+  if (![drop.lat, drop.lon].every(Number.isFinite)) return false;
+
+  const distance = haversineMeters(myLocation, drop);
+  return Number.isFinite(distance) && distance <= AUTO_COMPLETE_DISTANCE_M;
+}
+
+async function completeRideCore({ auto = false } = {}) {
+  if (!selectedRideId) return;
+  if (autoCompletingRide && auto) return;
+
+  if (auto) autoCompletingRide = true;
+
+  try {
+    setDriverStatus(auto ? "تم الوصول - إنهاء تلقائي..." : "ينهي...");
+
+    const rideRef = doc(db, "rides", selectedRideId);
+    const rideSnap = await getDoc(rideRef);
+    const ride = rideSnap.exists() ? rideSnap.data() : null;
+
+    if (!ride) throw new Error("الرحلة غير موجودة");
+    if (ride.status === "completed" || ride.status === "canceled") return;
+    if (ride.status !== "started") return;
+
+    await updateDoc(rideRef, {
+      status: "completed",
+      completedAt: serverTimestamp(),
+      archived: true,
+      autoCompleted: auto,
+    });
+
+    if (ride && myUser) {
+      const price = Number(ride.price || 0);
+      const walletBalance = Number(myUser.walletBalance || 0) + price;
+      const totalEarnings = Number(myUser.totalEarnings || 0) + price;
+      const completedTrips = Number(myUser.completedTrips || 0) + 1;
+
+      await updateDoc(doc(db, "users", myUser.uid), {
+        walletBalance,
+        totalEarnings,
+        completedTrips,
+        updatedAt: serverTimestamp()
+      }).catch(() => {});
+
+      myUser = { ...myUser, walletBalance, totalEarnings, completedTrips };
+      renderDriverWallet();
+
+      // التقييم اليدوي فقط، مش في الإنهاء التلقائي
+      if (!auto) {
+        const passengerRate = Number(prompt("قيّم الراكب من 1 إلى 5 (اختياري)", "5") || 0);
+        if (passengerRate >= 1 && passengerRate <= 5 && ride.passengerId) {
+          await updateDoc(rideRef, {
+            driverRating: passengerRate,
+            driverRatedAt: serverTimestamp()
+          }).catch(() => {});
+
+          const passengerRef = doc(db, "users", ride.passengerId);
+          const passengerSnap = await getDoc(passengerRef);
+
+          if (passengerSnap.exists()) {
+            const pData = passengerSnap.data();
+            const prevCount = Number(pData.ratingCount || 0);
+            const prevAvg = Number(pData.ratingAvg || 0);
+            const nextCount = prevCount + 1;
+            const nextAvg = ((prevAvg * prevCount) + passengerRate) / nextCount;
+
+            await updateDoc(passengerRef, {
+              ratingCount: nextCount,
+              ratingAvg: Number(nextAvg.toFixed(2)),
+              updatedAt: serverTimestamp()
+            }).catch(() => {});
+          }
+        }
+      }
+    }
+
+    stopLiveTracking();
+    btnComplete.disabled = true;
+    btnCancel.disabled = true;
+    btnTrackToggle.disabled = true;
+    btnArrived.disabled = true;
+    driverStartRideBtn.disabled = true;
+
+    resetSelectedRideUi(auto ? "تم الوصول وإنهاء الرحلة تلقائيًا." : "تم إنهاء الرحلة.");
+
+    notify({
+      title: auto ? "تم وصول الرحلة" : "تم إنهاء الرحلة",
+      body: auto ? "تم الوصول لمكان الوصول وإنهاء الرحلة تلقائيًا." : "شكراً لك.",
+      tag: auto ? "ride-auto-complete" : "ride-complete"
+    });
+
+    setDriverStatus("مكتمل");
+  } catch (e) {
+    console.error(e);
+    setDriverStatus("خطأ");
+  } finally {
+    if (auto) autoCompletingRide = false;
+  }
+}
+
+async function tryAutoCompleteCurrentRide() {
+  if (!selectedRideId || !selectedRideData) return;
+  if (selectedRideData.status !== "started") return;
+  if (!isDriverNearDropoff(selectedRideData)) return;
+  await completeRideCore({ auto: true });
+}
+
 function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   if (acceptedRideUnsub) {
     acceptedRideUnsub();
