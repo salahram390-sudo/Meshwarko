@@ -27,6 +27,7 @@
 html,body{
   height:100%;
   margin:0;
+  overflow-x:hidden !important;
   background:
     radial-gradient(circle at 20% 20%, rgba(255,215,0,.08), transparent 40%),
     radial-gradient(circle at 80% 10%, rgba(255,215,0,.05), transparent 40%),
