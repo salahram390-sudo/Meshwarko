@@ -199,11 +199,16 @@ body::before{
   text-overflow:ellipsis;
 }
 
-.top-actions .btn,
-.badge{
+.top-actions .btn{
   max-width:140px;
   overflow:hidden;
   text-overflow:ellipsis;
+}
+
+.badge{
+  max-width:none;
+  overflow:visible;
+  text-overflow:clip;
 }
 
 .badge{
