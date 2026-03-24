@@ -643,6 +643,9 @@ if (chatInputPassenger) chatInputPassenger.value = "";
   setText(distanceValue, "—");
   setText(priceValue, "—");
   setStatus("جاهز");
+  ratingValue = 0;
+if (rateComment) rateComment.value = "";
+setText(rateHint, "");
 
   btnRequest.disabled = false;
   btnCancel.disabled = true;
