@@ -111,13 +111,10 @@ body::before{
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:800;
-  font-size:18px;
-  color:#fff;
-  background:linear-gradient(135deg,#3b82f6,#14b8a6);
+  overflow:hidden;
+  background:#0f1720;
   border:1px solid rgba(255,255,255,.12);
   box-shadow:0 8px 18px rgba(0,0,0,.28);
-  overflow:hidden;
 }
 
 .user-avatar img{
