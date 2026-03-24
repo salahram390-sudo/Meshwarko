@@ -759,19 +759,27 @@ input[type="range"]{
   transform: scale(1.05);
 }
 
-.auth-shell .auth-container{
-  flex:1;
-  display:grid;
-  place-items:center;
-  padding:16px;
+.auth-shell{
   width:100%;
+  min-height:100%;
 }
 
-.auth-shell .card{
-  width:min(560px, 100%);
-  margin-inline:auto;
+.auth-shell .auth-container{
+  width:100%;
+  max-width:100%;
+  min-height:calc(100vh - 60px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
 }
-.auth-shell .card{ width:min(560px, 100%); }
+
+.auth-shell .card,
+.auth-shell .card-lite{
+  width:min(560px, calc(100vw - 24px));
+  max-width:calc(100vw - 24px);
+  margin:0 auto;
+}
 
 .modal.hidden{ display:none; }
 .modal{ position:fixed; inset:0; z-index:9999; }
