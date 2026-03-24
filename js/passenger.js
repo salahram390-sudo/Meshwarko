@@ -1578,9 +1578,16 @@ rateSend?.addEventListener("click", async () => {
 });
 
 rateClose?.addEventListener("click", hideRatingModal);
-rateSkip?.addEventListener("click", hideRatingModal);
+rateSkip?.addEventListener("click", () => {
+  hideRatingModal();
+  finalizePassengerRideCleanup();
+});
+
 rateModal?.addEventListener("click", (e) => {
-  if (e.target === rateModal) hideRatingModal();
+  if (e.target === rateModal) {
+    hideRatingModal();
+    finalizePassengerRideCleanup();
+  }
 });
 starsRoot?.addEventListener("click", (e) => {
   const t = e.target;
