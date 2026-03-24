@@ -227,9 +227,9 @@ body::before{
   border:1px solid rgba(255,215,0,.14);
   color:var(--muted);
 
-  max-width:120px;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  max-width:none;        /* 👈 مهم */
+  overflow:visible;      /* 👈 مهم */
+  text-overflow:unset;   /* 👈 مهم */
 }
 
 .map-layout{
