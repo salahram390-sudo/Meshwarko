@@ -1423,10 +1423,10 @@ body.splash-active::before{
   }
 
   .badge{
-  max-width:95px;
   font-size:10px;
   padding:4px 7px;
-  }
+  flex:0 0 auto;
+}
 
   .topbar{
     height:54px;
@@ -1440,8 +1440,8 @@ body.splash-active::before{
 
   .top-actions .btn{
   height:32px;
-  padding:0 9px;
-  font-size:12px;
+  padding:0 8px;
+  font-size:11px;
   flex:0 0 auto;
 }
 
