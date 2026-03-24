@@ -1173,12 +1173,19 @@ if (btnChatPassenger) btnChatPassenger.disabled = !(ride.status === "accepted" |
   }
 
   if (ride.status === "completed" && completedToastShownFor !== currentRideId) {
-    completedToastShownFor = currentRideId;
-    notify({
-      title: "تم وصول الرحلة",
-      body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅",
-      tag: "ride-completed"
-    });
+  completedToastShownFor = currentRideId;
+
+  notify({
+    title: "تمت الرحلة بنجاح 🎉",
+    body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅",
+    tag: "ride-completed"
+  });
+
+  // ✅ أهم حاجة
+  setTimeout(() => {
+    finalizePassengerRideCleanup();
+  }, 1200);
+}
   }
   
   const driverProfile = (ride.status === "accepted" || ride.status === "arrived" || ride.status === "started")
