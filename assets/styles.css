@@ -136,8 +136,16 @@ body::before{
 .top-actions{
   display:flex;
   align-items:center;
-  gap:8px;
-  flex-wrap:nowrap;
+  gap:6px;
+  flex:1;
+  min-width:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:none;
+}
+
+.top-actions::-webkit-scrollbar{
+  display:none;
 }
 
 .top-actions .btn{
