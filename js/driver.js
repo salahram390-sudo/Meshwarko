@@ -410,22 +410,17 @@ async function completeRideCore({ auto = false } = {}) {
       }
     }
 
-    stopLiveTracking();
-    btnComplete.disabled = true;
-    btnCancel.disabled = true;
-    btnTrackToggle.disabled = true;
-    btnArrived.disabled = true;
-    driverStartRideBtn.disabled = true;
+    finalizeDriverRideCleanup(
+  auto ? "تم الوصول وإنهاء الرحلة تلقائيًا." : "تمت الرحلة بنجاح ✅"
+);
 
-    resetSelectedRideUi(auto ? "تم الوصول وإنهاء الرحلة تلقائيًا." : "تم إنهاء الرحلة.");
-
-    notify({
-      title: auto ? "تم وصول الرحلة" : "تم إنهاء الرحلة",
-      body: auto ? "تم الوصول لمكان الوصول وإنهاء الرحلة تلقائيًا." : "شكراً لك.",
-      tag: auto ? "ride-auto-complete" : "ride-complete"
-    });
-
-    setDriverStatus("مكتمل");
+notify({
+  title: "تمت الرحلة بنجاح 🎉",
+  body: auto
+    ? "تم الوصول لمكان الوصول وإنهاء الرحلة تلقائيًا."
+    : "تم إنهاء الرحلة بنجاح.",
+  tag: auto ? "ride-auto-complete" : "ride-complete"
+});
   } catch (e) {
     console.error(e);
     setDriverStatus("خطأ");
