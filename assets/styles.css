@@ -277,8 +277,15 @@ body::before{
   transition:transform .2s ease, border-color .2s ease, box-shadow .25s ease;
 }
 
-.card{ padding:16px; }
-.card-lite{ padding:14px; }
+.card,
+.card-lite{
+  width:100%;
+  max-width:100%;
+  margin:0;
+}
+
+.card{ padding:16px 10px; }
+.card-lite{ padding:14px 10px; }
 
 .card:hover,
 .card-lite:hover{
