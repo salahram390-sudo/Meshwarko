@@ -686,6 +686,9 @@ function rideUiNone() {
 
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
   setStatus("جاهز");
+  ratingValue = 0;
+if (rateComment) rateComment.value = "";
+setText(rateHint, "");
 }
 
 async function reverseNameEG(lat, lon) {
