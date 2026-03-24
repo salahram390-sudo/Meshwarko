@@ -1046,13 +1046,16 @@ function watchCurrentRide(userId) {
       const docs = snap.docs
         .map((d) => ({ id: d.id, ...d.data() }))
         .filter((r) => {
-          return (
-            r.passengerId === userId &&
-            ["requested", "offered", "accepted", "arrived", "started", "completed", "canceled"].includes(r.status) &&
-            r.archived !== true &&
-            !isRideExpired(r, getRideFreshMaxAgeMs(r.status) || ACTIVE_RIDE_MAX_AGE_MS, now)
-          );
-        })
+  const activeOrFinished = ["requested", "offered", "accepted", "arrived", "started", "completed", "canceled"].includes(r.status);
+  const allowArchivedFinished = r.status === "completed" || r.status === "canceled";
+
+  return (
+    r.passengerId === userId &&
+    activeOrFinished &&
+    (allowArchivedFinished || r.archived !== true) &&
+    !isRideExpired(r, getRideFreshMaxAgeMs(r.status) || ACTIVE_RIDE_MAX_AGE_MS, now)
+  );
+})
         .sort((a, b) => {
           const at = a.createdAt?.toMillis?.() || 0;
           const bt = b.createdAt?.toMillis?.() || 0;
