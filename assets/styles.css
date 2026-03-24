@@ -39,21 +39,11 @@ html,body{
 
 .app-shell,
 .map-layout,
-.panel{
-  width:100%;
-  min-width:100%;
+.panel,
+.panel-body,
+.map-area{
   max-width:100%;
   overflow-x:hidden;
-}
-
-body,
-.app-shell,
-.map-layout,
-.map-area,
-.panel,
-.panel-body{
-  width:100%;
-  max-width:100%;
 }
 
 body::before{
