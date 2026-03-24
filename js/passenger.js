@@ -1194,8 +1194,7 @@ if (btnChatPassenger) btnChatPassenger.disabled = !(ride.status === "accepted" |
     finalizePassengerRideCleanup();
   }, 1200);
 }
-  }
-  
+
   const driverProfile = (ride.status === "accepted" || ride.status === "arrived" || ride.status === "started")
     ? {
         name: ride.driverName || "",
