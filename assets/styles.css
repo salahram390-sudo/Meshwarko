@@ -69,7 +69,13 @@ body::before{
 }
 
 .hidden{ display:none !important; }
-.app-shell{ min-height:100%; display:flex; flex-direction:column; background:transparent !important; }
+.app-shell{
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  background:transparent !important;
+  padding-top:60px;
+ }
 
 .topbar{
   position:fixed;
