@@ -72,16 +72,20 @@ body::before{
 .app-shell{ min-height:100%; display:flex; flex-direction:column; background:transparent !important; }
 
 .topbar{
-  min-height:58px;
-  padding:8px 10px;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:56px;
+  padding:10px 12px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:8px;
+  gap:10px;
   border-bottom:1px solid rgba(255,215,0,.08);
-  background:rgba(0,0,0,.32) !important;
-  backdrop-filter:blur(10px);
-  overflow:hidden;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(12px);
+  z-index:9999;
 }
 
 .brand{
@@ -1396,11 +1400,6 @@ body.splash-active::before{
   .map-area{
   flex:0 0 30vh;
   min-height:180px;
-}
-
-.topbar{
-  height:52px;
-  padding:8px 10px;
 }
 
 .panel-head{
