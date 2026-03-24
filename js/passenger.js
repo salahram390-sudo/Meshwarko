@@ -7,7 +7,7 @@ import {
   serverTimestamp, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, timestampToMillis, getRideFreshMaxAgeMs, formatRideDate } from "./utils.js";
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, getRideFreshMaxAgeMs, formatRideDate } from "./utils.js";
 import {
   createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
   geocodeNominatim, bindSearch, createCarIcon, moveCarMarkerSmooth,
