@@ -195,12 +195,12 @@ export function createMap(el, opts = {}) {
   return map;
 }
 
-export function clearAllMapLayers() {
+export function clearAllMapLayers(map) {
   if (!map) return;
 
-  map.eachLayer(layer => {
-    if (layer instanceof L.Marker || layer instanceof L.Polyline) {
-      try { map.removeLayer(layer); } catch {}
+  map.eachLayer((layer) => {
+    if (layer instanceof L.Marker || layer instanceof L.Polyline || layer instanceof L.GeoJSON) {
+      try { map.removeLayer(layer); } catch (_) {}
     }
   });
 }
