@@ -1394,17 +1394,3 @@ body.splash-active::before{
 @media (prefers-reduced-motion:reduce){
   *{ animation:none !important; transition:none !important; }
 }
-
-.actions,
-.input-group,
-.row-between{
-  width:100%;
-  max-width:100%;
-  overflow-x:hidden;
-  flex-wrap:nowrap;
-}
-
-.btn.map-btn,
-.map-btn{
-  flex:0 0 auto;
-}
