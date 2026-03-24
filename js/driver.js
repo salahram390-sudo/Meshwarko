@@ -441,6 +441,48 @@ async function tryAutoCompleteCurrentRide() {
   await completeRideCore({ auto: true });
 }
 
+async function finalizeDriverRideCleanup() {
+  try {
+    // 1. إلغاء أي listeners
+    if (acceptedRideUnsub) {
+      acceptedRideUnsub();
+      acceptedRideUnsub = null;
+    }
+
+    // 2. إيقاف التتبع
+    stopLiveTracking();
+
+    // 3. مسح الحالة
+    selectedRideId = null;
+    selectedRideData = null;
+
+    // 4. تنظيف الخريطة
+    if (driverMarker) {
+      try { map.removeLayer(driverMarker); } catch {}
+      driverMarker = null;
+    }
+
+    if (routeLayerRef) {
+      try { map.removeLayer(routeLayerRef); } catch {}
+      routeLayerRef = null;
+    }
+
+    // 5. إغلاق الشات
+    if (chatUnsubDriver) {
+      chatUnsubDriver();
+      chatUnsubDriver = null;
+    }
+
+    // 6. إعادة الواجهة
+    resetSelectedRideUi("تمت الرحلة بنجاح ✅");
+
+    setDriverStatus("متاح");
+
+  } catch (e) {
+    console.error("Driver cleanup error:", e);
+  }
+}
+
 function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   if (acceptedRideUnsub) {
     acceptedRideUnsub();
