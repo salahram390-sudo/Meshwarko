@@ -338,7 +338,7 @@ body::before{
 .card,
 .card-lite{
   position:relative;
-  overflow:hidden;
+  overflow:visible;
   width:100%;
   max-width:100%;
   margin:0;
