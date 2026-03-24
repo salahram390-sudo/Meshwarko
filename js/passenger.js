@@ -1045,7 +1045,7 @@ function watchCurrentRide(userId) {
         .filter((r) => {
           return (
             r.passengerId === userId &&
-            ["requested", "offered", "accepted", "arrived", "started"].includes(r.status) &&
+            ["requested", "offered", "accepted", "arrived", "started", "completed", "canceled"].includes(r.status) &&
             r.archived !== true &&
             !isRideExpired(r, getRideFreshMaxAgeMs(r.status) || ACTIVE_RIDE_MAX_AGE_MS, now)
           );
