@@ -1577,7 +1577,10 @@ rateSend?.addEventListener("click", async () => {
   }
 });
 
-rateClose?.addEventListener("click", hideRatingModal);
+rateClose?.addEventListener("click", () => {
+  hideRatingModal();
+  finalizePassengerRideCleanup();
+});
 rateSkip?.addEventListener("click", () => {
   hideRatingModal();
   finalizePassengerRideCleanup();
