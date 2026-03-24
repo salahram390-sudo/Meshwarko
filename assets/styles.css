@@ -149,11 +149,13 @@ body::before{
 }
 
 .top-actions .btn{
-  height:38px;
-  padding:0 12px;
-  min-width:unset !important;
+  height:34px;
+  padding:0 10px;
+  min-width:max-content !important;
   white-space:nowrap;
   border-radius:999px;
+  font-size:13px;
+  flex:0 0 auto;
 }
 
 .badge{
