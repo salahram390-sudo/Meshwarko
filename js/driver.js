@@ -599,12 +599,18 @@ function watchPassengerEndRequest(rideId) {
 }
 
     if (ride.status === "completed" || ride.status === "canceled") {
+
   if (acceptedRideUnsub) {
     acceptedRideUnsub();
     acceptedRideUnsub = null;
   }
 
   if (ride.status === "completed") {
+
+    // ✅ منع التكرار
+    if (completedHandledForRideId === rideId) return;
+    completedHandledForRideId = rideId;
+
     notify({
       title: "تمت الرحلة بنجاح 🎉",
       body: "شكراً لاستخدامك مشوارك ❤️",
@@ -612,6 +618,7 @@ function watchPassengerEndRequest(rideId) {
     });
 
     finalizeDriverRideCleanup("تمت الرحلة بنجاح ✅");
+
   } else {
     resetSelectedRideUi("تم إلغاء الرحلة");
   }
