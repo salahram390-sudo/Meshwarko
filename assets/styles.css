@@ -190,7 +190,8 @@ body::before{
   gap:6px;
   flex:1 1 auto;
   min-width:0;
-  overflow:visible;
+  overflow-x:auto;
+  overflow-y:hidden;
   -webkit-overflow-scrolling:touch;
   scrollbar-width:none;
 }
@@ -1449,12 +1450,12 @@ body.splash-active::before{
     gap:5px;
   }
 
-  .top-actions .btn{
-  height:32px;
-  padding:0 8px;
-  font-size:11px;
-  flex:0 0 auto;
-}
+  .top-actions{
+  gap:5px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  }
 
   .brand-title,
   .brand-sub{
