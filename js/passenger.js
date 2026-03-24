@@ -1106,19 +1106,34 @@ async function handleRideSnapshot(rideSnap) {
   }
 
   if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
-  if (ride.status === "completed" && !ride.passengerRating) {
+  if (ride.status === "completed") {
+    if (completedToastShownFor !== rideSnap.id) {
+      completedToastShownFor = rideSnap.id;
+
+      notify({
+        title: "تمت الرحلة بنجاح 🎉",
+        body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅",
+        tag: "ride-completed"
+      });
+    }
+
     stopDriverTracking();
     removeRouteLayer(routeLayerRef);
     removeRouteLayer(driverRouteLayerRef);
     setText(distanceValue, "");
     setText(routeMeta, "");
     setStatus("تم الوصول");
-    
+
     currentRideId = rideSnap.id;
 
-    renderStars(0);
-    setText(rateHint, "");
-    showRatingModal();
+    if (!ride.passengerRating) {
+      renderStars(0);
+      setText(rateHint, "");
+      showRatingModal();
+      return;
+    }
+
+    finalizePassengerRideCleanup();
     return;
   }
 
