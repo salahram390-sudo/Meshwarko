@@ -234,6 +234,7 @@ body::before{
 
 .map-area{
   position:relative;
+  z-index:1;
   flex:0 0 36vh;
   min-height:210px;
   max-width:100%;
