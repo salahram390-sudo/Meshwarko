@@ -227,9 +227,11 @@ body::before{
   border:1px solid rgba(255,215,0,.14);
   color:var(--muted);
 
-  max-width:none;        /* 👈 مهم */
-  overflow:visible;      /* 👈 مهم */
-  text-overflow:unset;   /* 👈 مهم */
+  flex:0 1 auto;
+  min-width:fit-content;
+  max-width:130px;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .map-layout{
