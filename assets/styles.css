@@ -217,8 +217,8 @@ body::before{
   color:var(--muted);
 
   flex:0 1 auto;
-  min-width:fit-content;
-  max-width:130px;
+  min-width:0;
+  max-width:110px;
   overflow:hidden;
   text-overflow:ellipsis;
 }
