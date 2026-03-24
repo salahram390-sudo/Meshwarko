@@ -219,22 +219,13 @@ body::before{
 }
 
 .badge{
-  max-width:none;
-  overflow:visible;
-  text-overflow:clip;
-}
-
-.badge{
-  padding:4px 10px;
+  padding:4px 8px;
   border-radius:999px;
   font-size:11px;
   white-space:nowrap;
   background:rgba(255,255,255,.05);
   border:1px solid rgba(255,215,0,.14);
   color:var(--muted);
-  max-width:90px;
-  overflow:hidden;
-  text-overflow:ellipsis;
 }
 
 .map-layout{
