@@ -195,6 +195,16 @@ export function createMap(el, opts = {}) {
   return map;
 }
 
+export function clearAllMapLayers() {
+  if (!map) return;
+
+  map.eachLayer(layer => {
+    if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+      try { map.removeLayer(layer); } catch {}
+    }
+  });
+}
+
 export function addMarker(map, latlng, opts = {}) {
   return L.marker(latlng, opts).addTo(map);
 }
