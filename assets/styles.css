@@ -87,8 +87,8 @@ body::before{
 .brand{
   display:flex;
   align-items:center;
-  gap:10px;
-  flex:1;
+  gap:8px;
+  flex:0 0 auto;
   min-width:0;
 }
 
