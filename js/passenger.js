@@ -585,42 +585,7 @@ function cleanupRideState() {
 
 function finalizePassengerRideCleanup() {
   try {
-    // 1. إلغاء listener الرحلة
-    if (currentRideDocUnsub) {
-      currentRideDocUnsub();
-      currentRideDocUnsub = null;
-    }
-
-    // 2. إيقاف التتبع
-    stopDriverTracking();
-    stopLiveDrivers();
-
-    // 3. مسح الحالة
-    currentRideId = null;
-    currentPickup = null;
-    arrivedToastShownFor = null;
-    completedToastShownFor = null;
-
-    // 4. تنظيف الخريطة
-    if (driverMarker) {
-      try { map.removeLayer(driverMarker); } catch {}
-      driverMarker = null;
-    }
-
-    if (routeLayerRef) {
-      try { map.removeLayer(routeLayerRef); } catch {}
-      routeLayerRef = null;
-    }
-
-    // 5. إغلاق الشات
-    if (chatUnsubPassenger) {
-      chatUnsubPassenger();
-      chatUnsubPassenger = null;
-    }
-
-    // 6. Reset UI كامل
     hardResetPassengerUI();
-
   } catch (e) {
     console.error("Passenger cleanup error:", e);
   }
