@@ -1367,6 +1367,27 @@ body.splash-active::before{
   top:auto;
 }
 
+  .btn.map-btn,
+.map-btn{
+  min-width:64px;
+  height:40px;
+  padding:0 8px;
+  font-size:12px;
+  border-radius:14px;
+  flex:0 0 auto;
+}
+
+.btn.search-btn,
+.search-btn{
+  width:40px;
+  height:40px;
+  min-width:40px;
+}
+
+.input-group{
+  gap:6px;
+}
+
   *{ transition:none !important; }
 }
 
