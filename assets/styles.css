@@ -460,6 +460,7 @@ textarea:focus{
   width:100%;
   max-width:100%;
   min-width:0;
+  flex-wrap:nowrap;
 }
 
 .input-group .input{
