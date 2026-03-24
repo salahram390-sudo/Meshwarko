@@ -190,7 +190,10 @@ body::before{
   gap:6px;
   flex:1 1 auto;
   min-width:0;
-  overflow:hidden;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
 
 .top-actions::-webkit-scrollbar{
@@ -216,11 +219,7 @@ body::before{
   border:1px solid rgba(255,215,0,.14);
   color:var(--muted);
 
-  flex:0 1 auto;
-  min-width:0;
-  max-width:110px;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  flex:0 0 auto;
 }
 
 .map-layout{
