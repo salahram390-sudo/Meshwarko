@@ -391,7 +391,11 @@ textarea:focus{
   min-width:0;
 }
 
-.input-group .input{ flex:1; }
+.input-group .input{
+  flex:1 1 auto;
+  min-width:0;
+  width:auto;
+}
 
 .btn{
   height:44px;
