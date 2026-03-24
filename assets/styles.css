@@ -158,6 +158,13 @@ body::before{
   flex:0 0 auto;
 }
 
+.top-actions .btn,
+.badge{
+  max-width:140px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 .badge{
   padding:4px 8px;
   border-radius:999px;
