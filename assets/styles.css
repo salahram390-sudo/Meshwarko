@@ -46,6 +46,16 @@ html,body{
   overflow-x:hidden;
 }
 
+body,
+.app-shell,
+.map-layout,
+.map-area,
+.panel,
+.panel-body{
+  width:100%;
+  max-width:100%;
+}
+
 body::before{
   content:"";
   position:fixed;
