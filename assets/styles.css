@@ -383,9 +383,12 @@ textarea:focus{
 .input-group{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:6px;
   margin-bottom:14px;
   position:relative;
+  width:100%;
+  max-width:100%;
+  min-width:0;
 }
 
 .input-group .input{ flex:1; }
