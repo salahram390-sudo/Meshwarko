@@ -1352,9 +1352,22 @@ body.splash-active::before{
 .panel-head{
   padding:12px 14px 10px;
 }
+  
+  .panel-body{
+  padding:10px 8px 14px;
+}
 
-.panel-body{
-  padding:10px 14px 14px;
+.card,
+.card-lite{
+  padding-left:8px;
+  padding-right:8px;
+}
+
+.map-fabs{
+  right:10px;
+  bottom:80px;
+  left:auto;
+  top:auto;
 }
 
   *{ transition:none !important; }
