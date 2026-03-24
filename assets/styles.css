@@ -1423,6 +1423,12 @@ body.splash-active::before{
     opacity:.18 !important;
   }
 
+  .badge{
+  max-width:95px;
+  font-size:10px;
+  padding:4px 7px;
+  }
+
   .topbar{
     height:54px;
     padding:8px 8px;
