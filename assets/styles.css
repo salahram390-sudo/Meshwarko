@@ -769,7 +769,18 @@ input[type="range"]{
   transform: scale(1.05);
 }
 
-.auth-shell .auth-container{ flex:1; display:grid; place-items:center; padding:16px; }
+.auth-shell .auth-container{
+  flex:1;
+  display:block;
+  width:100%;
+  max-width:100%;
+  padding:16px;
+}
+
+.auth-shell .card{
+  width:min(560px, 100%);
+  margin-inline:auto;
+}
 .auth-shell .card{ width:min(560px, 100%); }
 
 .modal.hidden{ display:none; }
