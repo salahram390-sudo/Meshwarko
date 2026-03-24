@@ -598,18 +598,23 @@ function watchPassengerEndRequest(rideId) {
 }
 
     if (ride.status === "completed" || ride.status === "canceled") {
+  if (acceptedRideUnsub) {
+    acceptedRideUnsub();
+    acceptedRideUnsub = null;
+  }
 
-      if (acceptedRideUnsub) {
-        acceptedRideUnsub();
-        acceptedRideUnsub = null;
-      }
+  if (ride.status === "completed") {
+    notify({
+      title: "تمت الرحلة بنجاح 🎉",
+      body: "شكراً لاستخدامك مشوارك ❤️",
+      tag: "ride-completed-driver"
+    });
 
-      resetSelectedRideUi(
-        ride.status === "completed"
-          ? "تم إنهاء الرحلة"
-          : "تم إلغاء الرحلة"
-      );
-    }
+    finalizeDriverRideCleanup("تمت الرحلة بنجاح ✅");
+  } else {
+    resetSelectedRideUi("تم إلغاء الرحلة");
+  }
+}
 
   });
 
