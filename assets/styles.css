@@ -1337,8 +1337,8 @@ body.splash-active::before{
   }
 
   .map-area{
-  flex:0 0 32vh;
-  min-height:190px;
+  flex:0 0 30vh;
+  min-height:180px;
 }
 
 .topbar{
