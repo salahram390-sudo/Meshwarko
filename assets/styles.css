@@ -249,7 +249,13 @@ body::before{
   border-bottom:1px solid rgba(255,215,0,.15);
 }
 
-.panel-body{ padding:14px 16px 18px; overflow:auto; }
+.panel-body{
+  width:100%;
+  max-width:100%;
+  padding:14px 10px 18px;
+  overflow-x:hidden;
+  overflow-y:auto;
+}
 .panel,.card,.card-lite{ color:rgba(255,255,255,.92); }
 .panel p,.card p,.card-lite p,
 .panel .muted,.card .muted,.card-lite .muted,
