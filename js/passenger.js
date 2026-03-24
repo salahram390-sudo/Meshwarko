@@ -1195,21 +1195,6 @@ if (btnChatPassenger) btnChatPassenger.disabled = !(ride.status === "accepted" |
     notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
   }
 
-  if (ride.status === "completed" && completedToastShownFor !== currentRideId) {
-  completedToastShownFor = currentRideId;
-
-  notify({
-    title: "تمت الرحلة بنجاح 🎉",
-    body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅",
-    tag: "ride-completed"
-  });
-
-  // ✅ أهم حاجة
-  setTimeout(() => {
-    finalizePassengerRideCleanup();
-  }, 1200);
-}
-
   const driverProfile = (ride.status === "accepted" || ride.status === "arrived" || ride.status === "started")
     ? {
         name: ride.driverName || "",
