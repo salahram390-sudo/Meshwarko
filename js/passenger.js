@@ -497,11 +497,49 @@ function hardResetPassengerUI() {
 }
 function rideUiNone() {
   clearRideSearchTimer();
-  hardResetPassengerUI();
   clearAll();
+
+  currentRideId = null;
+  currentPickup = null;
+  arrivedToastShownFor = null;
+  completedToastShownFor = null;
+
+  stopDriverTracking();
+  setDriverContactButtons(null);
+
+  if (btnChatPassenger) btnChatPassenger.disabled = true;
+  if (chatUnsubPassenger) {
+    chatUnsubPassenger();
+    chatUnsubPassenger = null;
+  }
+
+  closePassengerChatModal();
+  if (chatMessagesPassenger) chatMessagesPassenger.innerHTML = "";
+  if (chatInputPassenger) chatInputPassenger.value = "";
+
+  btnRequest.disabled = false;
+  btnCancel.disabled = true;
+  btnAcceptOffer.disabled = true;
+  btnRejectOffer.disabled = true;
+  btnTrack.disabled = true;
+  btnComplete.disabled = true;
+
+  hideEl(btnAcceptOffer);
+  hideEl(btnRejectOffer);
+  hideEl(btnCancel);
+  hideEl(btnComplete);
+  hideEl(btnTrack);
+  hideEl(btnCall);
+  hideEl(btnWhats);
+  hideEl(btnChatPassenger);
+
   rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
+  setText(routeMeta, "اختر قيام/وصول لرسم المسار");
+  setText(distanceValue, "—");
+  setText(priceValue, "—");
   setStatus("جاهز");
 }
+
 function finalizePassengerRideCleanup() { try { closePassengerDrawer(); closePassengerChatModal(); hideRatingModal(); hardResetPassengerUI(); } catch (e) { console.error("Passenger cleanup error:", e); } }
 
 async function reverseNameEG(lat, lon) {
