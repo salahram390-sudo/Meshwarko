@@ -821,8 +821,16 @@ let sdSelectedVehicle = null;
 async function openSwitchDriverModal() {
   const modal = $("#switchDriverModal"); const backdrop = $("#switchDriverBackdrop"); const hint = $("#switchDriverHint"); hint.textContent = "";
   const adm = await loadEgyptAdmin(); fillSelect($("#sdGov"), adm.governorates.map((g) => g.name));
-  const setCenters = () => { const g = adm.governorates.find((x) => x.name === $("#sdGov").value); fillSelect($("#sdCenter"), g?.centers || ["-"]); };
-  setCenters(); $("#sdGov").addEventListener("change", setCenters);
+  const sdGov = $("#sdGov");
+const sdCenter = $("#sdCenter");
+
+const setCenters = () => {
+  const g = adm.governorates.find((x) => x.name === sdGov.value);
+  fillSelect(sdCenter, g?.centers || ["-"]);
+};
+
+sdGov.onchange = setCenters;
+setCenters();
   sdSelectedVehicle = adm.vehicleTypes?.[0]?.id || null;
   const render = () => renderVehicleGrid($("#sdVehicles"), adm.vehicleTypes, sdSelectedVehicle, (id) => { sdSelectedVehicle = id; render(); });
   render(); modal?.classList.remove("hidden"); backdrop?.classList.add("show");
