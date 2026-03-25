@@ -472,7 +472,13 @@ function hardResetPassengerUI() {
   btnRequest.disabled = false; btnCancel.disabled = true; btnAcceptOffer.disabled = true; btnRejectOffer.disabled = true; btnTrack.disabled = true; btnComplete.disabled = true;
   hideEl(btnAcceptOffer); hideEl(btnRejectOffer); hideEl(btnCancel); hideEl(btnComplete); hideEl(btnTrack); hideEl(btnCall); hideEl(btnWhats); hideEl(btnChatPassenger);
 }
-function rideUiNone() { hardResetPassengerUI(); cleanupRideState(); clearAll(); rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`; setStatus("جاهز"); }
+function rideUiNone() {
+  clearRideSearchTimer();
+  hardResetPassengerUI();
+  clearAll();
+  rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`;
+  setStatus("جاهز");
+}
 function finalizePassengerRideCleanup() { try { closePassengerDrawer(); closePassengerChatModal(); hideRatingModal(); hardResetPassengerUI(); } catch (e) { console.error("Passenger cleanup error:", e); } }
 
 async function reverseNameEG(lat, lon) {
