@@ -1260,6 +1260,10 @@ document.addEventListener("click", (event) => {
   if (!insideDrop) clearSearchResults(dropResults);
 });
 
+menuBtnPassenger?.addEventListener("click", openPassengerDrawer);
+drawerClosePassenger?.addEventListener("click", closePassengerDrawer);
+drawerBackdropPassenger?.addEventListener("click", closePassengerDrawer);
+
 priceSlider.addEventListener("input", () => {
   priceSlider.dataset.touched = "1";
   updatePriceUI();
