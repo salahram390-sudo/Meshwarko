@@ -607,6 +607,9 @@ function cleanupRideState() {
 
 function finalizePassengerRideCleanup() {
   try {
+    closePassengerDrawer();
+    closePassengerChatModal();
+    hideRatingModal();
     hardResetPassengerUI();
   } catch (e) {
     console.error("Passenger cleanup error:", e);
