@@ -1031,16 +1031,20 @@ drawerSupportDriver?.addEventListener("click", () => {
   });
 });
 
-logoutBtn.addEventListener("click", async () => {
+logoutBtn?.addEventListener("click", async () => {
   closeDriverDrawer();
+
   stopLiveTracking();
   stopDriverHeartbeat();
   await cleanupDriverOnline();
+
   if (chatUnsubDriver) {
     chatUnsubDriver();
     chatUnsubDriver = null;
   }
+
   closeDriverChatModal();
+
   await signOut(auth);
   location.href = "./index.html";
 });
