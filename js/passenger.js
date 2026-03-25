@@ -1422,7 +1422,7 @@ map.on("click", async (e) => {
 
 drawerAccountPassenger?.addEventListener("click", () => {
   closePassengerDrawer();
-  window.scrollTo({ top: 0, behavior: "smooth" });
+  openPassengerAccountModal();
 });
 
 drawerTripsPassenger?.addEventListener("click", () => {
