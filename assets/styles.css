@@ -2041,3 +2041,158 @@ body.splash-active {
     font-size: 11px;
   }
 }
+
+/* =========================
+   FIX: Driver page actions layout
+========================= */
+
+.panel .actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.panel .actions .btn {
+  min-width: 0;
+  width: 100%;
+}
+
+/* لو كان السطر فيه زر واحد فقط يمتد بعرض السطر */
+.panel .actions .btn:only-child {
+  grid-column: 1 / -1;
+}
+
+/* =========================
+   FIX: Auth page top area spacing/alignment
+========================= */
+
+.auth-shell .topbar {
+  min-height: 64px;
+  padding: 8px 10px;
+}
+
+.auth-shell .top-actions {
+  flex: 0 0 auto;
+  min-width: auto;
+  overflow: visible;
+  gap: 6px;
+}
+
+.auth-shell .brand {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.auth-shell .auth-container {
+  align-items: flex-start;
+  padding-top: 10px;
+}
+
+.auth-shell .card {
+  margin-top: 6px;
+}
+
+.auth-shell .segmented {
+  flex-wrap: wrap;
+}
+
+.auth-shell .segmented > * {
+  min-width: 0;
+}
+
+.auth-shell #resetPasswordBtn {
+  width: 100%;
+}
+
+/* =========================
+   FIX: Auth form fields balance
+========================= */
+
+.auth-shell .grid2 {
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.auth-shell .form-row {
+  width: 100%;
+}
+
+.auth-shell input,
+.auth-shell select,
+.auth-shell .input {
+  width: 100%;
+}
+
+/* =========================
+   Mobile tuning
+========================= */
+
+@media (max-width: 640px) {
+  .panel .actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .auth-shell .topbar {
+    min-height: 62px;
+  }
+
+  .auth-shell .auth-container {
+    padding-top: 12px;
+  }
+}
+
+@media (max-width: 520px) {
+  .panel .actions {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .panel .actions .btn {
+    min-width: 0 !important;
+    font-size: 14px;
+    padding: 0 10px;
+  }
+
+  .auth-shell .topbar {
+    align-items: center;
+    min-height: 60px;
+    padding: 8px;
+  }
+
+  .auth-shell .brand-title {
+    max-width: 90px;
+  }
+
+  .auth-shell .brand-sub {
+    max-width: 90px;
+  }
+
+  .auth-shell .top-actions {
+    gap: 4px;
+  }
+
+  .auth-shell .badge {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
+    font-size: 12px;
+  }
+
+  .auth-shell .segmented {
+    gap: 6px;
+  }
+
+  .auth-shell .seg-btn {
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  .auth-shell #resetPasswordBtn {
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  .auth-shell .grid2 {
+    grid-template-columns: 1fr;
+  }
+}
