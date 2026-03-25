@@ -894,7 +894,10 @@ logoutBtn.addEventListener("click", async () => {
   location.href = "./index.html";
 });
 
-switchRoleBtn.addEventListener("click", () => { location.href = "./passenger.html"; });
+switchRoleBtn.addEventListener("click", () => {
+  closeDriverDrawer();
+  location.href = "./passenger.html";
+});
 
 btnLocate.addEventListener("click", () => {
   locateOnce(map, (loc) => {
