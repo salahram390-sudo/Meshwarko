@@ -978,34 +978,6 @@ function watchRidesForDriver() {
   };
 }
 
-menuBtnDriver?.addEventListener("click", openDriverDrawer);
-drawerCloseDriver?.addEventListener("click", closeDriverDrawer);
-drawerBackdropDriver?.addEventListener("click", closeDriverDrawer);
-
-drawerAccountDriver?.addEventListener("click", () => {
-  closeDriverDrawer();
-  window.scrollTo({ top: 0, behavior: "smooth" });
-});
-
-drawerTripsDriver?.addEventListener("click", () => {
-  closeDriverDrawer();
-  driverHistoryBtn?.scrollIntoView({ behavior: "smooth", block: "start" });
-});
-
-drawerWalletDriver?.addEventListener("click", () => {
-  closeDriverDrawer();
-  driverWalletStats?.scrollIntoView({ behavior: "smooth", block: "start" });
-});
-
-drawerSupportDriver?.addEventListener("click", () => {
-  closeDriverDrawer();
-  notify({
-    title: "الدعم",
-    body: "أضف وسيلة دعم مخصصة لاحقًا داخل التطبيق.",
-    tag: "driver-support-info"
-  });
-});
-
 logoutBtn?.addEventListener("click", async () => {
   closeDriverDrawer();
 
