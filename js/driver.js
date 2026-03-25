@@ -390,7 +390,6 @@ function syncOfferBtn() {
   btnSendOffer.disabled = !selectedRideId || !Number.isFinite(v) || v <= 0;
 }
 
-offerInput.addEventListener("input", syncOfferBtn);
 menuBtnDriver?.addEventListener("click", openDriverDrawer);
 drawerCloseDriver?.addEventListener("click", closeDriverDrawer);
 drawerBackdropDriver?.addEventListener("click", closeDriverDrawer);
@@ -414,7 +413,7 @@ drawerSupportDriver?.addEventListener("click", () => {
   closeDriverDrawer();
   notify({
     title: "الدعم",
-    body: "أضف وسيلة تواصل للدعم لاحقًا داخل التطبيق.",
+    body: "أضف وسيلة دعم مخصصة لاحقًا داخل التطبيق.",
     tag: "driver-support-info"
   });
 });
