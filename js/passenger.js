@@ -326,28 +326,45 @@ function renderPassengerChatMessages(rows = []) {
 }
 
 function watchPassengerChat(rideId) {
-  if (chatUnsubPassenger) { chatUnsubPassenger(); chatUnsubPassenger = null; }
-  if (!rideId) return renderPassengerChatMessages([]);
-  const q = query(collection(db, "rides", rideId, "messages"), orderBy("createdAt", "asc"));
-  chatUnsubPassenger = onSnapshot(q, (snap) => {
+  if (chatUnsubPassenger) {
+    chatUnsubPassenger();
+    chatUnsubPassenger = null;
+  }
+
+  if (!rideId) {
+    renderPassengerChatMessages([]);
+    return;
+  }
+
+  const q = query(
+    collection(db, "rides", rideId, "messages"),
+    orderBy("createdAt", "asc")
+  );
+
+  chatUnsubPassenger = onSnapshot(q, async (snap) => {
     const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
     if (rows.length > lastMsgCount) {
       const lastMsg = rows[rows.length - 1];
-      if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) new Audio("./assets/msg.mp3").play().catch(() => {});
-    }
-    lastMsgCount = rows.length;
-    const unread = snap.docs.filter((docSnap) => {
-  const msg = docSnap.data();
-  return msg.senderRole === "driver" && msg.read !== true;
-});
-
-for (const docSnap of unread.slice(0, 3)) {
-  await updateDoc(
-    doc(db, "rides", rideId, "messages", docSnap.id),
-    { read: true }
-  );
+      if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) {
+        new Audio("./assets/msg.mp3").play().catch(() => {});
       }
+    }
+
+    lastMsgCount = rows.length;
+
+    const unread = snap.docs.filter((docSnap) => {
+      const msg = docSnap.data();
+      return msg.senderRole === "driver" && msg.read !== true;
     });
+
+    for (const docSnap of unread.slice(0, 3)) {
+      await updateDoc(
+        doc(db, "rides", rideId, "messages", docSnap.id),
+        { read: true }
+      );
+    }
+
     renderPassengerChatMessages(rows);
   });
 }
