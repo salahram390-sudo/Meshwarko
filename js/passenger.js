@@ -341,22 +341,25 @@ function closePassengerChatModal() {
 function openPassengerTripsModal() {
   if (!passengerTripsModal) return;
   passengerTripsModal.classList.remove("hidden");
+  passengerTripsBackdrop?.classList.add("show");
 }
 
 function closePassengerTripsModal() {
-  if (!passengerTripsModal) return;
-  passengerTripsModal.classList.add("hidden");
+  passengerTripsBackdrop?.classList.remove("show");
+  passengerTripsModal?.classList.add("hidden");
 }
 
 function openPassengerWalletModal() {
   if (!passengerWalletModal) return;
   passengerWalletModal.classList.remove("hidden");
+  passengerWalletBackdrop?.classList.add("show");
 }
 
 function closePassengerWalletModal() {
-  if (!passengerWalletModal) return;
-  passengerWalletModal.classList.add("hidden");
+  passengerWalletBackdrop?.classList.remove("show");
+  passengerWalletModal?.classList.add("hidden");
 }
+
 function openPassengerAccountModal() {
   if (!passengerAccountModal) return;
 
@@ -400,11 +403,12 @@ function openPassengerAccountModal() {
   }
 
   passengerAccountModal.classList.remove("hidden");
+  passengerAccountBackdrop?.classList.add("show");
 }
 
 function closePassengerAccountModal() {
-  if (!passengerAccountModal) return;
-  passengerAccountModal.classList.add("hidden");
+  passengerAccountBackdrop?.classList.remove("show");
+  passengerAccountModal?.classList.add("hidden");
 }
 let lastMsgCount = 0;
 
