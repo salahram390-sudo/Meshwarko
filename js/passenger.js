@@ -336,10 +336,16 @@ function watchPassengerChat(rideId) {
       if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) new Audio("./assets/msg.mp3").play().catch(() => {});
     }
     lastMsgCount = rows.length;
-    snap.docs.forEach(async (docSnap) => {
-      const msg = docSnap.data();
-      if (msg.senderRole === "driver" && msg.read !== true) {
-        await updateDoc(doc(db, "rides", rideId, "messages", docSnap.id), { read: true });
+    const unread = snap.docs.filter((docSnap) => {
+  const msg = docSnap.data();
+  return msg.senderRole === "driver" && msg.read !== true;
+});
+
+for (const docSnap of unread.slice(0, 3)) {
+  await updateDoc(
+    doc(db, "rides", rideId, "messages", docSnap.id),
+    { read: true }
+  );
       }
     });
     renderPassengerChatMessages(rows);
