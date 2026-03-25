@@ -10,50 +10,41 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-  <div class="brand">
-    <div class="user-avatar">
-      <img src="assets/avatar.png" alt="User">
-    </div>
-    <div>
-      <div class="brand-title">مشوارك</div>
-      <div class="brand-sub">واجهة السائق</div>
-    </div>
-  </div>
-
-  <div class="top-actions top-actions-menu">
-    <button id="menuBtnDriver" class="menu-btn" type="button" aria-label="فتح القائمة">
-      ☰
-    </button>
-  </div>
-</header>
+      <div class="brand">
+        <div class="user-avatar"><img src="assets/avatar.png" alt="User"></div>
+        <div>
+          <div class="brand-title">مشوارك</div>
+          <div class="brand-sub">واجهة السائق</div>
+        </div>
+      </div>
+      <div class="top-actions top-actions-menu">
+        <button id="menuBtnDriver" class="menu-btn" type="button" aria-label="فتح القائمة">☰</button>
+      </div>
+    </header>
 
     <div id="drawerBackdropDriver" class="drawer-backdrop hidden"></div>
-
-<aside id="sideDrawerDriver" class="side-drawer" aria-hidden="true">
-  <div class="drawer-head">
-    <div class="drawer-user">
-      <div class="user-avatar">
-        <img src="assets/avatar.png" alt="User">
+    <aside id="sideDrawerDriver" class="side-drawer" aria-hidden="true">
+      <div class="drawer-head">
+        <div class="drawer-user">
+          <div class="user-avatar"><img src="assets/avatar.png" alt="User"></div>
+          <div>
+            <div class="drawer-title">مشوارك</div>
+            <div class="drawer-sub" id="meBadge">...</div>
+          </div>
+        </div>
+        <button id="drawerCloseDriver" class="drawer-close" type="button" aria-label="إغلاق القائمة">✕</button>
       </div>
-      <div>
-        <div class="drawer-title">مشوارك</div>
-        <div class="drawer-sub" id="meBadge">...</div>
+
+      <div class="drawer-menu">
+        <button id="drawerAccountDriver" class="drawer-item" type="button">👤 الحساب</button>
+        <button id="drawerTripsDriver" class="drawer-item" type="button">📜 الرحلات</button>
+        <button id="drawerWalletDriver" class="drawer-item" type="button">💰 المحفظة</button>
+        <button id="drawerSupportDriver" class="drawer-item" type="button">🛟 الدعم</button>
+        <button id="editProfileBtn" class="drawer-item" type="button">✏️ تعديل البيانات</button>
+        <button id="switchRoleBtn" class="drawer-item" type="button">🔄 التحويل إلى راكب</button>
+        <button id="logoutBtn" class="drawer-item danger" type="button">🚪 تسجيل الخروج</button>
       </div>
-    </div>
-
-    <button id="drawerCloseDriver" class="drawer-close" type="button" aria-label="إغلاق القائمة">✕</button>
-  </div>
-
-  <div class="drawer-menu">
-    <button id="drawerAccountDriver" class="drawer-item" type="button">👤 الحساب</button>
-    <button id="drawerTripsDriver" class="drawer-item" type="button">📜 الرحلات</button>
-    <button id="drawerWalletDriver" class="drawer-item" type="button">💰 المحفظة</button>
-    <button id="drawerSupportDriver" class="drawer-item" type="button">🛟 الدعم</button>
-    <button id="editProfileBtn" class="drawer-item" type="button">✏️ تعديل البيانات</button>
-    <button id="switchRoleBtn" class="drawer-item" type="button">🔄 التحويل إلى راكب</button>
-    <button id="logoutBtn" class="drawer-item danger" type="button">🚪 تسجيل الخروج</button>
-  </div>
-</aside>
+    </aside>
 
     <main class="map-layout">
       <section class="map-area">
@@ -86,9 +77,7 @@
 
           <div class="card-lite">
             <div class="panel-title">الطلب المحدد</div>
-            <div id="selectedRide" class="ride-card">
-              <div class="muted">لم يتم تحديد طلب.</div>
-            </div>
+            <div id="selectedRide" class="ride-card"><div class="muted">لم يتم تحديد طلب.</div></div>
 
             <div class="form-row" style="margin-top:10px">
               <label class="label">اقتراح سعر (اختياري)</label>
@@ -112,93 +101,79 @@
         </div>
       </section>
     </main>
-    
-<div id="driverHistoryModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="driverHistoryBackdrop"></div>
 
-  <div class="modal-card history-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">سجل الرحلات</div>
-        <div class="panel-sub">آخر الرحلات المكتملة الخاصة بك</div>
+    <div id="driverHistoryModal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop" id="driverHistoryBackdrop"></div>
+      <div class="modal-card history-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">سجل الرحلات</div>
+            <div class="panel-sub">آخر الرحلات المكتملة الخاصة بك</div>
+          </div>
+          <button id="driverHistoryClose" class="btn ghost small" type="button">✖</button>
+        </div>
+        <div id="driverHistoryList" class="list" style="margin-top:12px"></div>
       </div>
-      <button id="driverHistoryClose" class="btn ghost small" type="button">✖</button>
     </div>
 
-    <div id="driverHistoryList" class="list" style="margin-top:12px"></div>
-  </div>
-</div>
     <div id="chatModalDriver" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="chatBackdropDriver"></div>
-
-  <div class="modal-card chat-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">محادثة الرحلة</div>
-        <div class="panel-sub">تواصل مباشر مع الراكب</div>
+      <div class="modal-backdrop" id="chatBackdropDriver"></div>
+      <div class="modal-card chat-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">محادثة الرحلة</div>
+            <div class="panel-sub">تواصل مباشر مع الراكب</div>
+          </div>
+          <button id="chatCloseDriver" class="btn ghost small" type="button">✖</button>
+        </div>
+        <div id="chatMessagesDriver" class="chat-messages"></div>
+        <div class="chat-compose">
+          <input id="chatInputDriver" class="input" type="text" placeholder="اكتب رسالتك..." autocomplete="off" />
+          <button id="chatSendDriver" class="btn success" type="button">إرسال</button>
+        </div>
       </div>
-      <button id="chatCloseDriver" class="btn ghost small" type="button">✖</button>
     </div>
-
-    <div id="chatMessagesDriver" class="chat-messages"></div>
-
-    <div class="chat-compose">
-      <input
-        id="chatInputDriver"
-        class="input"
-        type="text"
-        placeholder="اكتب رسالتك..."
-        autocomplete="off"
-      />
-      <button id="chatSendDriver" class="btn success" type="button">إرسال</button>
-    </div>
-  </div>
-</div>
 
     <div id="driverAccountModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="driverAccountBackdrop"></div>
-
-  <div class="modal-card history-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">الحساب</div>
-        <div class="panel-sub">بيانات حساب السائق</div>
+      <div class="modal-backdrop" id="driverAccountBackdrop"></div>
+      <div class="modal-card history-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">الحساب</div>
+            <div class="panel-sub">بيانات حساب السائق</div>
+          </div>
+          <button id="driverAccountClose" class="btn ghost small" type="button">✖</button>
+        </div>
+        <div id="driverAccountInfo" style="margin-top:12px"></div>
       </div>
-      <button id="driverAccountClose" class="btn ghost small" type="button">✖</button>
     </div>
 
-    <div id="driverAccountInfo" class="list" style="margin-top:12px"></div>
-  </div>
-</div>
-
-<div id="driverWalletModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="driverWalletBackdrop"></div>
-
-  <div class="modal-card history-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">المحفظة</div>
-        <div class="panel-sub">ملخص الأرباح والرصيد</div>
+    <div id="driverWalletModal" class="modal hidden" role="dialog" aria-modal="true">
+      <div class="modal-backdrop" id="driverWalletBackdrop"></div>
+      <div class="modal-card history-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">المحفظة</div>
+            <div class="panel-sub">ملخص الأرباح والرصيد</div>
+          </div>
+          <button id="driverWalletClose" class="btn ghost small" type="button">✖</button>
+        </div>
+        <div id="driverWalletStatsModal" class="wallet-cards" style="margin-top:12px"></div>
       </div>
-      <button id="driverWalletClose" class="btn ghost small" type="button">✖</button>
     </div>
 
-    <div id="driverWalletStatsModal" class="grid2" style="margin-top:12px"></div>
-  </div>
-</div>
     <div id="toastRoot"></div>
-
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="./js/driver.js"></script>
   <script>
-  (function () {
-    var s = document.createElement('script');
-    s.src = "https://cdn.jsdelivr.net/npm/eruda";
-    s.onload = function () { eruda.init(); };
-    document.body.appendChild(s);
-  })();
-</script>
+    (function () {
+      var s = document.createElement('script');
+      s.src = "https://cdn.jsdelivr.net/npm/eruda";
+      s.onload = function () { eruda.init(); };
+      document.body.appendChild(s);
+    })();
+  </script>
 </body>
 </html>

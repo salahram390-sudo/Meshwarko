@@ -11,49 +11,47 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-  <div class="brand">
-    <div class="user-avatar">
-      <img src="assets/avatar.png" alt="User">
-    </div>
-    <div>
-      <div class="brand-title">مشوارك</div>
-      <div class="brand-sub">واجهة الراكب</div>
-    </div>
-  </div>
+      <div class="brand">
+        <div class="user-avatar">
+          <img src="assets/avatar.png" alt="User">
+        </div>
+        <div>
+          <div class="brand-title">مشوارك</div>
+          <div class="brand-sub">واجهة الراكب</div>
+        </div>
+      </div>
 
-  <div class="top-actions top-actions-menu">
-    <button id="menuBtnPassenger" class="menu-btn" type="button" aria-label="فتح القائمة">
-      ☰
-    </button>
-  </div>
+      <div class="top-actions top-actions-menu">
+        <button id="menuBtnPassenger" class="menu-btn" type="button" aria-label="فتح القائمة">☰</button>
+      </div>
     </header>
-    
+
     <div id="drawerBackdropPassenger" class="drawer-backdrop hidden"></div>
 
-<aside id="sideDrawerPassenger" class="side-drawer" aria-hidden="true">
-  <div class="drawer-head">
-    <div class="drawer-user">
-      <div class="user-avatar">
-        <img src="assets/avatar.png" alt="User">
-      </div>
-      <div>
-        <div class="drawer-title">مشوارك</div>
-        <div class="drawer-sub" id="meBadge">...</div>
-      </div>
-    </div>
+    <aside id="sideDrawerPassenger" class="side-drawer" aria-hidden="true">
+      <div class="drawer-head">
+        <div class="drawer-user">
+          <div class="user-avatar">
+            <img src="assets/avatar.png" alt="User">
+          </div>
+          <div>
+            <div class="drawer-title">مشوارك</div>
+            <div class="drawer-sub" id="meBadge">...</div>
+          </div>
+        </div>
 
-    <button id="drawerClosePassenger" class="drawer-close" type="button" aria-label="إغلاق القائمة">✕</button>
-  </div>
+        <button id="drawerClosePassenger" class="drawer-close" type="button" aria-label="إغلاق القائمة">✕</button>
+      </div>
 
-  <div class="drawer-menu">
-    <button id="drawerAccountPassenger" class="drawer-item" type="button">👤 الحساب</button>
-    <button id="drawerTripsPassenger" class="drawer-item" type="button">📜 الرحلات</button>
-    <button id="drawerWalletPassenger" class="drawer-item" type="button">💰 المحفظة</button>
-    <button id="drawerSupportPassenger" class="drawer-item" type="button">🛟 الدعم</button>
-    <button id="switchRoleBtn" class="drawer-item" type="button">🔄 التحويل إلى سائق</button>
-    <button id="logoutBtn" class="drawer-item danger" type="button">🚪 تسجيل الخروج</button>
-  </div>
-</aside>
+      <div class="drawer-menu">
+        <button id="drawerAccountPassenger" class="drawer-item" type="button">👤 الحساب</button>
+        <button id="drawerTripsPassenger" class="drawer-item" type="button">📜 الرحلات</button>
+        <button id="drawerWalletPassenger" class="drawer-item" type="button">💰 المحفظة</button>
+        <button id="drawerSupportPassenger" class="drawer-item" type="button">🛟 الدعم</button>
+        <button id="switchRoleBtn" class="drawer-item" type="button">🔄 التحويل إلى سائق</button>
+        <button id="logoutBtn" class="drawer-item danger" type="button">🚪 تسجيل الخروج</button>
+      </div>
+    </aside>
 
     <main class="map-layout">
       <section class="map-area">
@@ -74,7 +72,6 @@
         </div>
 
         <div class="panel-body">
-
           <div class="card-lite">
             <div class="panel-title">تحديد المنطقة ونوع المركبة</div>
             <div class="grid2" style="margin-top:10px">
@@ -96,9 +93,9 @@
           <div class="form-row" style="margin-top:10px">
             <label class="label">مكان القيام</label>
             <div class="input-group">
-            <input id="pickupText" class="input" placeholder="ابحث عن المكان..." />
-            <button id="pickupSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
-            <button id="pickupPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
+              <input id="pickupText" class="input" placeholder="ابحث عن المكان..." />
+              <button id="pickupSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
+              <button id="pickupPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
               <button id="pickupMyLoc" class="btn ghost small map-btn" type="button">📍 موقعي</button>
             </div>
             <div id="pickupResults" class="search-results hidden"></div>
@@ -107,9 +104,9 @@
           <div class="form-row">
             <label class="label">مكان الوصول</label>
             <div class="input-group">
-            <input id="dropText" class="input" placeholder="ابحث عن المكان..." />
-            <button id="dropSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
-            <button id="dropPick" class="btn ghost small map-btn" type="button">من الخريطة</button> 
+              <input id="dropText" class="input" placeholder="ابحث عن المكان..." />
+              <button id="dropSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
+              <button id="dropPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
             </div>
             <div id="dropResults" class="search-results hidden"></div>
           </div>
@@ -150,100 +147,87 @@
               <button id="btnRejectOffer" class="btn danger" type="button" disabled>رفض السعر</button>
             </div>
             <div class="actions" style="margin-top:10px">
-  <button id="btnTrack" class="btn ghost" type="button" disabled>تتبع الرحلة</button>
-  <button id="btnComplete" class="btn danger" type="button" disabled>إنهاء الرحلة</button>
-  <button id="btnChatPassenger" class="btn primary" type="button" disabled>محادثة</button>
+              <button id="btnTrack" class="btn ghost" type="button" disabled>تتبع الرحلة</button>
+              <button id="btnComplete" class="btn danger" type="button" disabled>إنهاء الرحلة</button>
+              <button id="btnChatPassenger" class="btn primary" type="button" disabled>محادثة</button>
             </div>
 
             <div class="actions" style="margin-top:10px">
               <button id="btnCall" class="btn ghost" type="button" disabled>اتصال بالسائق</button>
               <button id="btnWhats" class="btn ghost" type="button" disabled>واتساب</button>
             </div>
-
           </div>
 
           <div class="spacer"></div>
         </div>
       </section>
     </main>
+
     <div id="chatModalPassenger" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="chatBackdropPassenger"></div>
+      <div class="modal-backdrop" id="chatBackdropPassenger"></div>
+      <div class="modal-card chat-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">محادثة الرحلة</div>
+            <div class="panel-sub">تواصل مباشر مع السائق</div>
+          </div>
+          <button id="chatClosePassenger" class="btn ghost small" type="button">✖</button>
+        </div>
 
-  <div class="modal-card chat-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">محادثة الرحلة</div>
-        <div class="panel-sub">تواصل مباشر مع السائق</div>
+        <div id="chatMessagesPassenger" class="chat-messages"></div>
+
+        <div class="chat-compose">
+          <input id="chatInputPassenger" class="input" type="text" placeholder="اكتب رسالتك..." autocomplete="off" />
+          <button id="chatSendPassenger" class="btn success" type="button">إرسال</button>
+        </div>
       </div>
-      <button id="chatClosePassenger" class="btn ghost small" type="button">✖</button>
     </div>
-
-    <div id="chatMessagesPassenger" class="chat-messages"></div>
-
-    <div class="chat-compose">
-      <input
-        id="chatInputPassenger"
-        class="input"
-        type="text"
-        placeholder="اكتب رسالتك..."
-        autocomplete="off"
-      />
-      <button id="chatSendPassenger" class="btn success" type="button">إرسال</button>
-    </div>
-  </div>
-</div>
 
     <div id="passengerTripsModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="passengerTripsBackdrop"></div>
+      <div class="modal-backdrop" id="passengerTripsBackdrop"></div>
+      <div class="modal-card history-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">سجل الرحلات</div>
+            <div class="panel-sub">آخر الرحلات المكتملة الخاصة بك</div>
+          </div>
+          <button id="passengerTripsClose" class="btn ghost small" type="button">✖</button>
+        </div>
 
-  <div class="modal-card history-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">سجل الرحلات</div>
-        <div class="panel-sub">آخر الرحلات المكتملة الخاصة بك</div>
+        <div id="passengerStats" class="muted small" style="margin-top:8px">—</div>
+        <div id="passengerHistoryList" class="list" style="margin-top:12px"></div>
       </div>
-      <button id="passengerTripsClose" class="btn ghost small" type="button">✖</button>
     </div>
-
-    <div id="passengerStats" class="muted small" style="margin-top:8px">—</div>
-    <div id="passengerHistoryList" class="list" style="margin-top:12px"></div>
-  </div>
-</div>
 
     <div id="passengerWalletModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="passengerWalletBackdrop"></div>
-
-  <div class="modal-card history-sheet">
-  <div class="modal-head">
-    <div>
-      <div class="modal-title">المحفظة</div>
-      <div class="panel-sub">ملخص حسابك داخل التطبيق</div>
+      <div class="modal-backdrop" id="passengerWalletBackdrop"></div>
+      <div class="modal-card history-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">المحفظة</div>
+            <div class="panel-sub">ملخص حسابك داخل التطبيق</div>
+          </div>
+          <button id="passengerWalletClose" class="btn ghost small" type="button">✖</button>
+        </div>
+        <div id="passengerWalletInfo" style="margin-top:12px"></div>
+      </div>
     </div>
-    <button id="passengerWalletClose" class="btn ghost small" type="button">✖</button>
-  </div>
-
-  <div id="passengerWalletInfo"></div>
-</div>
-</div>
 
     <div id="passengerAccountModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="passengerAccountBackdrop"></div>
-
-  <div class="modal-card history-sheet">
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">الحساب</div>
-        <div class="panel-sub">بياناتك الحالية داخل مشوارك</div>
+      <div class="modal-backdrop" id="passengerAccountBackdrop"></div>
+      <div class="modal-card history-sheet">
+        <div class="modal-head">
+          <div>
+            <div class="modal-title">الحساب</div>
+            <div class="panel-sub">بياناتك الحالية داخل مشوارك</div>
+          </div>
+          <button id="passengerAccountClose" class="btn ghost small" type="button">✖</button>
+        </div>
+        <div id="passengerAccountInfo" style="margin-top:12px"></div>
       </div>
-      <button id="passengerAccountClose" class="btn ghost small" type="button">✖</button>
     </div>
 
-    <div id="passengerAccountInfo" class="list" style="margin-top:12px"></div>
-  </div>
-</div>
-    
     <div id="toastRoot"></div>
-
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -279,58 +263,59 @@
       <p class="hint" id="rateHint"></p>
     </div>
   </div>
-<!-- Switch to Driver Modal -->
-<div id="switchDriverModal" class="modal hidden" role="dialog" aria-modal="true">
-  <div class="modal-backdrop" id="switchDriverBackdrop"></div>
-  <div class="modal-card">
-    <div class="modal-head">
-      <div class="modal-title">التحويل إلى سائق</div>
-      <button id="switchDriverClose" class="btn primary" type="button">✕</button>
-    </div>
 
-    <div class="grid2" style="margin-top:10px">
-      <div class="form-row">
-        <label class="label">المحافظة</label>
-        <select id="sdGov" class="input"></select>
+  <div id="switchDriverModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-backdrop" id="switchDriverBackdrop"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title">التحويل إلى سائق</div>
+        <button id="switchDriverClose" class="btn primary" type="button">✕</button>
       </div>
-      <div class="form-row">
-        <label class="label">المركز/الحي</label>
-        <select id="sdCenter" class="input"></select>
+
+      <div class="grid2" style="margin-top:10px">
+        <div class="form-row">
+          <label class="label">المحافظة</label>
+          <select id="sdGov" class="input"></select>
+        </div>
+        <div class="form-row">
+          <label class="label">المركز/الحي</label>
+          <select id="sdCenter" class="input"></select>
+        </div>
       </div>
-    </div>
 
-    <div class="form-row" style="margin-top:10px">
-      <label class="label">نوع المركبة</label>
-      <div id="sdVehicles" class="vehicle-grid"></div>
-      <p class="hint">اختر نوع مركبة واحد.</p>
-    </div>
-
-    <div class="grid2" style="margin-top:10px">
-      <div class="form-row">
-        <label class="label">كود المركبة</label>
-        <input id="sdVehicleCode" class="input" type="text" placeholder="مثال: 1234" />
+      <div class="form-row" style="margin-top:10px">
+        <label class="label">نوع المركبة</label>
+        <div id="sdVehicles" class="vehicle-grid"></div>
+        <p class="hint">اختر نوع مركبة واحد.</p>
       </div>
-      <div class="form-row">
-        <label class="label">العنوان (اختياري)</label>
-        <input id="sdAddress" class="input" type="text" placeholder="شارع..." />
+
+      <div class="grid2" style="margin-top:10px">
+        <div class="form-row">
+          <label class="label">كود المركبة</label>
+          <input id="sdVehicleCode" class="input" type="text" placeholder="مثال: 1234" />
+        </div>
+        <div class="form-row">
+          <label class="label">العنوان (اختياري)</label>
+          <input id="sdAddress" class="input" type="text" placeholder="شارع..." />
+        </div>
       </div>
-    </div>
 
-    <div class="modal-actions" style="margin-top:12px; display:flex; gap:10px">
-      <button id="switchDriverSave" class="btn primary" type="button">تحويل الآن</button>
-      <button id="switchDriverCancel" class="btn ghost" type="button">إلغاء</button>
-    </div>
+      <div class="modal-actions" style="margin-top:12px; display:flex; gap:10px">
+        <button id="switchDriverSave" class="btn primary" type="button">تحويل الآن</button>
+        <button id="switchDriverCancel" class="btn ghost" type="button">إلغاء</button>
+      </div>
 
-    <p class="hint" id="switchDriverHint" style="margin-top:10px"></p>
+      <p class="hint" id="switchDriverHint" style="margin-top:10px"></p>
+    </div>
   </div>
-</div>
-<script>
-  (function () {
-    var s = document.createElement('script');
-    s.src = "https://cdn.jsdelivr.net/npm/eruda";
-    s.onload = function () { eruda.init(); };
-    document.body.appendChild(s);
-  })();
-</script>
+
+  <script>
+    (function () {
+      var s = document.createElement('script');
+      s.src = "https://cdn.jsdelivr.net/npm/eruda";
+      s.onload = function () { eruda.init(); };
+      document.body.appendChild(s);
+    })();
+  </script>
 </body>
 </html>
