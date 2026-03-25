@@ -106,6 +106,7 @@ const rateSkip = $("#rateSkip");
 const rateHint = $("#rateHint");
 const passengerStats = $("#passengerStats");
 const passengerHistoryList = $("#passengerHistoryList");
+const passengerWalletStats = $("#passengerWalletStats");
 const passengerTripsModal = $("#passengerTripsModal");
 const passengerTripsClose = $("#passengerTripsClose");
 const passengerTripsBackdrop = $("#passengerTripsBackdrop");
