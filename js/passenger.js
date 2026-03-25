@@ -1308,7 +1308,37 @@ map.on("click", async (e) => {
   pickMode = null;
 });
 
-logoutBtn.addEventListener("click", async () => {
+drawerAccountPassenger?.addEventListener("click", () => {
+  closePassengerDrawer();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+drawerTripsPassenger?.addEventListener("click", () => {
+  closePassengerDrawer();
+  passengerHistoryList?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+drawerWalletPassenger?.addEventListener("click", () => {
+  closePassengerDrawer();
+  passengerStats?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+drawerSupportPassenger?.addEventListener("click", () => {
+  closePassengerDrawer();
+  notify({
+    title: "الدعم",
+    body: "تواصل معنا عبر واتساب السائق أو أضف وسيلة دعم مخصصة لاحقًا.",
+    tag: "support-info"
+  });
+});
+
+switchRoleBtn?.addEventListener("click", () => {
+  closePassengerDrawer();
+  openSwitchDriverModal();
+});
+
+logoutBtn?.addEventListener("click", async () => {
+  closePassengerDrawer();
   stopLiveDrivers();
   stopDriverTracking();
   await signOut(auth);
