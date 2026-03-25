@@ -303,6 +303,16 @@ function closePassengerChatModal() {
   if (!chatModalPassenger) return;
   chatModalPassenger.classList.add("hidden");
 }
+
+function openPassengerTripsModal() {
+  if (!passengerTripsModal) return;
+  passengerTripsModal.classList.remove("hidden");
+}
+
+function closePassengerTripsModal() {
+  if (!passengerTripsModal) return;
+  passengerTripsModal.classList.add("hidden");
+}
 let lastMsgCount = 0;
 
 function renderPassengerChatMessages(rows = []) {
