@@ -105,6 +105,112 @@ let completedHandledForRideId = null;
 
 function setDriverStatus(t) { setText(driverStatus, t); }
 
+function openDriverDrawer() {
+  drawerBackdropDriver?.classList.remove("hidden");
+  sideDrawerDriver?.classList.add("open");
+  sideDrawerDriver?.setAttribute("aria-hidden", "false");
+}
+
+function closeDriverDrawer() {
+  sideDrawerDriver?.classList.remove("open");
+  sideDrawerDriver?.setAttribute("aria-hidden", "true");
+  setTimeout(() => {
+    drawerBackdropDriver?.classList.add("hidden");
+  }, 280);
+}
+
+function openDriverAccountModal() {
+  if (!driverAccountModal) return;
+
+  if (driverAccountInfo) {
+    driverAccountInfo.innerHTML = `
+      <div class="list-item">
+        <div class="row-between">
+          <b>الاسم</b>
+          <span>${escapeHtml(myUser?.name || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>الهاتف</b>
+          <span>${escapeHtml(myUser?.phone || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>المحافظة</b>
+          <span>${escapeHtml(myUser?.governorate || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>المركز / الحي</b>
+          <span>${escapeHtml(myUser?.center || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>نوع المركبة</b>
+          <span>${escapeHtml(myUser?.vehicleType || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>كود المركبة</b>
+          <span>${escapeHtml(myUser?.vehicleCode || "—")}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  driverAccountModal.classList.remove("hidden");
+}
+
+function closeDriverAccountModal() {
+  if (!driverAccountModal) return;
+  driverAccountModal.classList.add("hidden");
+}
+
+function openDriverWalletModal() {
+  if (!driverWalletModal) return;
+
+  if (driverWalletStatsModal && myUser) {
+    driverWalletStatsModal.innerHTML = `
+      <div class="card-lite">
+        <div class="muted small">الرصيد</div>
+        <div class="price" style="font-size:22px">${moneyEGP(myUser.walletBalance || 0)}</div>
+      </div>
+
+      <div class="card-lite">
+        <div class="muted small">إجمالي الأرباح</div>
+        <div class="price" style="font-size:22px">${moneyEGP(myUser.totalEarnings || 0)}</div>
+      </div>
+
+      <div class="card-lite">
+        <div class="muted small">الرحلات المكتملة</div>
+        <div class="price" style="font-size:22px">${escapeHtml(String(myUser.completedTrips || 0))}</div>
+      </div>
+
+      <div class="card-lite">
+        <div class="muted small">التقييم</div>
+        <div class="price" style="font-size:22px">${Number(myUser.ratingAvg || 0).toFixed(1)}</div>
+      </div>
+    `;
+  }
+
+  driverWalletModal.classList.remove("hidden");
+}
+
+function closeDriverWalletModal() {
+  if (!driverWalletModal) return;
+  driverWalletModal.classList.add("hidden");
+}
+
 function setTrackBtn() {
   if (!btnTrackToggle) return;
   btnTrackToggle.textContent = trackingEnabled ? "إيقاف التتبع" : "ابدأ التتبع";
