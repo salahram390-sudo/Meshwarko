@@ -109,6 +109,9 @@ const passengerHistoryList = $("#passengerHistoryList");
 const passengerTripsModal = $("#passengerTripsModal");
 const passengerTripsClose = $("#passengerTripsClose");
 const passengerTripsBackdrop = $("#passengerTripsBackdrop");
+const passengerWalletModal = $("#passengerWalletModal");
+const passengerWalletClose = $("#passengerWalletClose");
+const passengerWalletBackdrop = $("#passengerWalletBackdrop");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
