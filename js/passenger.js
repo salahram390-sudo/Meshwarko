@@ -835,7 +835,9 @@ const nearestMeta = await findNearestDriversMeta({
 });
     const rideRef = await addDoc(collection(db, "rides"), {
       passengerId: user.uid, passengerName: myData.name || "", passengerPhone: myData.phone || "", driverId: null, status: "requested", createdAt: serverTimestamp(), createdAtMs, clientCreatedAtMs: createdAtMs, expiresAt, expiresAtMs,
-      governorate: pGov.value, center: pCenter.value, vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dropoff: { lat: dropoff.lat, lon: dropoff.lon }, pickupText: pickupText.value.trim(), dropoffText: dropText.value.trim(),
+      governorate: savedGov,
+center: savedCenter,
+vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dropoff: { lat: dropoff.lat, lon: dropoff.lon }, pickupText: pickupText.value.trim(), dropoffText: dropText.value.trim(),
       distanceMeters: lastDistanceMeters, durationSec: lastDurationSec, pricing: buildPricingSummary(lastDistanceMeters, lastDurationSec, price), price, archived: false, passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
       nearestDriverId: nearestMeta.nearestDriverId || null, nearestDriverIds: nearestMeta.nearestDriverIds || [], nearestDrivers: nearestMeta.nearestDrivers || []
     });
