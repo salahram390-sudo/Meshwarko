@@ -99,7 +99,9 @@ async function initAdmin() {
   admin = await loadEgyptAdmin();
 
   const govs = admin.governorates.map((g) => g.name);
+
   fillSelect(pGov, govs);
+  fillSelect(pGovLogin, govs);
   fillSelect(dGov, govs);
   fillSelect(dGovLogin, govs);
 
@@ -109,10 +111,12 @@ async function initAdmin() {
   };
 
   setCenters(pGov?.value, pCenter);
+  setCenters(pGovLogin?.value, pCenterLogin);
   setCenters(dGov?.value, dCenter);
   setCenters(dGovLogin?.value, dCenterLogin);
 
   pGov?.addEventListener("change", () => setCenters(pGov.value, pCenter));
+  pGovLogin?.addEventListener("change", () => setCenters(pGovLogin.value, pCenterLogin));
   dGov?.addEventListener("change", () => setCenters(dGov.value, dCenter));
   dGovLogin?.addEventListener("change", () => setCenters(dGovLogin.value, dCenterLogin));
 
