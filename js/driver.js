@@ -1247,7 +1247,7 @@ btnComplete.addEventListener("click", async () => {
   await completeRideCore({ auto: false });
 });
 
-editProfileBtn.addEventListener("click", async () => {
+editProfileBtn?.addEventListener("click", async () => {
   closeDriverDrawer();
 if (!admin || !myUser) return;
   const gov = prompt("المحافظة", myUser.governorate || "");
