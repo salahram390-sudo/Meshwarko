@@ -36,6 +36,7 @@ let driverTrackUnsub = null;
 let liveDriversUnsub = null;
 let driverMarker = null;
 let driverLastLoc = null;
+let completedTripsCount = 0;
 let arrivedToastShownFor = null;
 let completedToastShownFor = null;
 let ratingValue = 0;
