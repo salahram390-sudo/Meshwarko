@@ -1858,3 +1858,36 @@ body.splash-active::before{
   font-size:13px;
   border:1px solid rgba(255,255,255,.05);
 }
+
+.wallet-cards{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+
+.wallet-box{
+  background:linear-gradient(145deg,#0f172a,#020617);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+}
+
+.wallet-box .label{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+}
+
+.wallet-box .value{
+  font-size:22px;
+  font-weight:800;
+  color:#FFD700;
+}
+
+@media (max-width:520px){
+  .wallet-cards{
+    grid-template-columns:1fr;
+  }
+}
