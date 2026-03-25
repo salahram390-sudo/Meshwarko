@@ -52,6 +52,15 @@ const NEARBY_DRIVER_RADIUS_M = 8000;
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
+const menuBtnPassenger = $("#menuBtnPassenger");
+const drawerBackdropPassenger = $("#drawerBackdropPassenger");
+const sideDrawerPassenger = $("#sideDrawerPassenger");
+const drawerClosePassenger = $("#drawerClosePassenger");
+
+const drawerAccountPassenger = $("#drawerAccountPassenger");
+const drawerTripsPassenger = $("#drawerTripsPassenger");
+const drawerWalletPassenger = $("#drawerWalletPassenger");
+const drawerSupportPassenger = $("#drawerSupportPassenger");
 switchRoleBtn?.addEventListener("click", openSwitchDriverModal);
 const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
