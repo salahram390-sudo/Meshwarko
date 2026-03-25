@@ -1680,6 +1680,14 @@ if (passengerWalletBackdrop) {
   passengerWalletBackdrop.addEventListener("click", closePassengerWalletModal);
 }
 
+if (passengerAccountClose) {
+  passengerAccountClose.addEventListener("click", closePassengerAccountModal);
+}
+
+if (passengerAccountBackdrop) {
+  passengerAccountBackdrop.addEventListener("click", closePassengerAccountModal);
+}
+
 if (chatSendPassenger) {
   chatSendPassenger.addEventListener("click", sendPassengerChatMessage);
 }
