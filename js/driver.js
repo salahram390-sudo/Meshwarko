@@ -102,6 +102,10 @@ function openDriverAccountModal() {
             <div class="profile-sub">سائق</div>
           </div>
         </div>
+        <div class="profile-stats">
+          <div class="profile-stat"><span class="n">${escapeHtml(String(myUser?.completedTrips || 0))}</span><span class="t">رحلات</span></div>
+          <div class="profile-stat"><span class="n">⭐ ${Number(myUser?.ratingAvg || 0).toFixed(1)}</span><span class="t">التقييم</span></div>
+        </div>
         <div class="profile-list">
           <div class="profile-item">📞 ${escapeHtml(myUser?.phone || "—")}</div>
           <div class="profile-item">📍 ${escapeHtml(myUser?.governorate || "—")} / ${escapeHtml(myUser?.center || "—")}</div>
@@ -177,7 +181,7 @@ function renderDriverHistory(rides) {
   if (!rows.length) return void (driverHistoryList.innerHTML = `<div class="muted small">لا يوجد سجل رحلات بعد.</div>`);
   rows.slice(0, 20).forEach((r) => {
     const item = document.createElement("div");
-    item.className = "list-item history-item";
+    item.className = "list-item history-item trip-entry";
     item.innerHTML = `
       <div class="row-between"><b>${moneyEGP(r.price || 0)}</b><span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span></div>
       <div class="muted small">الراكب: ${escapeHtml(r.passengerName || "-")} • ${escapeHtml(r.passengerPhone || "-")}</div>

@@ -239,11 +239,14 @@ function renderPassengerHistory(rides) {
   }
   completed.slice(0, 10).forEach((r) => {
     const item = document.createElement("div");
-    item.className = "list-item";
+    item.className = "list-item history-item trip-entry";
     item.innerHTML = `
-      <div class="row-between"><b>${moneyEGP(r.price)}</b><span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span></div>
-      <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
-      <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
+      <div class="row-between">
+        <b>${moneyEGP(r.price)}</b>
+        <span class="trip-chip">مكتملة</span>
+      </div>
+      <div class="muted small trip-date">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</div>
+      <div class="trip-route"><span>📍 ${escapeHtml(r.pickupText || "-")}</span><span>🏁 ${escapeHtml(r.dropoffText || "-")}</span></div>
       <div class="muted small">السائق: ${escapeHtml(r.driverName || "-")} • تقييمك: ${r.passengerRating ? `⭐ ${r.passengerRating}` : "—"}</div>
     `;
     passengerHistoryList.appendChild(item);
@@ -268,7 +271,7 @@ function openPassengerWalletModal() {
         </div>
         <div class="wallet-cards">
           <div class="wallet-box"><div class="label">الرصيد الحالي</div><div class="value">${moneyEGP(myData?.wallet || 0)}</div></div>
-          <div class="wallet-box"><div class="label">إجمالي الرحلات</div><div class="value">${passengerHistoryList?.children?.length || 0}</div></div>
+          <div class="wallet-box"><div class="label">إجمالي الرحلات</div><div class="value">${getPassengerCompletedTripsCount()}</div></div>
         </div>
       </div>`;
   }
@@ -289,7 +292,7 @@ function openPassengerAccountModal() {
           </div>
         </div>
         <div class="profile-stats">
-          <div class="profile-stat"><span class="n">🚕 ${passengerHistoryList?.children?.length || 0}</span><span class="t">رحلات</span></div>
+          <div class="profile-stat"><span class="n">🚕 ${getPassengerCompletedTripsCount()}</span><span class="t">رحلات</span></div>
           <div class="profile-stat"><span class="n">${escapeHtml(myData?.governorate || "—")}</span><span class="t">المحافظة</span></div>
         </div>
         <div class="profile-list">
