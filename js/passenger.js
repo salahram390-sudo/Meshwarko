@@ -689,15 +689,37 @@ function startLiveDriversLayer({ governorate, center }) {
 
 async function initAdmin() {
   admin = await loadEgyptAdmin();
-  const govs = admin.governorates.map((g) => g.name); fillSelect(pGov, govs);
-  const setCenters = (govName) => { const g = admin.governorates.find((x) => x.name === govName); fillSelect(pCenter, g?.centers || ["—"]); };
-  setCenters(pGov.value);
-  pGov.addEventListener("change", () => { setCenters(pGov.value); if (pGov.value && pCenter.value) startLiveDriversLayer({ governorate: pGov.value, center: pCenter.value }); });
-  pCenter.addEventListener("change", () => { if (pGov.value && pCenter.value) startLiveDriversLayer({ governorate: pGov.value, center: pCenter.value }); });
-  const vehicles = admin.vehicleTypes;
-  const render = () => renderVehicleGrid(pVehicles, vehicles, passengerVehicle, (id) => { passengerVehicle = id; render(); });
+
+  const vehicles = admin.vehicleTypes || [];
+
+  const render = () => {
+    renderVehicleGrid(pVehicles, vehicles, passengerVehicle, (id) => {
+      passengerVehicle = id;
+      render();
+    });
+  };
+
   render();
-  if (pGov.value && pCenter.value) startLiveDriversLayer({ governorate: pGov.value, center: pCenter.value });
+
+  const savedGov = String(myData?.governorate || "").trim();
+  const savedCenter = String(myData?.center || "").trim();
+
+  if (passengerAreaHint) {
+    if (savedGov && savedCenter) {
+      passengerAreaHint.textContent = `المنطقة الحالية: ${savedGov} / ${savedCenter}`;
+    } else if (savedGov) {
+      passengerAreaHint.textContent = `المحافظة الحالية: ${savedGov}`;
+    } else {
+      passengerAreaHint.textContent = "لم يتم حفظ المحافظة والمركز في حسابك بعد.";
+    }
+  }
+
+  if (savedGov && savedCenter) {
+    startLiveDriversLayer({
+      governorate: savedGov,
+      center: savedCenter
+    });
+  }
 }
 
 function watchCurrentRide(userId) {
