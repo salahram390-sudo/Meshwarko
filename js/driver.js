@@ -1049,7 +1049,7 @@ logoutBtn?.addEventListener("click", async () => {
   location.href = "./index.html";
 });
 
-switchRoleBtn.addEventListener("click", () => {
+switchRoleBtn?.addEventListener("click", () => {
   closeDriverDrawer();
   location.href = "./passenger.html";
 });
