@@ -1592,6 +1592,14 @@ if (passengerTripsBackdrop) {
   passengerTripsBackdrop.addEventListener("click", closePassengerTripsModal);
 }
 
+if (passengerWalletClose) {
+  passengerWalletClose.addEventListener("click", closePassengerWalletModal);
+}
+
+if (passengerWalletBackdrop) {
+  passengerWalletBackdrop.addEventListener("click", closePassengerWalletModal);
+}
+
 if (chatSendPassenger) {
   chatSendPassenger.addEventListener("click", sendPassengerChatMessage);
 }
