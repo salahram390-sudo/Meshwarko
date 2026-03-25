@@ -1093,7 +1093,8 @@ btnComplete.addEventListener("click", async () => {
 });
 
 editProfileBtn.addEventListener("click", async () => {
-  if (!admin || !myUser) return;
+  closeDriverDrawer();
+if (!admin || !myUser) return;
   const gov = prompt("المحافظة", myUser.governorate || "");
   if (!gov) return;
   const g = admin.governorates.find((x) => x.name === gov) || admin.governorates[0];
