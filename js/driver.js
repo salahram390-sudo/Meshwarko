@@ -462,6 +462,8 @@ async function tryAutoCompleteCurrentRide() {
 
 function finalizeDriverRideCleanup(successMessage = "تمت الرحلة بنجاح ✅") {
   try {
+    closeDriverDrawer();
+    closeDriverChatModal();
     resetSelectedRideUi(successMessage);
 
     if (routeLayerRef.current) {
