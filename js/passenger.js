@@ -1072,11 +1072,11 @@ function watchCurrentRide(userId) {
   const allowArchivedFinished = r.status === "completed" || r.status === "canceled";
 
   return (
-    r.passengerId === userId &&
-    activeOrFinished &&
-    (allowArchivedFinished || r.archived !== true) &&
-    !isRideExpired(r, getRideFreshMaxAgeMs(r.status) || ACTIVE_RIDE_MAX_AGE_MS, now)
-  );
+  r.passengerId === userId &&
+  activeOrFinished &&
+  (allowArchivedFinished || r.archived !== true) &&
+  (allowArchivedFinished || !isRideExpired(r, getRideFreshMaxAgeMs(r.status) || ACTIVE_RIDE_MAX_AGE_MS, now))
+);
 })
         .sort((a, b) => {
           const at = a.createdAt?.toMillis?.() || 0;
