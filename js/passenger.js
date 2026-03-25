@@ -124,6 +124,20 @@ function showEl(el) {
   if (el) el.style.display = "";
 }
 
+function openPassengerDrawer() {
+  drawerBackdropPassenger?.classList.remove("hidden");
+  sideDrawerPassenger?.classList.add("open");
+  sideDrawerPassenger?.setAttribute("aria-hidden", "false");
+}
+
+function closePassengerDrawer() {
+  sideDrawerPassenger?.classList.remove("open");
+  sideDrawerPassenger?.setAttribute("aria-hidden", "true");
+  setTimeout(() => {
+    drawerBackdropPassenger?.classList.add("hidden");
+  }, 280);
+}
+
 function clearSearchResults(container) {
   if (!container) return;
   container.innerHTML = "";
