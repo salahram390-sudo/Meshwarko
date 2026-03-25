@@ -272,74 +272,81 @@ body::before {
   max-width: 100%;
   min-height: calc(100vh - 60px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 18px 14px 24px;
+  padding: 14px 12px 20px;
 }
 
 .auth-shell .card,
 .auth-shell .card-lite {
-  width: min(560px, calc(100vw - 24px));
-  max-width: calc(100vw - 24px);
+  width: min(520px, calc(100vw - 18px));
+  max-width: calc(100vw - 18px);
   margin: 0 auto;
 }
 
 .auth-shell .card {
-  padding: 16px 14px;
+  padding: 14px 12px;
 }
 
 .auth-shell .form {
-  gap: 12px;
+  gap: 10px;
 }
 
 .auth-shell .form-row {
-  gap: 8px;
+  gap: 6px;
 }
 
 .auth-shell .input,
 .auth-shell input,
 .auth-shell select {
+  height: 44px;
+  line-height: 44px;
+  font-size: 14px;
+}
+
+.auth-shell .btn.primary,
+.auth-shell button[type="submit"] {
   height: 46px;
-  line-height: 46px;
 }
 
 .auth-shell .vehicle-grid {
-  gap: 10px;
-  padding-bottom: 6px;
+  gap: 8px;
+  padding: 2px 0 6px;
 }
 
 .auth-shell .vehicle {
-  flex: 0 0 108px;
-  min-width: 108px;
-  padding: 10px 8px;
-  gap: 8px;
+  flex: 0 0 96px;
+  min-width: 96px;
+  padding: 8px 6px;
+  gap: 6px;
 }
 
 .auth-shell .vehicle-thumb {
-  height: 68px;
+  height: 56px;
 }
 
 .auth-shell .vehicle .nm {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .segmented {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   background: rgba(255, 255, 255, 0.04);
-  padding: 6px;
+  padding: 5px;
   border-radius: 14px;
   border: 1px solid rgba(255, 215, 0, 0.12);
 }
 
 .seg-btn {
   flex: 1;
-  min-height: 42px;
+  min-height: 40px;
   border-radius: 12px;
   border: 1px solid rgba(255, 215, 0, 0.14);
   background: rgba(255, 255, 255, 0.03);
   color: #fff;
   font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
 }
 
