@@ -877,7 +877,16 @@ btnRejectOffer.addEventListener("click", async () => {
   setStatus("يرفض...");
   try {
     const refreshedCreatedAtMs = Date.now(); const refreshedExpiresAtMs = refreshedCreatedAtMs + REQUEST_EXPIRE_MS;
-    const nearestMeta = await findNearestDriversMeta({ governorate: pGov.value, center: pCenter.value, vehicleType: passengerVehicle, pickupPoint: pickup, limit: 8 });
+    const savedGov = String(myData?.governorate || "").trim();
+const savedCenter = String(myData?.center || "").trim();
+
+const nearestMeta = await findNearestDriversMeta({
+  governorate: savedGov,
+  center: savedCenter,
+  vehicleType: passengerVehicle,
+  pickupPoint: pickup,
+  limit: 8
+});
     await updateDoc(doc(db, "rides", currentRideId), {
       status: "requested", driverId: null, offerPrice: null, offeredAt: null, driverName: null, driverPhone: null, driverVehicleType: null, driverVehicleCode: null,
       createdAtMs: refreshedCreatedAtMs, expiresAt: Timestamp.fromMillis(refreshedExpiresAtMs), expiresAtMs: refreshedExpiresAtMs,
