@@ -61,7 +61,6 @@ const drawerAccountPassenger = $("#drawerAccountPassenger");
 const drawerTripsPassenger = $("#drawerTripsPassenger");
 const drawerWalletPassenger = $("#drawerWalletPassenger");
 const drawerSupportPassenger = $("#drawerSupportPassenger");
-switchRoleBtn?.addEventListener("click", openSwitchDriverModal);
 const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 const pGov = $("#pGov");
