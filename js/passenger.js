@@ -357,6 +357,55 @@ function closePassengerWalletModal() {
   if (!passengerWalletModal) return;
   passengerWalletModal.classList.add("hidden");
 }
+function openPassengerAccountModal() {
+  if (!passengerAccountModal) return;
+
+  if (passengerAccountInfo) {
+    passengerAccountInfo.innerHTML = `
+      <div class="list-item">
+        <div class="row-between">
+          <b>الاسم</b>
+          <span>${escapeHtml(myData?.name || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>الهاتف</b>
+          <span>${escapeHtml(myData?.phone || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>المحافظة</b>
+          <span>${escapeHtml(myData?.governorate || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>المركز / الحي</b>
+          <span>${escapeHtml(myData?.center || "—")}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>نوع المركبة المفضل</b>
+          <span>${escapeHtml(myData?.vehicleType || "—")}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  passengerAccountModal.classList.remove("hidden");
+}
+
+function closePassengerAccountModal() {
+  if (!passengerAccountModal) return;
+  passengerAccountModal.classList.add("hidden");
+}
 let lastMsgCount = 0;
 
 function renderPassengerChatMessages(rows = []) {
