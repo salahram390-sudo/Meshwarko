@@ -54,16 +54,33 @@
         </div>
 
         <form id="loginForm" class="form">
-          <div class="form-row">
-            <label class="label" for="loginEmail">البريد الإلكتروني</label>
-            <input id="loginEmail" class="input" type="email" required autocomplete="email" />
-          </div>
-          <div class="form-row">
-            <label class="label" for="loginPass">كلمة المرور</label>
-            <input id="loginPass" class="input" type="password" required autocomplete="current-password" />
-          </div>
+  <div class="form-row">
+    <label class="label" for="loginEmail">البريد الإلكتروني</label>
+    <input id="loginEmail" class="input" type="email" required autocomplete="email" />
+  </div>
 
-          <div id="driverExtrasLogin" class="card-lite hidden">
+  <div class="form-row">
+    <label class="label" for="loginPass">كلمة المرور</label>
+    <input id="loginPass" class="input" type="password" required autocomplete="current-password" />
+  </div>
+
+  <div id="passengerExtrasLogin" class="card-lite">
+    <div class="panel-title">اختيارات الراكب</div>
+
+    <div class="grid2" style="margin-top:10px">
+      <div class="form-row">
+        <label class="label">المحافظة</label>
+        <select id="pGovLogin"></select>
+      </div>
+
+      <div class="form-row">
+        <label class="label">المركز/الحي</label>
+        <select id="pCenterLogin"></select>
+      </div>
+    </div>
+  </div>
+
+  <div id="driverExtrasLogin" class="card-lite hidden">
             <div class="panel-title">بيانات السائق</div>
 
             <div class="grid2" style="margin-top:10px">
