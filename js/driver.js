@@ -416,6 +416,39 @@ function syncOfferBtn() {
 }
 
 offerInput.addEventListener("input", syncOfferBtn);
+menuBtnDriver?.addEventListener("click", openDriverDrawer);
+drawerCloseDriver?.addEventListener("click", closeDriverDrawer);
+drawerBackdropDriver?.addEventListener("click", closeDriverDrawer);
+
+drawerAccountDriver?.addEventListener("click", () => {
+  closeDriverDrawer();
+  openDriverAccountModal();
+});
+
+drawerTripsDriver?.addEventListener("click", () => {
+  closeDriverDrawer();
+  openDriverHistoryModal();
+});
+
+drawerWalletDriver?.addEventListener("click", () => {
+  closeDriverDrawer();
+  openDriverWalletModal();
+});
+
+drawerSupportDriver?.addEventListener("click", () => {
+  closeDriverDrawer();
+  notify({
+    title: "الدعم",
+    body: "أضف وسيلة تواصل للدعم لاحقًا داخل التطبيق.",
+    tag: "driver-support-info"
+  });
+});
+
+driverAccountClose?.addEventListener("click", closeDriverAccountModal);
+driverAccountBackdrop?.addEventListener("click", closeDriverAccountModal);
+
+driverWalletClose?.addEventListener("click", closeDriverWalletModal);
+driverWalletBackdrop?.addEventListener("click", closeDriverWalletModal);
 
 if (driverHistoryClose) {
   driverHistoryClose.addEventListener("click", closeDriverHistoryModal);
