@@ -60,12 +60,19 @@ let driverVehicle = "sedan";
 
 function setRole(next) {
   role = next;
+
   rolePassenger.classList.toggle("active", role === "passenger");
   roleDriver.classList.toggle("active", role === "driver");
-  setText(roleHint, role === "passenger" ? "التسجيل كـ راكب." : "التسجيل كـ سائق.");
 
-  driverExtras?.classList.toggle("hidden", role !== "driver");
+  setText(
+    roleHint,
+    role === "passenger" ? "التسجيل كـ راكب." : "التسجيل كـ سائق."
+  );
+
   passengerExtras?.classList.toggle("hidden", role !== "passenger");
+  driverExtras?.classList.toggle("hidden", role !== "driver");
+
+  passengerExtrasLogin?.classList.toggle("hidden", role !== "passenger");
   driverExtrasLogin?.classList.toggle("hidden", role !== "driver");
 }
 
