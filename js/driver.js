@@ -442,7 +442,28 @@ logoutBtn?.addEventListener("click", async () => {
   if (chatUnsubDriver) { chatUnsubDriver(); chatUnsubDriver = null; }
   closeDriverChatModal(); await signOut(auth); location.href = "./index.html";
 });
-switchRoleBtn?.addEventListener("click", () => { closeDriverDrawer(); location.href = "./passenger.html"; });
+switchRoleBtn?.addEventListener("click", async () => {
+  closeDriverDrawer();
+
+  try {
+    const u = auth.currentUser;
+    if (!u) return;
+
+    await updateDoc(doc(db, "users", u.uid), {
+      role: "passenger",
+      updatedAt: serverTimestamp(),
+    });
+
+    location.href = "./passenger.html?ts=" + Date.now();
+  } catch (e) {
+    console.error("SWITCH PASSENGER ERROR:", e);
+    notify({
+      title: "تعذر التحويل",
+      body: "حدث خطأ أثناء التحويل إلى راكب.",
+      tag: "switch-passenger-error"
+    });
+  }
+});
 btnLocate?.addEventListener("click", () => locateOnce(map, (loc) => { myLocation = loc; updateOwnDriverMarker(loc.lat, loc.lon, true); pushDriverOnline(); }));
 btnClear?.addEventListener("click", () => resetSelectedRideUi("لم يتم تحديد طلب."));
 btnRefresh?.addEventListener("click", () => { subText.textContent = "تم التحديث."; setTimeout(() => { subText.textContent = "اختر طلب ثم اقبل أو اقترح سعر"; }, 900); });
