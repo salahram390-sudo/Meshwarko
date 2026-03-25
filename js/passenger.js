@@ -106,6 +106,9 @@ const rateSkip = $("#rateSkip");
 const rateHint = $("#rateHint");
 const passengerStats = $("#passengerStats");
 const passengerHistoryList = $("#passengerHistoryList");
+const passengerTripsModal = $("#passengerTripsModal");
+const passengerTripsClose = $("#passengerTripsClose");
+const passengerTripsBackdrop = $("#passengerTripsBackdrop");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
