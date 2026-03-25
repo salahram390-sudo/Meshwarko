@@ -378,17 +378,16 @@ function openPassengerAccountModal() {
 
     <div class="profile-stats">
       <div class="profile-stat">
-        <span class="n">⭐ 4.9</span>
-        <span class="t">تقييمك</span>
+        <span class="n">🚕 ${passengerHistoryList?.children?.length || 0}</span>
+        <span class="t">رحلات</span>
       </div>
       <div class="profile-stat">
-        <span class="n">+20</span>
-        <span class="t">رحلات</span>
+        <span class="n">${escapeHtml(myData?.governorate || "—")}</span>
+        <span class="t">المحافظة</span>
       </div>
     </div>
 
     <div class="profile-list">
-
       <div class="profile-item">
         📞 ${escapeHtml(myData?.phone || "—")}
       </div>
@@ -400,7 +399,6 @@ function openPassengerAccountModal() {
       <div class="profile-item">
         🚗 ${escapeHtml(myData?.vehicleType || "—")}
       </div>
-
     </div>
 
   </div>
