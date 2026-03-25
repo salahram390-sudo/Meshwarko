@@ -28,17 +28,27 @@ const rolePassenger = $("#rolePassenger");
 const roleDriver = $("#roleDriver");
 const roleHint = $("#roleHint");
 const adminEntryBtn = $("#adminEntryBtn");
+
 const passengerExtras = $("#passengerExtras");
 const driverExtras = $("#driverExtras");
+const passengerExtrasLogin = $("#passengerExtrasLogin");
+const driverExtrasLogin = $("#driverExtrasLogin");
 
 let role = "passenger";
 let admin = null;
 
-const pGov = $("#pGov"), pCenter = $("#pCenter");
-const dGov = $("#dGov"), dCenter = $("#dCenter"), dVehicles = $("#dVehicles");
-const dAddress = $("#dAddress"), dVehicleCode = $("#dVehicleCode");
+const pGov = $("#pGov");
+const pCenter = $("#pCenter");
 
-const driverExtrasLogin = $("#driverExtrasLogin");
+const pGovLogin = $("#pGovLogin");
+const pCenterLogin = $("#pCenterLogin");
+
+const dGov = $("#dGov");
+const dCenter = $("#dCenter");
+const dVehicles = $("#dVehicles");
+const dAddress = $("#dAddress");
+const dVehicleCode = $("#dVehicleCode");
+
 const dGovLogin = $("#dGovLogin");
 const dCenterLogin = $("#dCenterLogin");
 const dAddressLogin = $("#dAddressLogin");
