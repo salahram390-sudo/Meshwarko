@@ -1796,6 +1796,7 @@ let sdSelectedVehicle = null;
 
 async function openSwitchDriverModal() {
   const modal = $("#switchDriverModal");
+  const backdrop = $("#switchDriverBackdrop");
   const hint = $("#switchDriverHint");
   hint.textContent = "";
 
@@ -1817,7 +1818,14 @@ async function openSwitchDriverModal() {
     });
   };
   render();
-  modal.classList.remove("hidden");
+
+  modal?.classList.remove("hidden");
+  backdrop?.classList.add("show");
+}
+
+function closeSwitchDriverModal() {
+  $("#switchDriverBackdrop")?.classList.remove("show");
+  $("#switchDriverModal")?.classList.add("hidden");
 }
 
 function closeSwitchDriverModal() {
