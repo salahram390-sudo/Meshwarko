@@ -278,19 +278,45 @@ function buildPricingSummary(distanceMeters, durationSec, manualPrice) {
 
 function renderPassengerHistory(rides) {
   if (!passengerHistoryList || !passengerStats) return;
+
   const completed = rides.filter((r) => r.status === "completed");
   const total = completed.reduce((sum, r) => sum + Number(r.price || 0), 0);
+
   passengerStats.textContent = `رحلات مكتملة: ${completed.length} • إجمالي المدفوع: ${moneyEGP(total)}`;
+
+  if (passengerWalletStats) {
+    passengerWalletStats.innerHTML = `
+      <div class="list-item">
+        <div class="row-between">
+          <b>إجمالي الرحلات</b>
+          <span>${completed.length}</span>
+        </div>
+      </div>
+
+      <div class="list-item">
+        <div class="row-between">
+          <b>إجمالي المدفوع</b>
+          <span>${moneyEGP(total)}</span>
+        </div>
+      </div>
+    `;
+  }
+
   passengerHistoryList.innerHTML = "";
+
   if (!completed.length) {
     passengerHistoryList.innerHTML = `<div class="muted small">لا يوجد سجل رحلات بعد.</div>`;
     return;
   }
+
   completed.slice(0, 10).forEach((r) => {
     const item = document.createElement("div");
     item.className = "list-item";
     item.innerHTML = `
-      <div class="row-between"><b>${moneyEGP(r.price)}</b><span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span></div>
+      <div class="row-between">
+        <b>${moneyEGP(r.price)}</b>
+        <span class="muted small">${escapeHtml(formatRideDate(r.completedAt || r.createdAt || r.createdAtMs))}</span>
+      </div>
       <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
       <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
       <div class="muted small">السائق: ${escapeHtml(r.driverName || "-")} • تقييمك: ${r.passengerRating ? `⭐ ${r.passengerRating}` : "—"}</div>
@@ -298,6 +324,7 @@ function renderPassengerHistory(rides) {
     passengerHistoryList.appendChild(item);
   });
 }
+
 function openPassengerChatModal() {
   if (!chatModalPassenger) return;
   chatModalPassenger.classList.remove("hidden");
