@@ -367,21 +367,15 @@ function openPassengerWalletModal() {
         </div>
 
         <div class="wallet-cards">
-
           <div class="wallet-box">
             <div class="label">الرصيد الحالي</div>
-            <div class="value">
-              ${moneyEGP(myData?.wallet || 0)}
-            </div>
+            <div class="value">${moneyEGP(myData?.wallet || 0)}</div>
           </div>
 
           <div class="wallet-box">
             <div class="label">إجمالي الرحلات</div>
-            <div class="value">
-              ${passengerHistoryList?.children?.length || 0}
-            </div>
+            <div class="value">${passengerHistoryList?.children?.length || 0}</div>
           </div>
-
         </div>
 
       </div>
@@ -390,6 +384,55 @@ function openPassengerWalletModal() {
 
   passengerWalletModal.classList.remove("hidden");
   passengerWalletBackdrop?.classList.add("show");
+}
+
+function closePassengerWalletModal() {
+  passengerWalletBackdrop?.classList.remove("show");
+  passengerWalletModal?.classList.add("hidden");
+}
+
+function openPassengerAccountModal() {
+  if (!passengerAccountModal) return;
+
+  if (passengerAccountInfo) {
+    passengerAccountInfo.innerHTML = `
+      <div class="profile-card">
+
+        <div class="profile-top">
+          <div class="profile-avatar">👤</div>
+          <div>
+            <div class="profile-name">${escapeHtml(myData?.name || "—")}</div>
+            <div class="profile-sub">راكب</div>
+          </div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <span class="n">🚕 ${passengerHistoryList?.children?.length || 0}</span>
+            <span class="t">رحلات</span>
+          </div>
+          <div class="profile-stat">
+            <span class="n">${escapeHtml(myData?.governorate || "—")}</span>
+            <span class="t">المحافظة</span>
+          </div>
+        </div>
+
+        <div class="profile-list">
+          <div class="profile-item">
+            📞 ${escapeHtml(myData?.phone || "—")}
+          </div>
+
+          <div class="profile-item">
+            📍 ${escapeHtml(myData?.governorate || "—")} / ${escapeHtml(myData?.center || "—")}
+          </div>
+
+          <div class="profile-item">
+            🚗 ${escapeHtml(myData?.vehicleType || "—")}
+          </div>
+        </div>
+
+      </div>
+    `;
   }
 
   passengerAccountModal.classList.remove("hidden");
