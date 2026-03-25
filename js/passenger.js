@@ -353,17 +353,17 @@ function watchPassengerChat(rideId) {
 
     lastMsgCount = rows.length;
 
-    const unread = snap.docs.filter((docSnap) => {
-      const msg = docSnap.data();
-      return msg.senderRole === "driver" && msg.read !== true;
-    });
+ //   const unread = snap.docs.filter((docSnap) => {
+ //     const msg = docSnap.data();
+ //     return msg.senderRole === "driver" && msg.read !== true;
+//    });
 
-    for (const docSnap of unread.slice(0, 3)) {
-      await updateDoc(
-        doc(db, "rides", rideId, "messages", docSnap.id),
-        { read: true }
-      );
-    }
+//    for (const docSnap of unread.slice(0, 3)) {
+ //     await updateDoc(
+ //       doc(db, "rides", rideId, "messages", docSnap.id),
+   //     { read: true }
+//      );
+//    }
 
     renderPassengerChatMessages(rows);
   });
