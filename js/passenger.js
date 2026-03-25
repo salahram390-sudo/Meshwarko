@@ -1860,10 +1860,6 @@ function closeSwitchDriverModal() {
   $("#switchDriverModal")?.classList.add("hidden");
 }
 
-function closeSwitchDriverModal() {
-  $("#switchDriverModal")?.classList.add("hidden");
-}
-
 $("#switchDriverClose")?.addEventListener("click", closeSwitchDriverModal);
 $("#switchDriverCancel")?.addEventListener("click", closeSwitchDriverModal);
 $("#switchDriverBackdrop")?.addEventListener("click", closeSwitchDriverModal);
