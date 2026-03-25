@@ -316,6 +316,16 @@ function closePassengerTripsModal() {
   if (!passengerTripsModal) return;
   passengerTripsModal.classList.add("hidden");
 }
+
+function openPassengerWalletModal() {
+  if (!passengerWalletModal) return;
+  passengerWalletModal.classList.remove("hidden");
+}
+
+function closePassengerWalletModal() {
+  if (!passengerWalletModal) return;
+  passengerWalletModal.classList.add("hidden");
+}
 let lastMsgCount = 0;
 
 function renderPassengerChatMessages(rows = []) {
