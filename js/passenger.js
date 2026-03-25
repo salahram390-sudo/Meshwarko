@@ -480,7 +480,7 @@ function hardResetPassengerUI() {
   clearRideSearchTimer();
   if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
   currentRideId = null; currentPickup = null; arrivedToastShownFor = null; completedToastShownFor = null;
-  stopDriverTracking(); stopLiveDrivers();
+  stopDriverTracking();
   if (btnChatPassenger) btnChatPassenger.disabled = true;
   if (chatUnsubPassenger) { chatUnsubPassenger(); chatUnsubPassenger = null; }
   closePassengerChatModal(); if (chatMessagesPassenger) chatMessagesPassenger.innerHTML = ""; if (chatInputPassenger) chatInputPassenger.value = "";
