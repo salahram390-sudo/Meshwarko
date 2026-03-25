@@ -94,20 +94,6 @@ let completedHandledForRideId = null;
 
 function setDriverStatus(t) { setText(driverStatus, t); }
 
-function openDriverDrawer() {
-  drawerBackdropDriver?.classList.remove("hidden");
-  sideDrawerDriver?.classList.add("open");
-  sideDrawerDriver?.setAttribute("aria-hidden", "false");
-}
-
-function closeDriverDrawer() {
-  sideDrawerDriver?.classList.remove("open");
-  sideDrawerDriver?.setAttribute("aria-hidden", "true");
-  setTimeout(() => {
-    drawerBackdropDriver?.classList.add("hidden");
-  }, 280);
-}
-
 function openDriverAccountModal() {
   if (!driverAccountModal) return;
 
