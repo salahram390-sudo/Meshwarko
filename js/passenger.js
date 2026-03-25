@@ -975,11 +975,8 @@ onAuthStateChanged(auth, async (user) => {
   if (myData.role === "admin") { location.href = "./admin.html"; return; }
   if (myData.status === "blocked") { await signOut(auth); alert("هذا الحساب محظور من الإدارة."); location.href = "./index.html"; return; }
   setText(meBadge, `${myData.name || "مستخدم"} • راكب`);
-  await initAdmin().catch(() => {});
-  if (myData.governorate) pGov.value = myData.governorate;
-  pGov.dispatchEvent(new Event("change"));
-  if (myData.center) pCenter.value = myData.center;
   if (myData.vehicleType) passengerVehicle = myData.vehicleType;
+await initAdmin().catch(() => {});
   locateOnce(map, (loc) => { myLocation = loc; showMyLocation(map, loc, { pan: true }); });
   watchCurrentRide(user.uid);
 });
