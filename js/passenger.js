@@ -291,7 +291,7 @@ function openPassengerAccountModal() {
           </div>
         </div>
         <div class="profile-stats">
-          <div class="profile-stat"><span class="n">🚕 ${passengerHistoryList?.children?.length || 0}</span><span class="t">رحلات</span></div>
+          <div class="profile-stat"><span class="n">🚕 ${completedTripsCount}</span><span class="t">رحلات</span></div>
           <div class="profile-stat"><span class="n">${escapeHtml(myData?.governorate || "—")}</span><span class="t">المحافظة</span></div>
         </div>
         <div class="profile-list">
