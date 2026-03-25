@@ -331,11 +331,12 @@ function renderPassengerHistory(rides) {
 function openPassengerChatModal() {
   if (!chatModalPassenger) return;
   chatModalPassenger.classList.remove("hidden");
+  chatBackdropPassenger?.classList.add("show");
 }
 
 function closePassengerChatModal() {
-  if (!chatModalPassenger) return;
-  chatModalPassenger.classList.add("hidden");
+  chatBackdropPassenger?.classList.remove("show");
+  chatModalPassenger?.classList.add("hidden");
 }
 
 function openPassengerTripsModal() {
