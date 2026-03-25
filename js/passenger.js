@@ -270,7 +270,7 @@ function openPassengerWalletModal() {
         </div>
         <div class="wallet-cards">
           <div class="wallet-box"><div class="label">الرصيد الحالي</div><div class="value">${moneyEGP(myData?.wallet || 0)}</div></div>
-          <div class="wallet-box"><div class="label">إجمالي الرحلات</div><div class="value">${passengerHistoryList?.children?.length || 0}</div></div>
+          <div class="wallet-box"><div class="label">إجمالي الرحلات</div><div class="value">${completedTripsCount}</div></div>
         </div>
       </div>`;
   }
