@@ -812,8 +812,27 @@ btnRequest.addEventListener("click", async () => {
   if (currentRideId) return notify({ title: "يوجد طلب نشط", body: "أنهِ الطلب الحالي أو ألغِه أولاً.", tag: "ride-exists" });
   const price = clampPrice(priceSlider.value); const createdAtMs = Date.now(); const expiresAtMs = createdAtMs + REQUEST_EXPIRE_MS; const expiresAt = Timestamp.fromMillis(expiresAtMs); setStatus("يرسل...");
   try {
-    await updateDoc(doc(db, "users", user.uid), { governorate: pGov.value, center: pCenter.value, vehicleType: passengerVehicle, updatedAt: serverTimestamp() }).catch(() => {});
-    const nearestMeta = await findNearestDriversMeta({ governorate: pGov.value, center: pCenter.value, vehicleType: passengerVehicle, pickupPoint: pickup, limit: 8 });
+    const savedGov = String(myData?.governorate || "").trim();
+const savedCenter = String(myData?.center || "").trim();
+
+if (!savedGov || !savedCenter) {
+  setStatus("ناقص");
+  setText(routeMeta, "لازم تحدد المحافظة والمركز من صفحة التسجيل/الدخول أولاً.");
+  return;
+}
+
+await updateDoc(doc(db, "users", user.uid), {
+  vehicleType: passengerVehicle,
+  updatedAt: serverTimestamp()
+}).catch(() => {});
+
+const nearestMeta = await findNearestDriversMeta({
+  governorate: savedGov,
+  center: savedCenter,
+  vehicleType: passengerVehicle,
+  pickupPoint: pickup,
+  limit: 8
+});
     const rideRef = await addDoc(collection(db, "rides"), {
       passengerId: user.uid, passengerName: myData.name || "", passengerPhone: myData.phone || "", driverId: null, status: "requested", createdAt: serverTimestamp(), createdAtMs, clientCreatedAtMs: createdAtMs, expiresAt, expiresAtMs,
       governorate: pGov.value, center: pCenter.value, vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dropoff: { lat: dropoff.lat, lon: dropoff.lon }, pickupText: pickupText.value.trim(), dropoffText: dropText.value.trim(),
