@@ -231,6 +231,7 @@ function buildPricingSummary(distanceMeters, durationSec, manualPrice) {
 function renderPassengerHistory(rides) {
   if (!passengerHistoryList || !passengerStats) return;
   const completed = rides.filter((r) => r.status === "completed");
+  completedTripsCount = completed.length;
   const total = completed.reduce((sum, r) => sum + Number(r.price || 0), 0);
   passengerStats.textContent = `رحلات مكتملة: ${completed.length} • إجمالي المدفوع: ${moneyEGP(total)}`;
   passengerHistoryList.innerHTML = "";
