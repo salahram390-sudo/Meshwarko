@@ -417,16 +417,6 @@ function syncOfferBtn() {
 
 offerInput.addEventListener("input", syncOfferBtn);
 
-if (driverHistoryBtn) {
-  driverHistoryBtn.addEventListener("click", openDriverHistoryModal);
-  driverHistoryBtn.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      openDriverHistoryModal();
-    }
-  });
-}
-
 if (driverHistoryClose) {
   driverHistoryClose.addEventListener("click", closeDriverHistoryModal);
 }
