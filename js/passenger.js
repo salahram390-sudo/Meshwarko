@@ -1334,7 +1334,7 @@ drawerAccountPassenger?.addEventListener("click", () => {
 
 drawerTripsPassenger?.addEventListener("click", () => {
   closePassengerDrawer();
-  passengerHistoryList?.scrollIntoView({ behavior: "smooth", block: "start" });
+  openPassengerTripsModal();
 });
 
 drawerWalletPassenger?.addEventListener("click", () => {
