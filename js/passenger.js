@@ -366,41 +366,45 @@ function openPassengerAccountModal() {
 
   if (passengerAccountInfo) {
     passengerAccountInfo.innerHTML = `
-      <div class="list-item">
-        <div class="row-between">
-          <b>الاسم</b>
-          <span>${escapeHtml(myData?.name || "—")}</span>
-        </div>
+  <div class="profile-card">
+
+    <div class="profile-top">
+      <div class="profile-avatar">👤</div>
+      <div>
+        <div class="profile-name">${escapeHtml(myData?.name || "—")}</div>
+        <div class="profile-sub">راكب</div>
+      </div>
+    </div>
+
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <span class="n">⭐ 4.9</span>
+        <span class="t">تقييمك</span>
+      </div>
+      <div class="profile-stat">
+        <span class="n">+20</span>
+        <span class="t">رحلات</span>
+      </div>
+    </div>
+
+    <div class="profile-list">
+
+      <div class="profile-item">
+        📞 ${escapeHtml(myData?.phone || "—")}
       </div>
 
-      <div class="list-item">
-        <div class="row-between">
-          <b>الهاتف</b>
-          <span>${escapeHtml(myData?.phone || "—")}</span>
-        </div>
+      <div class="profile-item">
+        📍 ${escapeHtml(myData?.governorate || "—")} / ${escapeHtml(myData?.center || "—")}
       </div>
 
-      <div class="list-item">
-        <div class="row-between">
-          <b>المحافظة</b>
-          <span>${escapeHtml(myData?.governorate || "—")}</span>
-        </div>
+      <div class="profile-item">
+        🚗 ${escapeHtml(myData?.vehicleType || "—")}
       </div>
 
-      <div class="list-item">
-        <div class="row-between">
-          <b>المركز / الحي</b>
-          <span>${escapeHtml(myData?.center || "—")}</span>
-        </div>
-      </div>
+    </div>
 
-      <div class="list-item">
-        <div class="row-between">
-          <b>نوع المركبة المفضل</b>
-          <span>${escapeHtml(myData?.vehicleType || "—")}</span>
-        </div>
-      </div>
-    `;
+  </div>
+`;
   }
 
   passengerAccountModal.classList.remove("hidden");
