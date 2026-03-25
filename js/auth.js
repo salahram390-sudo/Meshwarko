@@ -187,6 +187,17 @@ loginForm?.addEventListener("submit", async (e) => {
       return;
     }
 
+    if (role === "passenger") {
+      const gov = pGovLogin?.value.trim();
+      const center = pCenterLogin?.value.trim();
+
+      await updateDoc(doc(db, "users", u.uid), {
+        governorate: gov,
+        center,
+        updatedAt: serverTimestamp(),
+      });
+    }
+
     if (role === "driver") {
       const gov = dGovLogin?.value.trim();
       const center = dCenterLogin?.value.trim();
