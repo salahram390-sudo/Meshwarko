@@ -150,6 +150,16 @@ loginForm?.addEventListener("submit", async (e) => {
       return;
     }
 
+    if (role === "passenger") {
+      const gov = pGovLogin?.value.trim();
+      const center = pCenterLogin?.value.trim();
+
+      if (!gov || !center) {
+        alert("اكمل المحافظة والمركز قبل الدخول");
+        return;
+      }
+    }
+
     if (role === "driver") {
       const gov = dGovLogin?.value.trim();
       const center = dCenterLogin?.value.trim();
@@ -160,7 +170,7 @@ loginForm?.addEventListener("submit", async (e) => {
         return;
       }
     }
-
+    
     await signInWithEmailAndPassword(auth, email, pass);
 
     const u = auth.currentUser;
