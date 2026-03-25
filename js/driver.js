@@ -90,6 +90,20 @@ function setTrackBtn() {
   btnTrackToggle.textContent = trackingEnabled ? "إيقاف التتبع" : "ابدأ التتبع";
 }
 
+function openDriverDrawer() {
+  drawerBackdropDriver?.classList.remove("hidden");
+  sideDrawerDriver?.classList.add("open");
+  sideDrawerDriver?.setAttribute("aria-hidden", "false");
+}
+
+function closeDriverDrawer() {
+  sideDrawerDriver?.classList.remove("open");
+  sideDrawerDriver?.setAttribute("aria-hidden", "true");
+  setTimeout(() => {
+    drawerBackdropDriver?.classList.add("hidden");
+  }, 280);
+}
+
 function clampPrice(v) {
   const n = Number(normalizeArabicDigits(v));
   if (!Number.isFinite(n)) return null;
