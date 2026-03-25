@@ -27,6 +27,34 @@
   </div>
 </header>
 
+    <div id="drawerBackdropDriver" class="drawer-backdrop hidden"></div>
+
+<aside id="sideDrawerDriver" class="side-drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="drawer-user">
+      <div class="user-avatar">
+        <img src="assets/avatar.png" alt="User">
+      </div>
+      <div>
+        <div class="drawer-title">مشوارك</div>
+        <div class="drawer-sub" id="meBadge">...</div>
+      </div>
+    </div>
+
+    <button id="drawerCloseDriver" class="drawer-close" type="button" aria-label="إغلاق القائمة">✕</button>
+  </div>
+
+  <div class="drawer-menu">
+    <button id="drawerAccountDriver" class="drawer-item" type="button">👤 الحساب</button>
+    <button id="drawerTripsDriver" class="drawer-item" type="button">📜 الرحلات</button>
+    <button id="drawerWalletDriver" class="drawer-item" type="button">💰 المحفظة</button>
+    <button id="drawerSupportDriver" class="drawer-item" type="button">🛟 الدعم</button>
+    <button id="editProfileBtn" class="drawer-item" type="button">✏️ تعديل البيانات</button>
+    <button id="switchRoleBtn" class="drawer-item" type="button">🔄 التحويل إلى راكب</button>
+    <button id="logoutBtn" class="drawer-item danger" type="button">🚪 تسجيل الخروج</button>
+  </div>
+</aside>
+
     <main class="map-layout">
       <section class="map-area">
         <div id="map" class="map"></div>
