@@ -356,30 +356,22 @@ function openPassengerWalletModal() {
 
   if (passengerWalletInfo) {
     passengerWalletInfo.innerHTML = `
-      <div class="profile-card">
+  <div class="profile-card">
+    <div class="wallet-cards">
 
-        <div class="profile-top">
-          <div class="profile-avatar">💰</div>
-          <div>
-            <div class="profile-name">محفظتي</div>
-            <div class="profile-sub">رصيدك داخل التطبيق</div>
-          </div>
-        </div>
-
-        <div class="wallet-cards">
-          <div class="wallet-box">
-            <div class="label">الرصيد الحالي</div>
-            <div class="value">${moneyEGP(myData?.wallet || 0)}</div>
-          </div>
-
-          <div class="wallet-box">
-            <div class="label">إجمالي الرحلات</div>
-            <div class="value">${passengerHistoryList?.children?.length || 0}</div>
-          </div>
-        </div>
-
+      <div class="wallet-box">
+        <div class="label">الرصيد الحالي</div>
+        <div class="value">${moneyEGP(myData?.wallet || 0)}</div>
       </div>
-    `;
+
+      <div class="wallet-box">
+        <div class="label">إجمالي الرحلات</div>
+        <div class="value">${passengerHistoryList?.children?.length || 0}</div>
+      </div>
+
+    </div>
+  </div>
+`;
   }
 
   passengerWalletModal.classList.remove("hidden");
