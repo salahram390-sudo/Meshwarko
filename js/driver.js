@@ -19,17 +19,6 @@ const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
 const editProfileBtn = $("#editProfileBtn");
-
-const menuBtnDriver = $("#menuBtnDriver");
-const drawerBackdropDriver = $("#drawerBackdropDriver");
-const sideDrawerDriver = $("#sideDrawerDriver");
-const drawerCloseDriver = $("#drawerCloseDriver");
-
-const drawerAccountDriver = $("#drawerAccountDriver");
-const drawerTripsDriver = $("#drawerTripsDriver");
-const drawerWalletDriver = $("#drawerWalletDriver");
-const drawerSupportDriver = $("#drawerSupportDriver");
-
 const driverAccountModal = $("#driverAccountModal");
 const driverAccountClose = $("#driverAccountClose");
 const driverAccountBackdrop = $("#driverAccountBackdrop");
