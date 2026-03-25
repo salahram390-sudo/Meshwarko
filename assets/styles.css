@@ -1860,30 +1860,30 @@ body.splash-active::before{
 }
 
 .wallet-cards{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:12px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:6px;
 }
 
 .wallet-box{
-  background:linear-gradient(145deg,#0f172a,#020617);
-  border:1px solid rgba(255,255,255,.05);
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
   border-radius:18px;
-  padding:14px;
+  padding:18px 16px;
   text-align:center;
 }
 
 .wallet-box .label{
-  font-size:12px;
+  font-size:14px;
   color:var(--muted);
-  margin-bottom:6px;
+  margin-bottom:10px;
 }
 
 .wallet-box .value{
-  font-size:22px;
-  font-weight:800;
-  color:#FFD700;
+  font-size:26px;
+  font-weight:900;
+  color:var(--gold);
 }
 
 @media (max-width:520px){
