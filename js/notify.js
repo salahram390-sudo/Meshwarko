@@ -32,7 +32,13 @@ export function playSound(type = "notify") {
   let file = "./assets/sounds/notify.mp3";
 
   if (type === "request") file = "./assets/sounds/request.mp3";
-  if (type === "success") file = "./assets/sounds/success.mp3";
+  else if (type === "success") file = "./assets/sounds/success.mp3";
+  else if (type === "offer") file = "./assets/sounds/offer.mp3";
+  else if (type === "accepted") file = "./assets/sounds/accepted.mp3";
+  else if (type === "arrived") file = "./assets/sounds/arrived.mp3";
+  else if (type === "started") file = "./assets/sounds/started.mp3";
+  else if (type === "cancel") file = "./assets/sounds/cancel.mp3";
+  else if (type === "message") file = "./assets/sounds/message.mp3";
 
   const audio = new Audio(file);
   audio.volume = 1.0;
