@@ -655,6 +655,20 @@ select {
   background-size: auto;
 }
 
+select::-ms-expand {
+  display: none;
+}
+
+.form-row select {
+  width: 100%;
+  margin: 0;
+}
+
+.auth-shell .form-row select,
+.card-lite .form-row select {
+  width: 100%;
+}
+
 input::placeholder,
 textarea::placeholder {
   color: rgba(255, 255, 255, 0.65);
