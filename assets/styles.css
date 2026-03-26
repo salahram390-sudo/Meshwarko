@@ -521,7 +521,7 @@ body::before {
 }
 
 .card-lite {
-  padding: 14px 8px;
+  padding: 14px 12px;
 }
 
 .card::after,
