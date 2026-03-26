@@ -483,6 +483,10 @@ onAuthStateChanged(auth, async (user) => {
   await ensureNotificationPermission(true);
 
   const me = await getDoc(doc(db, "users", user.uid));
+
+console.log("ME EXISTS:", me.exists());
+console.log("ME DATA:", me.exists() ? me.data() : null);
+  
   if (!me.exists() || me.data().role !== "admin" || me.data().status === "blocked") {
     location.href = "./index.html";
     return;
