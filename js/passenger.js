@@ -767,6 +767,12 @@ async function handleRideSnapshot(rideSnap) {
   const soundKey = `${rideSnap.id}:${ride.status}:${ride.offerPrice || ride.price || 0}:${ride.driverId || ""}`;
 
 if (lastRideSoundKey !== soundKey) {
+  if (ride.status === "requested") {
+    startRequestSound();
+  } else {
+    stopRequestSound();
+  }
+
   if (ride.status === "offered") {
     playSound("offer");
   } else if (ride.status === "accepted") {
