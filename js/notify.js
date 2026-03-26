@@ -28,6 +28,22 @@ function beep() {
   } catch {}
 }
 
+function playSound(type = "notify") {
+  let soundFile = "assets/sounds/notify.mp3";
+
+  if (type === "request") {
+    soundFile = "assets/sounds/request.mp3";
+  }
+
+  if (type === "success") {
+    soundFile = "assets/sounds/success.mp3";
+  }
+
+  const audio = new Audio(soundFile);
+  audio.volume = 1.0;
+  audio.play().catch(() => {});
+}
+
 export function toast(title, message, ms = 3500) {
   const root = document.getElementById("toastRoot");
   if (!root) return;
