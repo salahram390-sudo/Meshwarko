@@ -292,7 +292,10 @@ function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   if (btnChatDriver) btnChatDriver.disabled = true;
   if (chatUnsubDriver) { chatUnsubDriver(); chatUnsubDriver = null; }
   closeDriverChatModal(); if (chatMessagesDriver) chatMessagesDriver.innerHTML = ""; if (chatInputDriver) chatInputDriver.value = "";
-  offerInput.value = ""; stopLiveTracking();
+  offerInput.value = "";
+stopRequestSound();
+requestSoundActive = false;
+stopLiveTracking();
 }
 
 function updateOwnDriverMarker(lat, lon, pan = false) {
