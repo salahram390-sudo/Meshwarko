@@ -869,7 +869,11 @@ vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dro
       distanceMeters: lastDistanceMeters, durationSec: lastDurationSec, pricing: buildPricingSummary(lastDistanceMeters, lastDurationSec, price), price, archived: false, passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
       nearestDriverId: nearestMeta.nearestDriverId || null, nearestDriverIds: nearestMeta.nearestDriverIds || [], nearestDrivers: nearestMeta.nearestDrivers || []
     });
-    currentRideId = rideRef.id; setText(routeMeta, "تم إرسال الطلب. جاري البحث عن سائق..."); setStatus("جاري البحث"); notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
+     currentRideId = rideRef.id;
+startRequestSound();
+setText(routeMeta, "تم إرسال الطلب. جاري البحث عن سائق...");
+setStatus("جاري البحث");
+notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
   } catch (e) {
     console.error("ADD DOC ERROR:", e); const msg = String(e?.message || e || "");
     if (msg.includes("Missing or insufficient permissions") || msg.includes("permission-denied")) alert("Firestore Rules تمنع إنشاء الطلب. فعّل القراءة والكتابة للمستخدم المسجل دخول مؤقتاً ثم أعد المحاولة.");
