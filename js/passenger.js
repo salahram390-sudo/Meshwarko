@@ -785,22 +785,26 @@ async function handleRideSnapshot(rideSnap) {
   if (!rideSnap.exists()) return hardResetPassengerUI();
   if (!currentRideId || rideSnap.id !== currentRideId) return;
   const ride = rideSnap.data(); const authUid = auth.currentUser?.uid || null;
-  const soundKey = `${rideSnap.id}:${ride.status}`;
+  const soundKey = `${rideSnap.id}:${ride.status}:${ride.offerPrice || ride.price || 0}:${ride.driverId || ""}`;
 
 if (lastRideSoundKey !== soundKey) {
   if (ride.status === "offered") {
-    playSound("message");
-  } else if (
-    ride.status === "accepted" ||
-    ride.status === "arrived" ||
-    ride.status === "started" ||
-    ride.status === "completed"
-  ) {
+    playSound("offer");
+  } else if (ride.status === "accepted") {
+    playSound("accepted");
+  } else if (ride.status === "arrived") {
+    playSound("arrived");
+  } else if (ride.status === "started") {
+    playSound("started");
+  } else if (ride.status === "completed") {
     playSound("success");
+  } else if (ride.status === "canceled") {
+    playSound("cancel");
   }
 
   lastRideSoundKey = soundKey;
 }
+  
   if (!authUid || ride.passengerId !== authUid) { if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; } return hardResetPassengerUI(); }
   if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
     if (ride.status === "completed") {
