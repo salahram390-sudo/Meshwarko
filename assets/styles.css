@@ -2226,7 +2226,16 @@ body.splash-active {
 .auth-shell #passengerExtrasLogin,
 .auth-shell #driverExtras,
 .auth-shell #driverExtrasLogin {
-  padding-inline: 10px;
+  padding: 14px 10px;
+}
+
+.auth-shell #passengerExtras .grid2,
+.auth-shell #passengerExtrasLogin .grid2,
+.auth-shell #driverExtras .grid2,
+.auth-shell #driverExtrasLogin .grid2 {
+  width: 100%;
+  margin: 0;
+  gap: 10px;
 }
 
 .auth-shell #passengerExtras .form-row,
@@ -2238,10 +2247,19 @@ body.splash-active {
   padding: 0;
 }
 
-.auth-shell #passengerExtras .grid2,
-.auth-shell #passengerExtrasLogin .grid2,
-.auth-shell #driverExtras .grid2,
-.auth-shell #driverExtrasLogin .grid2 {
+.auth-shell #passengerExtras .select-wrap,
+.auth-shell #passengerExtrasLogin .select-wrap,
+.auth-shell #driverExtras .select-wrap,
+.auth-shell #driverExtrasLogin .select-wrap {
   width: 100%;
-  margin: 0;
 }
+
+@media (max-width: 520px) {
+  .auth-shell #passengerExtras,
+  .auth-shell #passengerExtrasLogin,
+  .auth-shell #driverExtras,
+  .auth-shell #driverExtrasLogin {
+    padding: 12px 10px;
+  }
+}
+
