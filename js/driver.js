@@ -416,6 +416,7 @@ function watchRidesForDriver() {
       if (Number.isFinite(da) || Number.isFinite(db)) return da - db;
       return (b.createdAt?.toMillis?.() || b.createdAtMs || 0) - (a.createdAt?.toMillis?.() || a.createdAtMs || 0);
     });
+    syncIncomingRequestSound(rides);
     ridesList.innerHTML = "";
     renderDriverHistory(mineRows.filter((r) => r.status === "completed"));
     if (!rides.length) return void (ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`);
