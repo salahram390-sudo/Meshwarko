@@ -223,12 +223,13 @@ loginForm?.addEventListener("submit", async (e) => {
     }
 
     await ensureNotificationPermission(true);
+await initFirebaseMessaging(u.uid);
 
-    location.href = r === "admin"
-      ? "./admin.html"
-      : r === "driver"
-        ? "./driver.html"
-        : "./passenger.html";
+location.href = r === "admin"
+  ? "./admin.html"
+  : r === "driver"
+    ? "./driver.html"
+    : "./passenger.html";
 
   } catch (err) {
     console.log("LOGIN ERROR:", err.code, err.message, err);
