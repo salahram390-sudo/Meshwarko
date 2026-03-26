@@ -502,7 +502,11 @@ btnAccept?.addEventListener("click", async () => {
     selectedRideData = { ...liveRide, id: selectedRideId, status: "accepted", driverId: myUser.uid, driverName: myUser.name || "", driverPhone: myUser.phone || "", driverVehicleType: myUser.vehicleType || "", driverVehicleCode: myUser.vehicleCode || "", price: liveRide.offerPrice || liveRide.price || 0, expiresAt: null, expiresAtMs: null };
     refreshSelectedRideButtons(selectedRideData); await showAcceptedDetails(selectedRideId);
     if (selectedRideId) { startLiveTracking(selectedRideId); watchPassengerEndRequest(selectedRideId); }
-    notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" }); setDriverStatus("على الطريق");
+    stopRequestSound();
+requestSoundActive = false;
+playSound("success");
+notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });
+setDriverStatus("على الطريق");
   } catch (e) { console.error("DRIVER ACCEPT ERROR:", e); alert("ACCEPT ERROR: " + (e?.message || e)); setDriverStatus("خطأ"); }
 });
 
