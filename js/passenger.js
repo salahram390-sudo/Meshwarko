@@ -480,6 +480,8 @@ function cleanupRideState() {
 
 function hardResetPassengerUI() {
   clearRideSearchTimer();
+  lastRideSoundKey = "";
+  lastMsgCount = 0;
   if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
   currentRideId = null; currentPickup = null; arrivedToastShownFor = null; completedToastShownFor = null;
   stopDriverTracking();
