@@ -28,33 +28,33 @@ function beep() {
   } catch {}
 }
 
-// 🔊 تشغيل صوت حسب النوع
-function playSound(type = "notify") {
-  let soundFile = "assets/sounds/notify.mp3";
+export function playSound(type = "notify") {
+  let file = "./assets/sounds/notify.mp3";
 
-  if (type === "request") soundFile = "assets/sounds/request.mp3";
-  if (type === "success") soundFile = "assets/sounds/success.mp3";
+  if (type === "request") file = "./assets/sounds/request.mp3";
+  if (type === "success") file = "./assets/sounds/success.mp3";
 
-  const audio = new Audio(soundFile);
+  const audio = new Audio(file);
   audio.volume = 1.0;
   audio.play().catch(() => {});
 }
 
-// 🔁 صوت متكرر لطلب الرحلة
-let loopSound;
+let requestLoopAudio = null;
 
-function startRequestSound() {
-  loopSound = new Audio("assets/sounds/request.mp3");
-  loopSound.loop = true;
-  loopSound.play();
+export function startRequestSound() {
+  if (requestLoopAudio) return;
+  requestLoopAudio = new Audio("./assets/sounds/request.mp3");
+  requestLoopAudio.loop = true;
+  requestLoopAudio.volume = 1.0;
+  requestLoopAudio.play().catch(() => {});
 }
 
-function stopRequestSound() {
-  if (loopSound) {
-    loopSound.pause();
-    loopSound.currentTime = 0;
-  }
-}
+export function stopRequestSound() {
+  if (!requestLoopAudio) return;
+  requestLoopAudio.pause();
+  requestLoopAudio.currentTime = 0;
+  requestLoopAudio = null;
+} //اخر تشغيل الصوت
 
 export function toast(title, message, ms = 3500) {
   const root = document.getElementById("toastRoot");
