@@ -499,8 +499,11 @@ function hardResetPassengerUI() {
   btnRequest.disabled = false; btnCancel.disabled = true; btnAcceptOffer.disabled = true; btnRejectOffer.disabled = true; btnTrack.disabled = true; btnComplete.disabled = true;
   hideEl(btnAcceptOffer); hideEl(btnRejectOffer); hideEl(btnCancel); hideEl(btnComplete); hideEl(btnTrack); hideEl(btnCall); hideEl(btnWhats); hideEl(btnChatPassenger);
 }
+
 function rideUiNone() {
   clearRideSearchTimer();
+  lastRideSoundKey = "";
+  lastMsgCount = 0;
   clearAll();
 
   currentRideId = null;
