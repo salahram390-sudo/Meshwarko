@@ -274,8 +274,11 @@ async function completeRideCore({ auto = false } = {}) {
         }
       }
     }
-    finalizeDriverRideCleanup(auto ? "تم الوصول وإنهاء الرحلة تلقائيًا." : "تمت الرحلة بنجاح ✅");
-    notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الوصول لمكان الوصول وإنهاء الرحلة تلقائيًا." : "تم إنهاء الرحلة بنجاح.", tag: auto ? "ride-auto-complete" : "ride-complete" });
+    stopRequestSound();
+requestSoundActive = false;
+playSound("success");
+finalizeDriverRideCleanup(auto ? "تم الوصول وإنهاء الرحلة تلقائيًا." : "تمت الرحلة بنجاح ✅");
+notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الوصول لمكان الوصول وإنهاء الرحلة تلقائيًا." : "تم إنهاء الرحلة بنجاح.", tag: auto ? "ride-auto-complete" : "ride-complete" });
   } catch (e) { console.error(e); setDriverStatus("خطأ"); }
   finally { if (auto) autoCompletingRide = false; }
 }
