@@ -19,7 +19,10 @@ messaging.onBackgroundMessage((payload) => {
     body: payload?.notification?.body || "لديك إشعار جديد",
     icon: "./assets/logo.png",
     badge: "./assets/logo.png",
-    data: payload?.data || {}
+    data: {
+      url: payload?.data?.url || "./index.html",
+      ...payload?.data
+    }
   };
 
   self.registration.showNotification(title, options);
@@ -27,7 +30,20 @@ messaging.onBackgroundMessage((payload) => {
 
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
+
+  const targetUrl = event.notification?.data?.url || "./index.html";
+
   event.waitUntil(
-    clients.openWindow("./index.html")
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if ("focus" in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
   );
 });
