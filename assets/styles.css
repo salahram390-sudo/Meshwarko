@@ -1488,11 +1488,11 @@ input[type="range"] {
   width: 100%;
 }
 
-.card-lite,
 .card,
+.card-lite,
 .modal-card,
 .profile-card {
-  overflow: hidden;
+  overflow: visible;
 }
 
 #driverWalletStatsModal.wallet-cards {
