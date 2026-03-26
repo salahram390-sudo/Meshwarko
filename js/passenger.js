@@ -755,6 +755,22 @@ async function handleRideSnapshot(rideSnap) {
   if (!rideSnap.exists()) return hardResetPassengerUI();
   if (!currentRideId || rideSnap.id !== currentRideId) return;
   const ride = rideSnap.data(); const authUid = auth.currentUser?.uid || null;
+  const soundKey = `${rideSnap.id}:${ride.status}`;
+
+if (lastRideSoundKey !== soundKey) {
+  if (ride.status === "offered") {
+    playSound("message");
+  } else if (
+    ride.status === "accepted" ||
+    ride.status === "arrived" ||
+    ride.status === "started" ||
+    ride.status === "completed"
+  ) {
+    playSound("success");
+  }
+
+  lastRideSoundKey = soundKey;
+}
   if (!authUid || ride.passengerId !== authUid) { if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; } return hardResetPassengerUI(); }
   if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
     if (ride.status === "completed") {
