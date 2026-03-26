@@ -28,20 +28,32 @@ function beep() {
   } catch {}
 }
 
+// 🔊 تشغيل صوت حسب النوع
 function playSound(type = "notify") {
   let soundFile = "assets/sounds/notify.mp3";
 
-  if (type === "request") {
-    soundFile = "assets/sounds/request.mp3";
-  }
-
-  if (type === "success") {
-    soundFile = "assets/sounds/success.mp3";
-  }
+  if (type === "request") soundFile = "assets/sounds/request.mp3";
+  if (type === "success") soundFile = "assets/sounds/success.mp3";
 
   const audio = new Audio(soundFile);
   audio.volume = 1.0;
   audio.play().catch(() => {});
+}
+
+// 🔁 صوت متكرر لطلب الرحلة
+let loopSound;
+
+function startRequestSound() {
+  loopSound = new Audio("assets/sounds/request.mp3");
+  loopSound.loop = true;
+  loopSound.play();
+}
+
+function stopRequestSound() {
+  if (loopSound) {
+    loopSound.pause();
+    loopSound.currentTime = 0;
+  }
 }
 
 export function toast(title, message, ms = 3500) {
