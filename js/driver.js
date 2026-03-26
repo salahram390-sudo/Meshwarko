@@ -482,7 +482,11 @@ btnSendOffer?.addEventListener("click", async () => {
     const rideRef = doc(db, "rides", selectedRideId); const rideSnap = await getDoc(rideRef); if (!rideSnap.exists()) throw new Error("الطلب غير موجود");
     const liveRide = rideSnap.data(); if (!isRideVisibleForDriver(liveRide) || liveRide.status !== "requested") throw new Error("الطلب لم يعد متاحاً");
     await updateDoc(rideRef, { status: "offered", driverId: myUser.uid, offerPrice: offer, driverName: myUser.name || "", driverPhone: myUser.phone || "", driverVehicleType: myUser.vehicleType || "", driverVehicleCode: myUser.vehicleCode || "", offeredAt: serverTimestamp() });
-    btnSendOffer.disabled = true; setTimeout(syncOfferBtn, 800); notify({ title: "تم إرسال العرض", body: `عرض سعر: ${offer} ج`, tag: "offer-sent" }); setDriverStatus("بانتظار رد الراكب");
+    btnSendOffer.disabled = true;
+setTimeout(syncOfferBtn, 800);
+playSound("success");
+notify({ title: "تم إرسال العرض", body: `عرض سعر: ${offer} ج`, tag: "offer-sent" });
+setDriverStatus("بانتظار رد الراكب");
   } catch (e) { console.error(e); setDriverStatus("خطأ"); }
 });
 
