@@ -15,7 +15,7 @@ import {
   createPickupIcon, createDropoffIcon,
 } from "./map.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
-import { notify, ensureNotificationPermission } from "./notify.js";
+import { notify, ensureNotificationPermission, playSound } from "./notify.js";
 console.log("passenger.js loaded ✅");
 
 let myData = {};
