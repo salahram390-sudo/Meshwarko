@@ -449,7 +449,11 @@ function watchRidesForDriver() {
 logoutBtn?.addEventListener("click", async () => {
   closeDriverDrawer(); stopLiveTracking(); stopDriverHeartbeat(); await cleanupDriverOnline();
   if (chatUnsubDriver) { chatUnsubDriver(); chatUnsubDriver = null; }
-  closeDriverChatModal(); await signOut(auth); location.href = "./index.html";
+  closeDriverChatModal();
+stopRequestSound();
+requestSoundActive = false;
+await signOut(auth);
+location.href = "./index.html";
 });
 switchRoleBtn?.addEventListener("click", async () => {
   closeDriverDrawer();
