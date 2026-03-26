@@ -2047,7 +2047,8 @@ body.splash-active {
 ========================= */
 
 .auth-shell .topbar {
-  min-height: 64px;
+  min-height: 56px;
+  height: 56px;
   padding: 8px 10px;
 }
 
