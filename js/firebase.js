@@ -53,9 +53,9 @@ export async function initFirebaseMessaging() {
     }
 
     const token = await getToken(messaging, {
-      vapidKey: "PUT_YOUR_FIREBASE_WEB_PUSH_CERTIFICATE_KEY_HERE",
-      serviceWorkerRegistration: registration
-    });
+  vapidKey: "BMmr4DfucDSm0JzDoBhUTp7v5xagCgBFpSmqgmNmAPJUSUJ8S9ga49SlJQRvxillsIeE4_isvJkPAsNxg4Y0uws",
+  serviceWorkerRegistration: registration
+});
 
     console.log("FCM TOKEN:", token);
     return token;
