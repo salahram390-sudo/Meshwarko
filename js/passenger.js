@@ -783,10 +783,7 @@ if (lastRideSoundKey !== soundKey) {
   
   if (!authUid || ride.passengerId !== authUid) { if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; } return hardResetPassengerUI(); }
   if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
-    if (ride.status === "canceled" && lastRideSoundKey !== `${rideSnap.id}:canceled`) {
-  playSound("cancel");
-  lastRideSoundKey = `${rideSnap.id}:canceled`;
-}
+
     if (ride.status === "completed") {
       if (completedToastShownFor !== rideSnap.id) { completedToastShownFor = rideSnap.id; notify({ title: "تمت الرحلة بنجاح 🎉", body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅", tag: "ride-completed" }); }
       stopDriverTracking(); removeRouteLayer(routeLayerRef); removeRouteLayer(driverRouteLayerRef); setText(distanceValue, ""); setText(routeMeta, ""); setStatus("تم الوصول"); currentRideId = rideSnap.id;
