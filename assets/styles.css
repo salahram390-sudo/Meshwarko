@@ -624,49 +624,53 @@ textarea.input {
   min-height: 92px;
 }
 
-select {
-  width: 100%;
-  height: 48px;
-  line-height: 48px;
-  display: block;
+select,
+select.input {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  display: block !important;
 
-  direction: rtl;
-  text-align: right;
-  text-align-last: right;
+  margin: 0 !important;
+  padding: 0 14px !important;
 
-  padding-right: 14px;
-  padding-left: 40px;
+  direction: rtl !important;
+  text-align: right !important;
+  text-align-last: right !important;
 
-  font-size: 16px;
-  color: #fff;
+  font-size: 15px !important;
+  color: #fff !important;
+  border-radius: 16px !important;
+  box-sizing: border-box !important;
+
+  border: 1px solid rgba(255, 215, 0, 0.18) !important;
+  background: linear-gradient(145deg, rgba(14, 22, 34, 0.95), rgba(8, 14, 22, 0.95)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 8px 18px rgba(0, 0, 0, 0.35) !important;
 
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
 
-  -webkit-appearance: none;
-  appearance: none;
-  -moz-appearance: none;
-
-  background:
-    linear-gradient(145deg, rgba(14, 22, 34, 0.95), rgba(8, 14, 22, 0.95));
-  background-repeat: no-repeat;
-  background-position: left 14px center;
-  background-size: auto;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
 }
 
 select::-ms-expand {
   display: none;
 }
 
-.form-row select {
-  width: 100%;
-  margin: 0;
-}
-
-.auth-shell .form-row select,
-.card-lite .form-row select {
-  width: 100%;
+.form-row > select,
+.form-row > select.input,
+.auth-shell .form-row > select,
+.card-lite .form-row > select {
+  width: 100% !important;
+  margin: 0 !important;
+  transform: none !important;
 }
 
 input::placeholder,
