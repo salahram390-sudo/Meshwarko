@@ -222,9 +222,6 @@ loginForm?.addEventListener("submit", async (e) => {
       return;
     }
 
-    await ensureNotificationPermission(true);
-await initFirebaseMessaging(u.uid);
-
 location.href = r === "admin"
   ? "./admin.html"
   : r === "driver"
