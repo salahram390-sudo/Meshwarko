@@ -1970,26 +1970,6 @@ body.splash-active {
   grid-template-columns: 1fr;
 }
 
-.auth-shell .auth-container {
-  padding: 10px 8px 16px;
-}
-
-.auth-shell .card,
-.auth-shell .card-lite {
-  width: calc(100vw - 12px);
-  max-width: calc(100vw - 12px);
-}
-
-.auth-shell .card {
-  padding: 12px 10px;
-}
-
-.auth-shell .seg-btn,
-.auth-shell #resetPasswordBtn {
-  min-height: 38px;
-  font-size: 13px;
-}
-
   .wallet-box .value {
     font-size: 24px;
   }
