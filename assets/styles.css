@@ -2070,7 +2070,7 @@ body.splash-active {
 }
 
 .auth-shell .card {
-  margin-top: 6px;
+  margin-top: 10px;
 }
 
 .auth-shell .segmented {
@@ -2175,5 +2175,46 @@ body.splash-active {
 
   .auth-shell .grid2 {
     grid-template-columns: 1fr;
+  }
+}
+
+/* =========================
+   FINAL AUTH CLEANUP
+========================= */
+
+.auth-shell .card-lite {
+  padding: 12px 10px;
+}
+
+.auth-shell #passengerExtras,
+.auth-shell #passengerExtrasLogin,
+.auth-shell #driverExtras,
+.auth-shell #driverExtrasLogin {
+  margin-top: 4px;
+}
+
+.auth-shell .label {
+  margin-bottom: 2px;
+}
+
+.auth-shell .hint {
+  margin-top: 6px;
+}
+
+.auth-shell form .btn.primary,
+.auth-shell form button[type="submit"] {
+  margin-top: 4px;
+}
+
+@media (max-width: 520px) {
+  .auth-shell .card-lite {
+    padding: 10px 8px;
+  }
+
+  .auth-shell #passengerExtras,
+  .auth-shell #passengerExtrasLogin,
+  .auth-shell #driverExtras,
+  .auth-shell #driverExtrasLogin {
+    margin-top: 2px;
   }
 }
