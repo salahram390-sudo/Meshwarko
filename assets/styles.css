@@ -2219,43 +2219,26 @@ body.splash-active {
   }
 }
 
-/* =========================
-   FINAL AUTH CLEANUP
-========================= */
-
-.auth-shell .card-lite {
-  padding: 12px 10px;
-}
-
 .auth-shell #passengerExtras,
 .auth-shell #passengerExtrasLogin,
 .auth-shell #driverExtras,
 .auth-shell #driverExtrasLogin {
-  margin-top: 4px;
+  padding-inline: 10px;
 }
 
-.auth-shell .label {
-  margin-bottom: 2px;
+.auth-shell #passengerExtras .form-row,
+.auth-shell #passengerExtrasLogin .form-row,
+.auth-shell #driverExtras .form-row,
+.auth-shell #driverExtrasLogin .form-row {
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-.auth-shell .hint {
-  margin-top: 6px;
-}
-
-.auth-shell form .btn.primary,
-.auth-shell form button[type="submit"] {
-  margin-top: 4px;
-}
-
-@media (max-width: 520px) {
-  .auth-shell .card-lite {
-    padding: 10px 8px;
-  }
-
-  .auth-shell #passengerExtras,
-  .auth-shell #passengerExtrasLogin,
-  .auth-shell #driverExtras,
-  .auth-shell #driverExtrasLogin {
-    margin-top: 2px;
-  }
+.auth-shell #passengerExtras .grid2,
+.auth-shell #passengerExtrasLogin .grid2,
+.auth-shell #driverExtras .grid2,
+.auth-shell #driverExtrasLogin .grid2 {
+  width: 100%;
+  margin: 0;
 }
