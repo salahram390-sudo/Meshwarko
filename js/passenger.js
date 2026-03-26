@@ -617,6 +617,30 @@ function getRideStatusLabel(status) {
   }
 }
 
+function handleRideSound(ride) {
+  if (!ride || !ride.status) return;
+
+  const key = `${ride.id || currentRideId || ""}:${ride.status}:${ride.offerPrice || ""}:${ride.driverId || ""}`;
+
+  if (key === lastRideSoundKey) return;
+
+  if (ride.status === "offered") {
+    playSound("offer");
+  } else if (ride.status === "accepted") {
+    playSound("accepted");
+  } else if (ride.status === "arrived") {
+    playSound("arrived");
+  } else if (ride.status === "started") {
+    playSound("started");
+  } else if (ride.status === "completed") {
+    playSound("success");
+  } else if (ride.status === "canceled") {
+    playSound("cancel");
+  }
+
+  lastRideSoundKey = key;
+}
+
 function renderRideCard(ride, driverProfile) {
   clearRideSearchTimer();
   if (!ride) { rideCard.innerHTML = `<div class="muted">لا يوجد طلب نشط.</div>`; return; }
