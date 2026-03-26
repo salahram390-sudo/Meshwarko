@@ -283,10 +283,7 @@ registerForm?.addEventListener("submit", async (e) => {
     }
 
     await setDoc(doc(db, "users", cred.user.uid), { ...common, ...profile });
-
-await ensureNotificationPermission(true);
-await initFirebaseMessaging(cred.user.uid);
-
+    
 location.href = role === "driver" ? "./driver.html" : "./passenger.html";
   } catch (err) {
     setText(regHint, friendlyAuthError(err));
