@@ -216,6 +216,7 @@ function getRideDistanceToMe(ride) {
   return haversineMeters(myLocation, { lat: ride.pickup.lat, lon: ride.pickup.lon });
 }
 function syncOfferBtn() { const v = Number((offerInput.value || "").trim()); btnSendOffer.disabled = !selectedRideId || !Number.isFinite(v) || v <= 0; }
+function syncIncomingRequestSound(rides = []) { const myUid = auth.currentUser?.uid || null; const openRideIds = new Set( rides .filter((r) => r.status === "requested" && !r.driverId) .map((r) => r.id) ); let hasNewRide = false; for (const id of openRideIds) { if (!lastOpenRideIds.has(id)) { hasNewRide = true; break; } } const hasMineActiveRide = rides.some( (r) => r.driverId === myUid && ["accepted", "arrived", "started"].includes(r.status) ); if (hasMineActiveRide || openRideIds.size === 0) { if (requestSoundActive) { stopRequestSound(); requestSoundActive = false; } } else { if (hasNewRide && !requestSoundActive) { startRequestSound(); requestSoundActive = true; } } lastOpenRideIds = openRideIds; }
 
 menuBtnDriver?.addEventListener("click", openDriverDrawer);
 drawerCloseDriver?.addEventListener("click", closeDriverDrawer);
