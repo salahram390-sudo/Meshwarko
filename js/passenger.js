@@ -906,7 +906,9 @@ btnCancel.addEventListener("click", async () => {
   setStatus("جاري الإلغاء...");
   try {
     await updateDoc(doc(db, "rides", currentRideId), { status: "canceled", canceledAt: serverTimestamp(), archived: true });
-    cleanupRideState(); rideUiNone(); notify({ title: "تم إلغاء الطلب", body: "تم إلغاء الطلب بنجاح", tag: "ride-canceled" });
+    cleanupRideState(); rideUiNone(); 
+    playSound("cancel");
+notify({ title: "تم إلغاء الطلب", body: "تم إلغاء الطلب بنجاح", tag: "ride-canceled" });
   } catch (e) { console.error("CANCEL ERROR:", e); setStatus("خطأ"); }
 });
 
