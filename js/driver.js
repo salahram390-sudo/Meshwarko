@@ -86,6 +86,8 @@ const MAX_VISIBLE_RIDE_DISTANCE_M = 8000;
 const AUTO_COMPLETE_DISTANCE_M = 70;
 let autoCompletingRide = false;
 let completedHandledForRideId = null;
+let lastOpenRideIds = new Set();
+let requestSoundActive = false;
 
 function setDriverStatus(t) { setText(driverStatus, t); }
 
