@@ -1,7 +1,4 @@
-import { auth, db } from "./firebase.js";
-
-import { initFirebaseMessaging } from "./firebase.js";
-
+import { auth, db, initFirebaseMessaging } from "./firebase.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
