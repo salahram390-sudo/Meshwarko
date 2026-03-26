@@ -625,11 +625,34 @@ textarea.input {
 }
 
 select {
-  padding: 0 40px 0 14px;
+  width: 100%;
+  height: 48px;
+  line-height: 48px;
+  display: block;
+
+  direction: rtl;
+  text-align: right;
+  text-align-last: right;
+
+  padding-right: 14px;
+  padding-left: 40px;
+
   font-size: 16px;
+  color: #fff;
+
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+
+  -webkit-appearance: none;
+  appearance: none;
+  -moz-appearance: none;
+
+  background:
+    linear-gradient(145deg, rgba(14, 22, 34, 0.95), rgba(8, 14, 22, 0.95));
+  background-repeat: no-repeat;
+  background-position: left 14px center;
+  background-size: auto;
 }
 
 input::placeholder,
