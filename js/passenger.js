@@ -884,7 +884,8 @@ setText(routeMeta, "تم إرسال الطلب. جاري البحث عن سائ�
 setStatus("جاري البحث");
 notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
   } catch (e) {
-    console.error("ADD DOC ERROR:", e); const msg = String(e?.message || e || "");
+  stopRequestSound();
+  console.error("ADD DOC ERROR:", e); const msg = String(e?.message || e || "");
     if (msg.includes("Missing or insufficient permissions") || msg.includes("permission-denied")) alert("Firestore Rules تمنع إنشاء الطلب. فعّل القراءة والكتابة للمستخدم المسجل دخول مؤقتاً ثم أعد المحاولة.");
     else alert("FIRESTORE ERROR: " + msg);
     setStatus("خطأ"); setText(routeMeta, "تعذر إرسال الطلب. جرّب مرة أخرى.");
