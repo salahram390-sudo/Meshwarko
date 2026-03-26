@@ -2255,3 +2255,65 @@ body.splash-active {
   width: 100%;
   margin: 0;
 }
+/* FIX AUTH INNER CARDS */
+.auth-shell .card {
+  overflow: visible !important;
+}
+
+.auth-shell #passengerExtras,
+.auth-shell #passengerExtrasLogin,
+.auth-shell #driverExtras,
+.auth-shell #driverExtrasLogin {
+  width: calc(100% - 6px) !important;
+  margin: 8px auto 0 !important;
+  padding: 14px 12px !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-shell #passengerExtras::after,
+.auth-shell #passengerExtrasLogin::after,
+.auth-shell #driverExtras::after,
+.auth-shell #driverExtrasLogin::after {
+  inset: 0 !important;
+  border-radius: 20px !important;
+}
+
+.auth-shell #passengerExtras .grid2,
+.auth-shell #passengerExtrasLogin .grid2,
+.auth-shell #driverExtras .grid2,
+.auth-shell #driverExtrasLogin .grid2 {
+  width: 100% !important;
+  margin: 10px 0 0 0 !important;
+  gap: 10px !important;
+}
+
+.auth-shell #passengerExtras .form-row,
+.auth-shell #passengerExtrasLogin .form-row,
+.auth-shell #driverExtras .form-row,
+.auth-shell #driverExtrasLogin .form-row {
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.auth-shell #passengerExtras .select-wrap,
+.auth-shell #passengerExtrasLogin .select-wrap,
+.auth-shell #driverExtras .select-wrap,
+.auth-shell #driverExtrasLogin .select-wrap {
+  width: 100% !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 520px) {
+  .auth-shell #passengerExtras,
+  .auth-shell #passengerExtrasLogin,
+  .auth-shell #driverExtras,
+  .auth-shell #driverExtrasLogin {
+    width: calc(100% - 4px) !important;
+    padding: 12px 10px !important;
+  }
+}
+
