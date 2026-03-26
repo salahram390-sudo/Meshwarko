@@ -345,11 +345,11 @@ function watchPassengerChat(rideId) {
     const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
     if (rows.length > lastMsgCount) {
-      const lastMsg = rows[rows.length - 1];
-      if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) {
-        new Audio("./assets/msg.mp3").play().catch(() => {});
-      }
-    }
+  const lastMsg = rows[rows.length - 1];
+  if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) {
+    playSound("message");
+  }
+}
 
     lastMsgCount = rows.length;
 
