@@ -307,6 +307,12 @@ onAuthStateChanged(auth, async (user) => {
     try {
       const snap = await getDoc(doc(db, "users", user.uid));
       const profile = snap.exists() ? snap.data() : null;
+      try {
+        await ensureNotificationPermission(true);
+        await initFirebaseMessaging(user.uid);
+      } catch (err) {
+        console.warn("FCM init warning:", err?.message || err);
+      }
       const isAdmin = !!profile && profile.role === "admin" && profile.status !== "blocked";
       adminEntryBtn?.classList.toggle("hidden", !isAdmin);
     } catch (err) {
