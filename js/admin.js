@@ -472,6 +472,9 @@ function rerenderAll() {
 }
 
 onAuthStateChanged(auth, async (user) => {
+
+  console.log("ADMIN CHECK UID:", user?.uid);
+
   if (!user) {
     location.href = "./index.html";
     return;
