@@ -579,6 +579,12 @@ onAuthStateChanged(auth, async (user) => {
   watchRidesForDriver();
 });
 
-window.addEventListener("beforeunload", () => { stopLiveTracking(); stopDriverHeartbeat(); cleanupDriverOnline(); });
+window.addEventListener("beforeunload", () => {
+  stopRequestSound();
+  requestSoundActive = false;
+  stopLiveTracking();
+  stopDriverHeartbeat();
+  cleanupDriverOnline();
+});
 window.addEventListener("error", (e) => { alert(`JS ERROR: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`); });
 window.addEventListener("unhandledrejection", (e) => { alert(`PROMISE ERROR: ${e.reason?.message || e.reason}`); });
