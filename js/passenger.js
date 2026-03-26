@@ -471,6 +471,7 @@ function cleanupRideState() {
   clearRideSearchTimer(); currentRideId = null; currentPickup = null; arrivedToastShownFor = null; completedToastShownFor = null;
   lastRideSoundKey = "";
   lastMsgCount = 0;
+  stopRequestSound();
   stopDriverTracking(); setDriverContactButtons(null); resetActionVisibility();
   if (btnChatPassenger) btnChatPassenger.disabled = true;
   if (chatUnsubPassenger) { chatUnsubPassenger(); chatUnsubPassenger = null; }
