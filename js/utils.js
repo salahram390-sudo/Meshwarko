@@ -71,7 +71,7 @@ export function isRideExpired(ride, maxAgeMs = null, now = Date.now()) {
 }
 
 export function isActiveRideStatus(status) {
-  return ["requested", "offered", "accepted", "arrived"].includes(status);
+  return ["requested", "offered", "accepted", "arrived", "started"].includes(status);
 }
 
 export function normalizeArabicDigits(value) {
