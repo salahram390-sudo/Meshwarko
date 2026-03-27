@@ -815,6 +815,7 @@ async function handleRideSnapshot(rideSnap) {
   if (!rideSnap.exists()) return hardResetPassengerUI();
   if (!currentRideId || rideSnap.id !== currentRideId) return;
   const ride = rideSnap.data(); const authUid = auth.currentUser?.uid || null;
+selectedRideData = { ...ride, id: rideSnap.id };
   const soundKey = `${rideSnap.id}:${ride.status}:${ride.offerPrice || ride.price || 0}:${ride.driverId || ""}`;
 
 if (lastRideSoundKey !== soundKey) {
