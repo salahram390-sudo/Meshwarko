@@ -848,7 +848,13 @@ if (lastRideSoundKey !== soundKey) {
 
     if (ride.status === "completed") {
       if (completedToastShownFor !== rideSnap.id) { completedToastShownFor = rideSnap.id; notify({ title: "تمت الرحلة بنجاح 🎉", body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅", tag: "ride-completed" }); }
-      stopDriverTracking(); removeRouteLayer(routeLayerRef); removeRouteLayer(driverRouteLayerRef); setText(distanceValue, ""); setText(routeMeta, ""); setStatus("تم الوصول"); currentRideId = rideSnap.id;
+      stopDriverTracking();
+removeRouteLayer(routeLayerRef);
+removeRouteLayer(driverRouteLayerRef);
+setText(distanceValue, "");
+setText(routeMeta, "تم الوصول إلى مكان الوصول وإنهاء الرحلة بنجاح.");
+setStatus("تمت الرحلة");
+currentRideId = rideSnap.id;
       if (!ride.passengerRating) { renderStars(0); setText(rateHint, ""); showRatingModal(); return; }
       finalizePassengerRideCleanup(); return;
     }
