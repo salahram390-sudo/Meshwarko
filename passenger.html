@@ -71,59 +71,59 @@
         </div>
 
         <div class="panel-body">
-          <div class="card-lite">
-  <div class="panel-title">نوع المركبة</div>
-
   <div class="form-row" style="margin-top:10px">
-    <label class="label">نوع المركبة</label>
-    <div id="pVehicles" class="vehicle-grid"></div>
+    <label class="label">مكان القيام</label>
+    <div class="input-group">
+      <input id="pickupText" class="input" placeholder="ابحث عن المكان..." />
+      <button id="pickupSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
+      <button id="pickupPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
+      <button id="pickupMyLoc" class="btn ghost small map-btn" type="button">📍 موقعي</button>
+    </div>
+    <div id="pickupResults" class="search-results hidden"></div>
   </div>
 
-  <p class="hint" id="passengerAreaHint">
-    يتم استخدام المحافظة والمركز المحفوظين في حسابك تلقائيًا.
-  </p>
-</div>
+  <div class="form-row">
+    <label class="label">مكان الوصول</label>
+    <div class="input-group">
+      <input id="dropText" class="input" placeholder="ابحث عن المكان..." />
+      <button id="dropSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
+      <button id="dropPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
+    </div>
+    <div id="dropResults" class="search-results hidden"></div>
+  </div>
 
-          <div class="form-row" style="margin-top:10px">
-            <label class="label">مكان القيام</label>
-            <div class="input-group">
-              <input id="pickupText" class="input" placeholder="ابحث عن المكان..." />
-              <button id="pickupSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
-              <button id="pickupPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
-              <button id="pickupMyLoc" class="btn ghost small map-btn" type="button">📍 موقعي</button>
-            </div>
-            <div id="pickupResults" class="search-results hidden"></div>
-          </div>
+  <div class="card-lite">
+    <div class="panel-title">نوع المركبة</div>
 
-          <div class="form-row">
-            <label class="label">مكان الوصول</label>
-            <div class="input-group">
-              <input id="dropText" class="input" placeholder="ابحث عن المكان..." />
-              <button id="dropSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
-              <button id="dropPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
-            </div>
-            <div id="dropResults" class="search-results hidden"></div>
-          </div>
+    <div class="form-row" style="margin-top:10px">
+      <label class="label">نوع المركبة</label>
+      <div id="pVehicles" class="vehicle-grid"></div>
+    </div>
 
-          <div class="card-lite">
-            <div class="row-between">
-              <div>
-                <div class="label-inline">السعر المقترح</div>
-                <div class="price" id="priceValue">—</div>
-              </div>
-              <div class="muted" id="distanceValue">—</div>
-            </div>
+    <p class="hint" id="passengerAreaHint">
+      يتم استخدام المحافظة والمركز المحفوظين في حسابك تلقائيًا.
+    </p>
+  </div>
 
-            <div class="form-row">
-              <label class="label">السعر (15 → 3000) خطوة 5 جنيه</label>
-              <input id="priceSlider" class="slider" type="range" min="15" max="3000" step="5" value="50" />
-              <div class="row-between muted small">
-                <span>15</span><span>1500</span><span>3000</span>
-              </div>
-            </div>
-            <p class="hint" id="surgeHint">يتم تحسين السعر حسب المسافة وزمن الذروة تلقائيًا.</p>
-          </div>
+  <div class="card-lite">
+    <div class="row-between">
+      <div>
+        <div class="label-inline">السعر المقترح</div>
+        <div class="price" id="priceValue">—</div>
+      </div>
+      <div class="muted" id="distanceValue">—</div>
+    </div>
 
+    <div class="form-row">
+      <label class="label">السعر (15 → 3000) خطوة 5 جنيه</label>
+      <input id="priceSlider" class="slider" type="range" min="15" max="3000" step="5" value="50" />
+      <div class="row-between muted small">
+        <span>15</span><span>1500</span><span>3000</span>
+      </div>
+    </div>
+    <p class="hint" id="surgeHint">يتم تحسين السعر حسب المسافة وزمن الذروة تلقائيًا.</p>
+  </div>
+          
           <div class="actions">
             <button id="btnRequest" class="btn request-btn" type="button">إرسال الطلب</button>
             <button id="btnCancel" class="btn danger" type="button" disabled>إلغاء</button>
