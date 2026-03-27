@@ -94,11 +94,16 @@ export async function startRequestSound() {
 }
 
 export function stopRequestSound() {
-  if (!requestLoopAudio) return;
-  requestLoopAudio.pause();
-  requestLoopAudio.currentTime = 0;
-  requestLoopAudio = null;
-} //اخر تشغيل الصوت
+  try {
+    if (requestLoopSource) {
+      requestLoopSource.stop(0);
+      requestLoopSource.disconnect();
+      requestLoopSource = null;
+    }
+  } catch (_) {
+    requestLoopSource = null;
+  }
+}
 
 export function toast(title, message, ms = 3500) {
   const root = document.getElementById("toastRoot");
