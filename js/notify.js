@@ -49,6 +49,18 @@ export function playSound(type = "notify") {
 
 let requestLoopAudio = null;
 
+async function getAudioBuffer(url) {
+  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+
+  if (audioCtx.state === "suspended") {
+    try { await audioCtx.resume(); } catch (_) {}
+  }
+
+  const res = await fetch(url);
+  const arr = await res.arrayBuffer();
+  return await audioCtx.decodeAudioData(arr);
+}
+
 export function startRequestSound() {
   if (requestLoopAudio) return;
   requestLoopAudio = new Audio("./assets/sounds/request.mp3");
