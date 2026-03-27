@@ -52,7 +52,7 @@ export function timestampToMillis(ts) {
 
 export function getRideFreshMaxAgeMs(status) {
   if (status === "requested" || status === "offered") return 3 * 60 * 1000;
-  if (status === "accepted" || status === "arrived") return 6 * 60 * 60 * 1000;
+  if (status === "accepted" || status === "arrived" || status === "started") return 6 * 60 * 60 * 1000;
   return 15 * 60 * 1000;
 }
 
