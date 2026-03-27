@@ -13,16 +13,32 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage((payload) => {
-  const title = payload?.notification?.title || "مشوارك";
-  const options = {
-    body: payload?.notification?.body || "لديك إشعار جديد",
+messaging.onBackgroundMessage(function (payload) {
+  var title = "مشوارك";
+  if (payload && payload.notification && payload.notification.title) {
+    title = payload.notification.title;
+  }
+
+  var body = "لديك إشعار جديد";
+  if (payload && payload.notification && payload.notification.body) {
+    body = payload.notification.body;
+  }
+
+  var data = {};
+  if (payload && payload.data) {
+    data = payload.data;
+  }
+
+  var targetUrl = "./index.html";
+  if (data.url) {
+    targetUrl = data.url;
+  }
+
+  var options = {
+    body: body,
     icon: "./assets/logo.png",
     badge: "./assets/logo.png",
-    data: {
-      url: payload?.data?.url || "./index.html",
-      ...payload?.data
-    }
+    data: Object.assign({}, data, { url: targetUrl })
   };
 
   self.registration.showNotification(title, options);
@@ -31,16 +47,21 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
-  const targetUrl = event.notification?.data?.url || "./index.html";
+  var targetUrl = "./index.html";
+  if (event.notification && event.notification.data && event.notification.data.url) {
+    targetUrl = event.notification.data.url;
+  }
 
   event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
-      for (const client of clientList) {
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (clientList) {
+      for (var i = 0; i < clientList.length; i++) {
+        var client = clientList[i];
         if ("focus" in client) {
           client.navigate(targetUrl);
           return client.focus();
         }
       }
+
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
       }
