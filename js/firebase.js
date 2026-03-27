@@ -73,12 +73,15 @@ export async function initFirebaseMessaging(uid) {
       return null;
     }
 
-    const token = await getToken(messaging, {
-      vapidKey: "BMmr4DfucDSm0JzDoBhUTp7v5xagCgBFpSmqgmNmAPJUSUJ8S9ga49SlJQRvxillsIeE4_isvJkPAsNxg4Y0uws",
-      serviceWorkerRegistration: registration,
-    });
+    console.log("Before getToken");
 
-    console.log("FCM raw token =", token);
+const token = await getToken(messaging, {
+  vapidKey: "BMmr4DfucDSm0JzDoBhUTp7v5xagCgBFpSmqgmNmAPJUSUJ8S9ga49SlJQRvxillsIeE4_isvJkPAsNxg4Y0uws",
+  serviceWorkerRegistration: registration,
+});
+
+console.log("After getToken");
+console.log("FCM raw token =", token);
 
     if (!token) {
       console.warn("No FCM token returned");
