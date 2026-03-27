@@ -1,6 +1,8 @@
 import { $, escapeHtml } from "./utils.js";
 
 let audioCtx = null;
+let requestLoopSource = null;
+let requestLoopBuffer = null;
 
 export async function ensureNotificationPermission(ask = true) {
   if (!("Notification" in window)) return "unsupported";
