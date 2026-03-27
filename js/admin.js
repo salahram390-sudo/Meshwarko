@@ -227,26 +227,32 @@ function onlineDriverCard(d) {
 }
 
 async function deleteUserAppData(userId) {
-  await deleteDoc(doc(db, "users", userId)).catch(() => {});
-  await deleteDoc(doc(db, "driversOnline", userId)).catch(() => {});
+  // حذف من users (لازم ينجح)
+  await deleteDoc(doc(db, "users", userId));
 
+  // حذف من driversOnline (لو فشل مش مشكلة)
+  await deleteDoc(doc(db, "driversOnline", userId)).catch((err) => {
+    console.warn("driversOnline delete skipped:", err?.message || err);
+  });
+
+  // هات الرحلات المرتبطة
   const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", userId)));
   const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", userId)));
+
   const relatedRides = [...r1.docs, ...r2.docs];
+  const uniqueRideIds = [...new Set(relatedRides.map((d) => d.id))];
 
-  for (const rideDoc of relatedRides) {
-    const rideId = rideDoc.id;
-
+  for (const rideId of uniqueRideIds) {
     try {
-      const msgs = await getDocs(collection(db, "rides", rideId, "messages"));
-      for (const m of msgs.docs) {
+      const msgsSnap = await getDocs(collection(db, "rides", rideId, "messages"));
+      for (const m of msgsSnap.docs) {
         await deleteDoc(doc(db, "rides", rideId, "messages", m.id));
       }
     } catch (e) {
-      console.warn("messages delete fail", e);
+      console.warn("messages delete fail:", rideId, e?.message || e);
     }
 
-    await deleteDoc(doc(db, "rides", rideId)).catch(() => {});
+    await deleteDoc(doc(db, "rides", rideId));
   }
 }
 
