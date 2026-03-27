@@ -47,6 +47,7 @@ let rideSearchTimer = null;
 let chatUnsubPassenger = null;
 let lastMsgCount = 0;
 let lastRideSoundKey = "";
+let selectedRideData = null;
 
 const REQUEST_EXPIRE_MS = 3 * 60 * 1000;
 const ACTIVE_RIDE_MAX_AGE_MS = 6 * 60 * 60 * 1000;
