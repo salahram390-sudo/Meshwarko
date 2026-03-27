@@ -645,18 +645,40 @@ function renderRideCard(ride, driverProfile) {
   rideCard.innerHTML = lines.join("");
 }
 
-async function drawDriverToPickupRoute(driverLat, driverLon, pickupLat, pickupLon) {
+async function drawDriverToTargetRoute(driverLat, driverLon, targetLat, targetLon, mode = "pickup") {
   try {
-    const start = { lat: Number(driverLat), lon: Number(driverLon) }, end = { lat: Number(pickupLat), lon: Number(pickupLon) };
+    const start = { lat: Number(driverLat), lon: Number(driverLon) };
+    const end = { lat: Number(targetLat), lon: Number(targetLon) };
     if (![start.lat, start.lon, end.lat, end.lon].every(Number.isFinite)) return;
+
     const r = await routeOSRM(start, end);
     drawRoute(map, r.geojson, driverRouteLayerRef);
+
     const mins = Math.max(1, Math.round((Number(r.durationSec) || 0) / 60));
     const meters = Math.round(Number(r.distanceMeters) || 0);
     const distanceText = meters < 1000 ? `${meters} متر` : `${(meters / 1000).toFixed(1)} كم`;
-    if (r.isFallbackStraightLine) { setText(distanceValue, `🚗 السائق يبعد ${distanceText}`); setStatus(rideStatus.textContent === "السائق وصل" ? "السائق وصل" : "جارٍ تتبع السائق"); }
-    else { setText(distanceValue, `🚗 السائق يبعد ${distanceText} • يصل خلال ${mins} دقيقة`); setStatus(rideStatus.textContent === "السائق وصل" ? "السائق وصل" : `السائق سيصل خلال ${mins} دقيقة`); }
-  } catch (e) { console.error("drawDriverToPickupRoute ERROR", e); }
+
+    if (mode === "dropoff") {
+      if (r.isFallbackStraightLine) {
+        setText(distanceValue, `🚗 متبقي إلى الوصول ${distanceText}`);
+        setStatus("الرحلة جارية");
+      } else {
+        setText(distanceValue, `🚗 متبقي ${distanceText} • الوصول خلال ${mins} دقيقة`);
+        setStatus("الرحلة جارية");
+      }
+      return;
+    }
+
+    if (r.isFallbackStraightLine) {
+      setText(distanceValue, `🚗 السائق يبعد ${distanceText}`);
+      setStatus(rideStatus.textContent === "السائق وصل" ? "السائق وصل" : "جارٍ تتبع السائق");
+    } else {
+      setText(distanceValue, `🚗 السائق يبعد ${distanceText} • يصل خلال ${mins} دقيقة`);
+      setStatus(rideStatus.textContent === "السائق وصل" ? "السائق وصل" : `السائق سيصل خلال ${mins} دقيقة`);
+    }
+  } catch (e) {
+    console.error("drawDriverToTargetRoute ERROR", e);
+  }
 }
 
 function startDriverTracking(driverId) {
