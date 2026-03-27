@@ -95,7 +95,9 @@ export async function initFirebaseMessaging(uid) {
     console.log("FCM TOKEN SAVED:", token);
     return token;
   } catch (err) {
-    console.warn("FCM init error:", err?.message || err);
+    console.error("FCM init error FULL:", err);
+console.error("FCM init error message:", err?.message);
+console.error("FCM init error code:", err?.code);
     return null;
   }
 }
