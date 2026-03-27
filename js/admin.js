@@ -277,22 +277,23 @@ async function handleUsersClick(e) {
   }
 
   const deleteBtn = e.target.closest('[data-action="delete-user"]');
-  if (deleteBtn) {
-    const id = deleteBtn.dataset.id;
-    const u = allUsers.find((x) => x.id === id);
-    if (!u) return;
+if (deleteBtn) {
+  const id = deleteBtn.dataset.id;
+  const u = allUsers.find((x) => x.id === id);
+  if (!u) return;
 
-    if (currentAdmin?.uid === id) {
-      alert("لا يمكنك حذف حسابك الحالي من لوحة الإدارة.");
-      return;
-    }
+  if (currentAdmin?.uid === id) {
+    alert("لا يمكنك حذف حسابك الحالي من لوحة الإدارة.");
+    return;
+  }
 
-    const ok1 = confirm(`هل أنت متأكد من حذف المستخدم "${u.name || u.email || id}" نهائيًا؟`);
-    if (!ok1) return;
+  const ok1 = confirm(`هل أنت متأكد من حذف المستخدم "${u.name || u.email || id}" نهائيًا؟`);
+  if (!ok1) return;
 
-    const ok2 = confirm("سيتم حذف بياناته من التطبيق والرحلات المرتبطة به. هل تريد المتابعة؟");
-    if (!ok2) return;
+  const ok2 = confirm("سيتم حذف بياناته من التطبيق والرحلات المرتبطة به. هل تريد المتابعة؟");
+  if (!ok2) return;
 
+  try {
     await deleteUserAppData(id);
 
     notify({
@@ -300,8 +301,13 @@ async function handleUsersClick(e) {
       body: "تم حذف المستخدم من التطبيق",
       tag: "delete-user"
     });
-    return;
+  } catch (err) {
+    console.error("DELETE USER ERROR:", err);
+    alert("فشل حذف المستخدم: " + (err?.message || err));
   }
+
+  return;
+}
 
   const walletBtn = e.target.closest('[data-action="wallet-user"]');
   if (walletBtn) {
