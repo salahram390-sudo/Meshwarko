@@ -154,10 +154,10 @@ function userCard(u) {
         <button class="btn ${u.status === "blocked" ? "success" : "danger"} small" data-action="toggle-user" data-id="${u.id}">
           ${u.status === "blocked" ? "فك الحظر" : "حظر"}
         </button>
-        
+
         <button class="btn danger small" data-action="delete-user" data-id="${u.id}">
-   حذف المستخدم نهائى
-</button>
+          حذف المستخدم نهائي
+        </button>
 
         <button class="btn ghost small" data-action="wallet-user" data-id="${u.id}">
           تعديل الرصيد
@@ -227,24 +227,16 @@ function onlineDriverCard(d) {
 }
 
 async function deleteUserAppData(userId) {
-
-  // 1️⃣ حذف من users
   await deleteDoc(doc(db, "users", userId)).catch(() => {});
-
-  // 2️⃣ حذف من driversOnline
   await deleteDoc(doc(db, "driversOnline", userId)).catch(() => {});
 
-  // 3️⃣ هات الرحلات المرتبطة
   const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", userId)));
   const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", userId)));
+  const relatedRides = [...r1.docs, ...r2.docs];
 
-  const allRides = [...r1.docs, ...r2.docs];
-
-  // 4️⃣ امسح الشات + الرحلة
-  for (const rideDoc of allRides) {
+  for (const rideDoc of relatedRides) {
     const rideId = rideDoc.id;
 
-    // 🧹 حذف messages (الشات)
     try {
       const msgs = await getDocs(collection(db, "rides", rideId, "messages"));
       for (const m of msgs.docs) {
@@ -254,7 +246,6 @@ async function deleteUserAppData(userId) {
       console.warn("messages delete fail", e);
     }
 
-    // 🧹 حذف الرحلة
     await deleteDoc(doc(db, "rides", rideId)).catch(() => {});
   }
 }
@@ -314,6 +305,7 @@ async function handleUsersClick(e) {
 
     const amount = prompt("اكتب الرصيد الجديد", String(Number(u.walletBalance || 0)));
     if (amount === null) return;
+
     const num = Number(amount);
     if (!Number.isFinite(num) || num < 0) {
       alert("قيمة غير صحيحة");
@@ -341,6 +333,7 @@ async function handleUsersClick(e) {
       status: "active",
       promotedAt: serverTimestamp()
     });
+
     notify({
       title: "الإدارة",
       body: "تمت الترقية إلى أدمن",
@@ -356,6 +349,7 @@ async function handleUsersClick(e) {
       role: "passenger",
       demotedAt: serverTimestamp()
     });
+
     notify({
       title: "الإدارة",
       body: "تمت إزالة صلاحية الأدمن",
@@ -367,8 +361,8 @@ async function handleUsersClick(e) {
 async function handleRidesClick(e) {
   const btn = e.target.closest('[data-action="cancel-ride"]');
   if (!btn) return;
-  const id = btn.dataset.id;
 
+  const id = btn.dataset.id;
   await updateDoc(doc(db, "rides", id), {
     status: "canceled",
     archived: true,
@@ -472,7 +466,6 @@ function rerenderAll() {
 }
 
 onAuthStateChanged(auth, async (user) => {
-
   console.log("ADMIN CHECK UID:", user?.uid);
 
   if (!user) {
@@ -484,9 +477,9 @@ onAuthStateChanged(auth, async (user) => {
 
   const me = await getDoc(doc(db, "users", user.uid));
 
-console.log("ME EXISTS:", me.exists());
-console.log("ME DATA:", me.exists() ? me.data() : null);
-  
+  console.log("ME EXISTS:", me.exists());
+  console.log("ME DATA:", me.exists() ? me.data() : null);
+
   if (!me.exists() || me.data().role !== "admin" || me.data().status === "blocked") {
     location.href = "./index.html";
     return;
