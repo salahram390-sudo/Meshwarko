@@ -684,16 +684,45 @@ async function drawDriverToTargetRoute(driverLat, driverLon, targetLat, targetLo
 function startDriverTracking(driverId) {
   stopDriverTracking();
   const ref = doc(db, "driversOnline", driverId);
+
   driverTrackUnsub = onSnapshot(ref, async (snap) => {
     if (!snap.exists()) return;
-    const d = snap.data(); const lat = Number(d.lat), lon = Number(d.lon ?? d.lng); if (![lat, lon].every(Number.isFinite)) return;
+
+    const d = snap.data();
+    const lat = Number(d.lat);
+    const lon = Number(d.lon ?? d.lng);
+    if (![lat, lon].every(Number.isFinite)) return;
+
     const pos = [lat, lon];
-    if (!driverMarker) driverMarker = L.marker(pos, { icon: createCarIcon(0) }).addTo(map);
-    else if (driverLastLoc) moveCarMarkerSmooth(driverMarker, driverLastLoc, { lat, lon }, 900);
-    else driverMarker.setLatLng(pos);
+
+    if (!driverMarker) {
+      driverMarker = L.marker(pos, { icon: createCarIcon(0) }).addTo(map);
+    } else if (driverLastLoc) {
+      moveCarMarkerSmooth(driverMarker, driverLastLoc, { lat, lon }, 900);
+    } else {
+      driverMarker.setLatLng(pos);
+    }
+
     driverLastLoc = { lat, lon };
-    if (!currentPickup && pickup) currentPickup = { lat: pickup.lat, lon: pickup.lon };
-    if (currentPickup) await drawDriverToPickupRoute(lat, lon, currentPickup.lat, currentPickup.lon);
+
+    if (!currentPickup && pickup) {
+      currentPickup = { lat: pickup.lat, lon: pickup.lon };
+    }
+
+    if (selectedRideData?.status === "started" && selectedRideData?.dropoff?.lat && selectedRideData?.dropoff?.lon) {
+      await drawDriverToTargetRoute(
+        lat,
+        lon,
+        Number(selectedRideData.dropoff.lat),
+        Number(selectedRideData.dropoff.lon),
+        "dropoff"
+      );
+      return;
+    }
+
+    if (currentPickup) {
+      await drawDriverToTargetRoute(lat, lon, currentPickup.lat, currentPickup.lon, "pickup");
+    }
   });
 }
 
