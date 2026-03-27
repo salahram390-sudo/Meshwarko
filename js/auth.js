@@ -171,7 +171,7 @@ loginForm?.addEventListener("submit", async (e) => {
     }
 
     const cred = await
-    await signInWithEmailAndPassword(auth, email, pass);
+    signInWithEmailAndPassword(auth, email, pass);
     console.log("LOGIN UID:", cred.user.uid);
 
     const u = auth.currentUser;
