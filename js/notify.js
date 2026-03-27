@@ -95,6 +95,6 @@ export async function notify({ title, body, tag = "mashwark", vibrate = true, so
   if (perm !== "granted") return;
 
   try {
-    new Notification(title, { body, tag, silent: true });
+    new Notification(title, { body, tag });
   } catch {}
 }
