@@ -40,6 +40,8 @@ export let messaging = null;
 
 export async function initFirebaseMessaging(uid) {
   try {
+    console.log("FCM START, uid =", uid);
+
     if (!uid) {
       console.warn("FCM skipped: uid missing");
       return null;
@@ -51,15 +53,21 @@ export async function initFirebaseMessaging(uid) {
     }
 
     const supported = await isSupported();
+    console.log("FCM supported =", supported);
+
     if (!supported) {
       console.warn("Firebase messaging not supported on this browser");
       return null;
     }
 
     const registration = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
+    console.log("SW registered =", registration);
+
     messaging = getMessaging(app);
 
     const permission = await Notification.requestPermission();
+    console.log("Notification permission =", permission);
+
     if (permission !== "granted") {
       console.warn("Notification permission not granted");
       return null;
@@ -69,6 +77,8 @@ export async function initFirebaseMessaging(uid) {
       vapidKey: "BMmr4DfucDSm0JzDoBhUTp7v5xagCgBFpSmqgmNmAPJUSUJ8S9ga49SlJQRvxillsIeE4_isvJkPAsNxg4Y0uws",
       serviceWorkerRegistration: registration,
     });
+
+    console.log("FCM raw token =", token);
 
     if (!token) {
       console.warn("No FCM token returned");
@@ -82,7 +92,7 @@ export async function initFirebaseMessaging(uid) {
       console.warn("Saving FCM token failed:", err?.message || err);
     });
 
-    console.log("FCM TOKEN:", token);
+    console.log("FCM TOKEN SAVED:", token);
     return token;
   } catch (err) {
     console.warn("FCM init error:", err?.message || err);
