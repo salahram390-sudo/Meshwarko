@@ -61,12 +61,36 @@ async function getAudioBuffer(url) {
   return await audioCtx.decodeAudioData(arr);
 }
 
-export function startRequestSound() {
-  if (requestLoopAudio) return;
-  requestLoopAudio = new Audio("./assets/sounds/request.mp3");
-  requestLoopAudio.loop = true;
-  requestLoopAudio.volume = 1.0;
-  requestLoopAudio.play().catch(() => {});
+export async function startRequestSound() {
+  try {
+    if (requestLoopSource) return;
+
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+
+    if (audioCtx.state === "suspended") {
+      try { await audioCtx.resume(); } catch (_) {}
+    }
+
+    if (!requestLoopBuffer) {
+      requestLoopBuffer = await getAudioBuffer("./assets/sounds/request.mp3");
+    }
+
+    const source = audioCtx.createBufferSource();
+    const gain = audioCtx.createGain();
+
+    source.buffer = requestLoopBuffer;
+    source.loop = true;
+
+    gain.gain.value = 1.0;
+
+    source.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    source.start(0);
+    requestLoopSource = source;
+  } catch (e) {
+    console.warn("startRequestSound failed:", e);
+  }
 }
 
 export function stopRequestSound() {
