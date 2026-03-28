@@ -358,12 +358,8 @@ onAuthStateChanged(auth, async (user) => {
       adminEntryBtn?.classList.toggle("hidden", !isAdmin);
 
       const currentPage = location.pathname.split("/").pop() || "index.html";
-      const targetPage = profile?.role === "admin"
-        ? "admin.html"
-        : profile?.role === "driver"
-          ? "driver.html"
-          : "passenger.html";
-
+      const targetPage = getSafeTargetPage(profile);
+      
       // 🔥 أهم سطر (auto redirect)
       if (currentPage === "index.html" || currentPage === "" || currentPage === "Meshwarko") {
         location.href = `./${targetPage}`;
