@@ -308,13 +308,8 @@ async function redirectLoggedUser(user) {
     return;
   }
 
-  const r = profile?.role || "passenger";
-
-  location.href = r === "admin"
-    ? "./admin.html"
-    : r === "driver"
-      ? "./driver.html"
-      : "./passenger.html";
+  const targetPage = getSafeTargetPage(profile);
+  location.replace(`./${targetPage}`);
 }
 
 function getSafeTargetPage(profile) {
