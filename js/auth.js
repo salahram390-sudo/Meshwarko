@@ -324,15 +324,43 @@ onAuthStateChanged(auth, async (user) => {
     try {
       const snap = await getDoc(doc(db, "users", user.uid));
       const profile = snap.exists() ? snap.data() : null;
+
+      if (!snap.exists()) {
+        await signOut(auth);
+        return;
+      }
+
+      if (profile?.status === "blocked") {
+        await signOut(auth);
+        alert("هذا الحساب محظور من الإدارة.");
+        return;
+      }
+
+      const isAdmin = !!profile && profile.role === "admin" && profile.status !== "blocked";
+      adminEntryBtn?.classList.toggle("hidden", !isAdmin);
+
+      const currentPage = location.pathname.split("/").pop() || "index.html";
+      const targetPage = profile?.role === "admin"
+        ? "admin.html"
+        : profile?.role === "driver"
+          ? "driver.html"
+          : "passenger.html";
+
+      // 🔥 أهم سطر (auto redirect)
+      if (currentPage === "index.html" || currentPage === "" || currentPage === "Meshwarko") {
+        location.href = `./${targetPage}`;
+      }
+
+      // (اختياري) تشغيل الإشعارات بعد تسجيل الدخول
       try {
         await ensureNotificationPermission(true);
         await initFirebaseMessaging(user.uid);
       } catch (err) {
         console.warn("FCM init warning:", err?.message || err);
       }
-      const isAdmin = !!profile && profile.role === "admin" && profile.status !== "blocked";
-      adminEntryBtn?.classList.toggle("hidden", !isAdmin);
+
     } catch (err) {
+      console.warn("AUTH STATE ERROR:", err?.message || err);
       adminEntryBtn?.classList.add("hidden");
     }
   } else {
