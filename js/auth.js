@@ -295,6 +295,32 @@ btnLogout?.addEventListener("click", async () => {
   await signOut(auth);
 });
 
+async function redirectLoggedUser(user) {
+  if (!user) return;
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+  if (!snap.exists()) {
+    await signOut(auth);
+    return;
+  }
+
+  const profile = snap.data();
+
+  if (profile?.status === "blocked") {
+    await signOut(auth);
+    alert("هذا الحساب محظور من الإدارة.");
+    return;
+  }
+
+  const r = profile?.role || "passenger";
+
+  location.href = r === "admin"
+    ? "./admin.html"
+    : r === "driver"
+      ? "./driver.html"
+      : "./passenger.html";
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     btnLogout?.classList.remove("hidden");
