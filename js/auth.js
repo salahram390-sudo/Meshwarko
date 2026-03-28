@@ -318,6 +318,23 @@ async function redirectLoggedUser(user) {
       : "./passenger.html";
 }
 
+function getSafeTargetPage(profile) {
+  const rolePage =
+    profile?.role === "admin"
+      ? "admin.html"
+      : profile?.role === "driver"
+        ? "driver.html"
+        : "passenger.html";
+
+  const lastPage = localStorage.getItem("lastAppPage") || "";
+
+  if (profile?.role === "admin" && lastPage === "admin.html") return "admin.html";
+  if (profile?.role === "driver" && lastPage === "driver.html") return "driver.html";
+  if (profile?.role === "passenger" && lastPage === "passenger.html") return "passenger.html";
+
+  return rolePage;
+}
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     btnLogout?.classList.remove("hidden");
