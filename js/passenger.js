@@ -16,7 +16,7 @@ import {
 } from "./map.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission, playSound, startRequestSound, stopRequestSound } from "./notify.js";
-localStorage.setItem("lastAppPage", location.pathname.split("/").pop() || "index.html");
+localStorage.setItem("lastAppPage", "passenger.html");
 console.log("passenger.js loaded ✅");
 
 let myData = {};
