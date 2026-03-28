@@ -223,11 +223,7 @@ console.log("LOGIN UID:", cred.user.uid);
       return;
     }
 
-location.href = r === "admin"
-  ? "./admin.html"
-  : r === "driver"
-    ? "./driver.html"
-    : "./passenger.html";
+await redirectLoggedUser(u);
 
   } catch (err) {
     console.log("LOGIN ERROR:", err.code, err.message, err);
