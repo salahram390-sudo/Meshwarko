@@ -14,6 +14,7 @@ import {
 import { $, setText } from "./utils.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { ensureNotificationPermission } from "./notify.js";
+localStorage.setItem("lastAppPage", location.pathname.split("/").pop() || "index.html");
 
 const tabLogin = $("#tabLogin");
 const tabRegister = $("#tabRegister");
