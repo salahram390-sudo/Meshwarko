@@ -15,7 +15,7 @@ import {
 } from "./map.js";
 import { loadEgyptAdmin } from "./admin_data.js";
 import { notify, ensureNotificationPermission, playSound, startRequestSound, stopRequestSound } from "./notify.js";
-localStorage.setItem("lastAppPage", location.pathname.split("/").pop() || "index.html");
+localStorage.setItem("lastAppPage", "driver.html");
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
 const switchRoleBtn = $("#switchRoleBtn");
