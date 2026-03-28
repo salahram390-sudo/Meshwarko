@@ -281,7 +281,7 @@ registerForm?.addEventListener("submit", async (e) => {
 
     await setDoc(doc(db, "users", cred.user.uid), { ...common, ...profile });
     
-location.href = role === "driver" ? "./driver.html" : "./passenger.html";
+await redirectLoggedUser(cred.user);
   } catch (err) {
     setText(regHint, friendlyAuthError(err));
   }
