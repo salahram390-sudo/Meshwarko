@@ -14,6 +14,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { $, escapeHtml, moneyEGP, formatRideDate } from "./utils.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
+localStorage.setItem("lastAppPage", "admin.html");
 
 const adminBadge = $("#adminBadge");
 const adminStats = $("#adminStats");
