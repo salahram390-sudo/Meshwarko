@@ -345,12 +345,14 @@ onAuthStateChanged(auth, async (user) => {
 
       if (!snap.exists()) {
         await signOut(auth);
+        document.documentElement.style.visibility = "visible";
         return;
       }
 
       if (profile?.status === "blocked") {
         await signOut(auth);
         alert("هذا الحساب محظور من الإدارة.");
+        document.documentElement.style.visibility = "visible";
         return;
       }
 
@@ -359,13 +361,12 @@ onAuthStateChanged(auth, async (user) => {
 
       const currentPage = location.pathname.split("/").pop() || "index.html";
       const targetPage = getSafeTargetPage(profile);
-      
-      // 🔥 أهم سطر (auto redirect)
+
       if (currentPage === "index.html" || currentPage === "" || currentPage === "Meshwarko") {
-        location.href = `./${targetPage}`;
+        location.replace(`./${targetPage}`);
+        return;
       }
 
-      // (اختياري) تشغيل الإشعارات بعد تسجيل الدخول
       try {
         await ensureNotificationPermission(true);
         await initFirebaseMessaging(user.uid);
@@ -381,6 +382,8 @@ onAuthStateChanged(auth, async (user) => {
     btnLogout?.classList.add("hidden");
     adminEntryBtn?.classList.add("hidden");
   }
+
+  document.documentElement.style.visibility = "visible";
 });
 
 initAdmin().catch(() => {});
