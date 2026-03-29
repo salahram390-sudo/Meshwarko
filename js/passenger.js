@@ -125,7 +125,7 @@ const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
 const driverRouteLayerRef = { current: null };
 const driverMarkers = new Map();
-
+hardResetPassengerUI();
 function setStatus(text) { setText(rideStatus, text); }
 function hideEl(el) { if (el) el.style.display = "none"; }
 function showEl(el) { if (el) el.style.display = ""; }
