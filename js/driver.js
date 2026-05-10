@@ -386,6 +386,7 @@ async function selectRide(id, ride) {
     <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")} • مركبة: ${escapeHtml(ride.vehicleType || "-")}</div>
     <div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>
     <div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>
+    ${ride.rideNote ? `<div class="muted small"><b>ملاحظة الراكب:</b> ${escapeHtml(ride.rideNote)}</div>` : ""}
     <div class="muted small">${Number.isFinite(distanceToMe) ? `يبعد عنك ${(distanceToMe / 1000).toFixed(1)} كم` : ""}</div>
     <div class="muted small">بيانات الراكب تظهر بعد القبول.</div>`;
   await drawRideRoute(ride);
