@@ -501,6 +501,10 @@ body::before {
   opacity: 1 !important;
 }
 
+.muted.small b {
+  color: #d35400; /* لون مميز */
+}
+
 .card,
 .card-lite {
   position: relative;
