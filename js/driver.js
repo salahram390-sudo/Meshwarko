@@ -405,6 +405,7 @@ async function showAcceptedDetails(rideId) {
     <div class="muted small">الاسم: ${escapeHtml(ride.passengerName || "-")}</div>
     <div class="muted small">الهاتف: ${escapeHtml(ride.passengerPhone || "-")}</div>
     <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")}</div>`;
+  ${ride.rideNote ? `<div class="muted small"><b>ملاحظة الراكب:</b> ${escapeHtml(ride.rideNote)}</div>` : ""}
 }
 
 function watchRidesForDriver() {
