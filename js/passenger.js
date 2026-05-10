@@ -939,6 +939,7 @@ center: savedCenter,
 vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dropoff: { lat: dropoff.lat, lon: dropoff.lon }, pickupText: pickupText.value.trim(), dropoffText: dropText.value.trim(),
       distanceMeters: lastDistanceMeters, durationSec: lastDurationSec, pricing: buildPricingSummary(lastDistanceMeters, lastDurationSec, price), price, archived: false, passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
       nearestDriverId: nearestMeta.nearestDriverId || null, nearestDriverIds: nearestMeta.nearestDriverIds || [], nearestDrivers: nearestMeta.nearestDrivers || []
+      rideNote: rideNoteValue
     });
      currentRideId = rideRef.id;
 startRequestSound();
