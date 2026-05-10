@@ -930,6 +930,8 @@ const nearestMeta = await findNearestDriversMeta({
   pickupPoint: pickup,
   limit: 8
 });
+    const rideNoteValue = ($("#rideNote")?.value || "").trim();
+    
     const rideRef = await addDoc(collection(db, "rides"), {
       passengerId: user.uid, passengerName: myData.name || "", passengerPhone: myData.phone || "", driverId: null, status: "requested", createdAt: serverTimestamp(), createdAtMs, clientCreatedAtMs: createdAtMs, expiresAt, expiresAtMs,
       governorate: savedGov,
