@@ -954,13 +954,26 @@ notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن س
 
 btnCancel.addEventListener("click", async () => {
   if (!currentRideId) return rideUiNone();
+
   setStatus("جاري الإلغاء...");
+
+  // توقف صوت طلب البحث فوراً
+  stopRequestSound();
+
   try {
     await updateDoc(doc(db, "rides", currentRideId), { status: "canceled", canceledAt: serverTimestamp(), archived: true });
-    cleanupRideState(); rideUiNone(); 
+
+    cleanupRideState(); 
+    rideUiNone(); 
+
+    // بعد توقف الصوت، شغل صوت الإلغاء مرة واحدة
     playSound("cancel");
-notify({ title: "تم إلغاء الطلب", body: "تم إلغاء الطلب بنجاح", tag: "ride-canceled" });
-  } catch (e) { console.error("CANCEL ERROR:", e); setStatus("خطأ"); }
+
+    notify({ title: "تم إلغاء الطلب", body: "تم إلغاء الطلب بنجاح", tag: "ride-canceled" });
+  } catch (e) { 
+    console.error("CANCEL ERROR:", e); 
+    setStatus("خطأ"); 
+  }
 });
 
 btnAcceptOffer.addEventListener("click", async () => {
