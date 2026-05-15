@@ -396,16 +396,17 @@ async function showAcceptedDetails(rideId) {
   const rideSnap = await getDoc(doc(db, "rides", rideId)); if (!rideSnap.exists()) return;
   const ride = rideSnap.data(); await drawRideRoute(ride);
   selectedRideEl.innerHTML = `
-    <div class="row-between"><b>الحالة</b><span class="muted">${escapeHtml(ride.status || "accepted")}</span></div>
-    <div class="row-between"><b>السعر النهائي</b><span>${moneyEGP(ride.price)}</span></div>
-    <div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>
-    <div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>
-    <div class="divider"></div>
-    <div><b>الراكب</b></div>
-    <div class="muted small">الاسم: ${escapeHtml(ride.passengerName || "-")}</div>
-    <div class="muted small">الهاتف: ${escapeHtml(ride.passengerPhone || "-")}</div>
-    <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")}</div>`;
+  <div class="row-between"><b>الحالة</b><span class="muted">${escapeHtml(ride.status || "accepted")}</span></div>
+  <div class="row-between"><b>السعر النهائي</b><span>${moneyEGP(ride.price)}</span></div>
+  <div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>
+  <div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>
+  <div class="divider"></div>
+  <div><b>الراكب</b></div>
+  <div class="muted small">الاسم: ${escapeHtml(ride.passengerName || "-")}</div>
+  <div class="muted small">الهاتف: ${escapeHtml(ride.passengerPhone || "-")}</div>
+  <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")}</div>
   ${ride.rideNote ? `<div class="muted small"><b>ملاحظة الراكب:</b> ${escapeHtml(ride.rideNote)}</div>` : ""}
+`;
 }
 
 function watchRidesForDriver() {
