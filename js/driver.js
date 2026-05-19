@@ -347,9 +347,15 @@ function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   
   offerInput.value = "";
 
-  // === إيقاف الصوت بشكل قوي ===
+  // === إيقاف الصوت بشكل قوي جدًا ===
   stopRequestSound();
   requestSoundActive = false;
+
+  // Force cleanup
+  try {
+    if (typeof requestLoopSource !== "undefined") requestLoopSource = null;
+    if (typeof window.requestLoopSource !== "undefined") window.requestLoopSource = null;
+  } catch (_) {}
 
   try {
     if (requestLoopSource) {
