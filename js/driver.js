@@ -314,17 +314,58 @@ notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الو
 async function tryAutoCompleteCurrentRide() { if (!selectedRideId || !selectedRideData || selectedRideData.status !== "started" || !isDriverNearDropoff(selectedRideData)) return; await completeRideCore({ auto: true }); }
 function finalizeDriverRideCleanup(successMessage = "تمت الرحلة بنجاح ✅") { try { closeDriverDrawer(); closeDriverChatModal(); resetSelectedRideUi(successMessage); setDriverStatus("متاح"); } catch (e) { console.error("Driver cleanup error:", e); } }
 function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
-  if (acceptedRideUnsub) { acceptedRideUnsub(); acceptedRideUnsub = null; }
-  selectedRideId = null; selectedRideData = null; completedHandledForRideId = null;
+  if (acceptedRideUnsub) { 
+    acceptedRideUnsub(); 
+    acceptedRideUnsub = null; 
+  }
+  
+  selectedRideId = null; 
+  selectedRideData = null; 
+  completedHandledForRideId = null;
+  
   selectedRideEl.innerHTML = `<div class="muted">${escapeHtml(message)}</div>`;
-  clearRouteAndMarkers(); btnSendOffer.disabled = true; btnAccept.disabled = true; btnTrackToggle.disabled = true; btnCancel.disabled = true; btnArrived.disabled = true; btnComplete.disabled = true; driverStartRideBtn.disabled = true;
+  
+  clearRouteAndMarkers(); 
+  btnSendOffer.disabled = true; 
+  btnAccept.disabled = true; 
+  btnTrackToggle.disabled = true; 
+  btnCancel.disabled = true; 
+  btnArrived.disabled = true; 
+  btnComplete.disabled = true; 
+  driverStartRideBtn.disabled = true;
+  
   if (btnChatDriver) btnChatDriver.disabled = true;
-  if (chatUnsubDriver) { chatUnsubDriver(); chatUnsubDriver = null; }
-  closeDriverChatModal(); if (chatMessagesDriver) chatMessagesDriver.innerHTML = ""; if (chatInputDriver) chatInputDriver.value = "";
+  
+  if (chatUnsubDriver) { 
+    chatUnsubDriver(); 
+    chatUnsubDriver = null; 
+  }
+  
+  closeDriverChatModal(); 
+  if (chatMessagesDriver) chatMessagesDriver.innerHTML = ""; 
+  if (chatInputDriver) chatInputDriver.value = "";
+  
   offerInput.value = "";
-stopRequestSound();
-requestSoundActive = false;
-stopLiveTracking();
+
+  // === إيقاف الصوت بشكل قوي ===
+  stopRequestSound();
+  requestSoundActive = false;
+
+  try {
+    if (requestLoopSource) {
+      requestLoopSource.stop(0);
+      requestLoopSource.disconnect();
+      requestLoopSource = null;
+    }
+  } catch (_) {}
+
+  try {
+    if (window.requestLoopSource) window.requestLoopSource = null;
+  } catch (_) {}
+
+  // ========================
+
+  stopLiveTracking();
 }
 
 function updateOwnDriverMarker(lat, lon, pan = false) {
