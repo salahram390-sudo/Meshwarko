@@ -100,11 +100,17 @@ export function stopRequestSound() {
       requestLoopSource.disconnect();
       requestLoopSource = null;
     }
-  } catch (_) {
+    
+    // حل إضافي للمشاكل الشائعة
+    if (requestLoopAudio) {
+      requestLoopAudio.pause();
+      requestLoopAudio = null;
+    }
+  } catch (e) {
+    console.warn("stopRequestSound error:", e);
     requestLoopSource = null;
   }
 }
-
 export function toast(title, message, ms = 3500) {
   const root = document.getElementById("toastRoot");
   if (!root) return;
