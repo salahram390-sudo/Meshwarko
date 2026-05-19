@@ -820,13 +820,15 @@ async function handleRideSnapshot(rideSnap) {
 selectedRideData = { ...ride, id: rideSnap.id };
   const soundKey = `${rideSnap.id}:${ride.status}:${ride.offerPrice || ride.price || 0}:${ride.driverId || ""}`;
 
-if (lastRideSoundKey !== soundKey) {
+  if (lastRideSoundKey !== soundKey) {
+  // إدارة صوت الطلب المستمر (loop)
   if (ride.status === "requested") {
     startRequestSound();
   } else {
-    stopRequestSound();
+    stopRequestSound();   // وقف الصوت في كل الحالات غير "requested"
   }
 
+  // أصوات منفصلة للأحداث
   if (ride.status === "offered") {
     playSound("offer");
   } else if (ride.status === "accepted") {
