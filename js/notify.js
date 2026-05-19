@@ -95,20 +95,29 @@ export async function startRequestSound() {
 
 export function stopRequestSound() {
   try {
+    // إيقاف Web Audio API
     if (requestLoopSource) {
       requestLoopSource.stop(0);
       requestLoopSource.disconnect();
       requestLoopSource = null;
     }
-    
-    // حل إضافي للمشاكل الشائعة
+
+    // إيقاف أي Audio object عادي (احتياطي)
     if (requestLoopAudio) {
       requestLoopAudio.pause();
+      requestLoopAudio.currentTime = 0;
       requestLoopAudio = null;
     }
+
+    // إعادة تهيئة كاملة
+    requestLoopSource = null;
+    requestLoopBuffer = null;   // هيخليها تعيد تحميل الصوت المرة الجاية
+
   } catch (e) {
     console.warn("stopRequestSound error:", e);
+    // Force reset
     requestLoopSource = null;
+    requestLoopAudio = null;
   }
 }
 export function toast(title, message, ms = 3500) {
