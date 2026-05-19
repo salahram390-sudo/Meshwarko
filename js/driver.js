@@ -230,15 +230,12 @@ function syncIncomingRequestSound(rides = []) {
     (r) => r.driverId === myUid && ["accepted", "arrived", "started"].includes(r.status) 
   );
 
-  // لو في رحلة مقبولة أو مفيش طلبات مفتوحة → وقف الصوت
   if (hasMineActiveRide || openRideIds.size === 0) {
     if (requestSoundActive) {
       stopRequestSound();
       requestSoundActive = false;
     }
-  } 
-  // لو في طلبات مفتوحة ومفيش رحلة مقبولة → شغل الصوت
-  else {
+  } else {
     if (!requestSoundActive) {
       startRequestSound();
       requestSoundActive = true;
