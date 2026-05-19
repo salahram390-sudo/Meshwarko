@@ -959,16 +959,19 @@ btnCancel.addEventListener("click", async () => {
 
   setStatus("جاري الإلغاء...");
 
-  // توقف صوت طلب البحث فوراً
+  // إيقاف الصوت فوراً وبقوة
   stopRequestSound();
 
   try {
-    await updateDoc(doc(db, "rides", currentRideId), { status: "canceled", canceledAt: serverTimestamp(), archived: true });
+    await updateDoc(doc(db, "rides", currentRideId), { 
+      status: "canceled", 
+      canceledAt: serverTimestamp(), 
+      archived: true 
+    });
 
     cleanupRideState(); 
     rideUiNone(); 
 
-    // بعد توقف الصوت، شغل صوت الإلغاء مرة واحدة
     playSound("cancel");
 
     notify({ title: "تم إلغاء الطلب", body: "تم إلغاء الطلب بنجاح", tag: "ride-canceled" });
