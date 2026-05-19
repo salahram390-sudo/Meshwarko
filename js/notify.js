@@ -61,33 +61,17 @@ async function getAudioBuffer(url) {
   return await audioCtx.decodeAudioData(arr);
 }
 
-export async function startRequestSound() {
+export function startRequestSound() {
   try {
-    if (requestLoopSource) return;
+    stopRequestSound(); // وقف أي صوت قديم أولاً
 
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-
-    if (audioCtx.state === "suspended") {
-      try { await audioCtx.resume(); } catch (_) {}
-    }
-
-    if (!requestLoopBuffer) {
-      requestLoopBuffer = await getAudioBuffer("./assets/sounds/request.mp3");
-    }
-
-    const source = audioCtx.createBufferSource();
-    const gain = audioCtx.createGain();
-
-    source.buffer = requestLoopBuffer;
-    source.loop = true;
-
-    gain.gain.value = 1.0;
-
-    source.connect(gain);
-    gain.connect(audioCtx.destination);
-
-    source.start(0);
-    requestLoopSource = source;
+    requestLoopAudio = new Audio("./assets/sounds/request.mp3");
+    requestLoopAudio.loop = true;
+    requestLoopAudio.volume = 0.9;
+    
+    requestLoopAudio.play().catch(e => {
+      console.warn("Request sound play failed", e);
+    });
   } catch (e) {
     console.warn("startRequestSound failed:", e);
   }
@@ -95,31 +79,17 @@ export async function startRequestSound() {
 
 export function stopRequestSound() {
   try {
-    // إيقاف Web Audio API
-    if (requestLoopSource) {
-      requestLoopSource.stop(0);
-      requestLoopSource.disconnect();
-      requestLoopSource = null;
-    }
-
-    // إيقاف أي Audio object عادي (احتياطي)
     if (requestLoopAudio) {
       requestLoopAudio.pause();
       requestLoopAudio.currentTime = 0;
       requestLoopAudio = null;
     }
-
-    // إعادة تهيئة كاملة
-    requestLoopSource = null;
-    requestLoopBuffer = null;   // هيخليها تعيد تحميل الصوت المرة الجاية
-
   } catch (e) {
     console.warn("stopRequestSound error:", e);
-    // Force reset
-    requestLoopSource = null;
     requestLoopAudio = null;
   }
 }
+
 export function toast(title, message, ms = 3500) {
   const root = document.getElementById("toastRoot");
   if (!root) return;
