@@ -444,10 +444,12 @@ async function findNearestDriversMeta({ governorate, center, vehicleType, pickup
 }
 
 function updatePriceUI() {
-  if (!Number.isFinite(lastDistanceMeters) || !Number.isFinite(lastDurationSec)) return;
-  if (!priceSlider.dataset.touched) priceSlider.value = clampPrice(computeSuggestedPrice(lastDistanceMeters, lastDurationSec));
-  setText(priceValue, moneyEGP(clampPrice(priceSlider.value)));
-  setText(surgeHint, `تحسين تلقائي: ذروة × ${surgeMultiplier().toFixed(2)} • يمكنك تعديل السعر.`);
+  let price = clampPrice(priceSlider.value);
+  setText(priceValue, moneyEGP(price));
+  
+  // تحديث الـ hint
+  const hintText = `تحسين تلقائي: ذروة × ${surgeMultiplier().toFixed(2)} • يمكنك تعديل السعر.`;
+  setText(surgeHint, hintText);
 }
 function removeRouteLayer(ref) { try { if (ref?.current) { map.removeLayer(ref.current); ref.current = null; } } catch (_) {} }
 function clearDriverMarker() { if (driverMarker) try { map.removeLayer(driverMarker); } catch (_) {} driverMarker = null; driverLastLoc = null; }
