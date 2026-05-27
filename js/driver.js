@@ -89,6 +89,7 @@ const AUTO_COMPLETE_DISTANCE_M = 100;
 let autoCompletingRide = false;
 let completedHandledForRideId = null;
 let lastOpenRideIds = new Set();
+const ignoredRideIds = new Set();
 let requestSoundActive = false;
 
 function setDriverStatus(t) { setText(driverStatus, t); }
