@@ -483,13 +483,17 @@ async function drawRideRoute(ride) {
 function refreshSelectedRideButtons(ride) {
   const myUid = auth.currentUser?.uid || null, mine = ride?.driverId === myUid, status = String(ride?.status || "");
   const canOffer = status === "requested" && !ride?.driverId;
-  const canAccept = (status === "requested" && !ride?.driverId) || (status === "offered" && (!ride?.driverId || mine)) || (status === "accepted" && mine);
-  const canTrack = mine && ["accepted", "arrived", "started"].includes(status);
-  const canArrive = mine && status === "accepted";
-  const canStart = mine && status === "arrived";
-  const canComplete = mine && (status === "started" || ride?.passengerEndRequested === true);
-  const canCancel = mine && ["accepted", "arrived", "started", "offered"].includes(status);
-  const canChat = mine && ["accepted", "arrived", "started"].includes(status);
+const canAccept = (status === "requested" && !ride?.driverId) || (status === "offered" && (!ride?.driverId || mine)) || (status === "accepted" && mine);
+const canTrack = mine && ["accepted", "arrived", "started"].includes(status);
+const canArrive = mine && status === "accepted";
+const canStart = mine && status === "arrived";
+
+// === التعديل الجديد ===
+const canDecline = mine && ["accepted", "arrived"].includes(status);   // يظهر زر الاعتذار
+const canComplete = mine && (status === "started" || ride?.passengerEndRequested === true);
+
+const canCancel = mine && ["accepted", "arrived", "started", "offered"].includes(status);
+const canChat = mine && ["accepted", "arrived", "started"].includes(status);
   driverStartRideBtn.disabled = !canStart; btnSendOffer.disabled = !canOffer; btnAccept.disabled = !canAccept; btnTrackToggle.disabled = !canTrack; btnCancel.disabled = !canCancel; btnArrived.disabled = !canArrive; btnComplete.disabled = !canComplete;
   if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
   if (btnChatDriver) btnChatDriver.disabled = !canChat;
