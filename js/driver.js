@@ -581,7 +581,7 @@ function watchRidesForDriver() {
   let openRows = [], mineRows = [];
   const renderMerged = () => {
     const mergedMap = new Map();
-    [...openRows, ...mineRows].forEach((r) => { if (isRideVisibleForDriver(r)) mergedMap.set(r.id, r); });
+    [...openRows, ...mineRows].forEach((r) => { if (isRideVisibleForDriver(r) && !ignoredRideIds.has(r.id)) mergedMap.set(r.id, r); });
     const rides = Array.from(mergedMap.values()).sort((a, b) => {
       const aMine = a.driverId === driverUid ? 1 : 0, bMine = b.driverId === driverUid ? 1 : 0;
       if (aMine !== bMine) return bMine - aMine;
