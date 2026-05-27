@@ -712,6 +712,52 @@ btnComplete?.addEventListener("click", async () => { if (!selectedRideId) return
 // ربط زر الاعتذار
 btnDeclineRide?.addEventListener("click", declineRide);
 
+// ====================== زر التجاهل (Ignore Request) ======================
+btnCancel?.addEventListener("click", async () => {
+    if (!selectedRideId || !selectedRideData) return;
+
+    const status = String(selectedRideData.status || "");
+
+    // تجاهل الطلب الجديد (requested)
+    if (status === "requested" && !selectedRideData.driverId) {
+        
+        resetSelectedRideUi("تم تجاهل الطلب");
+
+        // إخفاء الكارت من القائمة
+        const card = document.querySelector(`.list-item[onclick*="selectRide('${selectedRideId}'"]`);
+        if (card) {
+            card.style.display = "none";
+            // card.remove();   // لو عايز تشيله نهائياً
+        }
+
+        notify({ 
+            title: "تم التجاهل", 
+            body: "تم إخفاء الطلب من قائمتك", 
+            tag: "ride-ignored" 
+        });
+
+        return;
+    }
+
+    // إلغاء الرحلة في المراحل المتقدمة
+    if (["accepted", "arrived", "started", "offered"].includes(status)) {
+        if (!confirm("هل تريد إلغاء الرحلة الحالية؟")) return;
+        
+        try {
+            await updateDoc(doc(db, "rides", selectedRideId), {
+                status: "canceled",
+                canceledBy: "driver",
+                canceledAt: serverTimestamp()
+            });
+            resetSelectedRideUi("تم إلغاء الرحلة");
+            notify({ title: "تم الإلغاء", body: "تم إلغاء الرحلة", tag: "ride-canceled" });
+        } catch (e) {
+            console.error(e);
+            notify({ title: "خطأ", body: "فشل في الإلغاء", tag: "error" });
+        }
+    }
+});
+
 editProfileBtn?.addEventListener("click", async () => {
   closeDriverDrawer(); if (!admin || !myUser) return;
   const gov = prompt("المحافظة", myUser.governorate || ""); if (!gov) return;
