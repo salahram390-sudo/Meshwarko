@@ -45,6 +45,7 @@ const offerInput = $("#offerInput");
 const btnSendOffer = $("#btnSendOffer");
 const btnAccept = $("#btnAccept");
 const btnComplete = $("#btnComplete");
+const btnDeclineRide = $("#btnDeclineRide");
 const btnCancel = $("#btnCancel");
 const btnTrackToggle = $("#btnTrackToggle");
 const btnArrived = $("#btnArrived");
