@@ -520,7 +520,8 @@ function refreshSelectedRideButtons(ride) {
   const canDecline = mine && ["accepted", "arrived"].includes(status);
   const canComplete = mine && (status === "started" || ride?.passengerEndRequested === true);
 
-  const canCancel = mine && ["accepted", "arrived", "started", "offered"].includes(status);
+  const canCancel = (status === "requested" && !ride?.driverId) || 
+  (mine && ["accepted", "arrived", "started", "offered"].includes(status));
   const canChat = mine && ["accepted", "arrived", "started"].includes(status);
 
   // تفعيل / تعطيل الأزرار
