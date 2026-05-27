@@ -494,7 +494,16 @@ const canComplete = mine && (status === "started" || ride?.passengerEndRequested
 
 const canCancel = mine && ["accepted", "arrived", "started", "offered"].includes(status);
 const canChat = mine && ["accepted", "arrived", "started"].includes(status);
-  driverStartRideBtn.disabled = !canStart; btnSendOffer.disabled = !canOffer; btnAccept.disabled = !canAccept; btnTrackToggle.disabled = !canTrack; btnCancel.disabled = !canCancel; btnArrived.disabled = !canArrive; btnComplete.disabled = !canComplete;
+driverStartRideBtn.disabled = !canStart; 
+btnSendOffer.disabled = !canOffer; 
+btnAccept.disabled = !canAccept; 
+btnTrackToggle.disabled = !canTrack; 
+btnCancel.disabled = !canCancel; 
+btnArrived.disabled = !canArrive; 
+
+// === التعديل الجديد ===
+btnDeclineRide.disabled = !canDecline;
+btnComplete.disabled = !canComplete;
   if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
   if (btnChatDriver) btnChatDriver.disabled = !canChat;
 }
