@@ -309,6 +309,55 @@ notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الو
   } catch (e) { console.error(e); setDriverStatus("خطأ"); }
   finally { if (auto) autoCompletingRide = false; }
 }
+// ====================== اعتذار السائق عن الرحلة ======================
+async function declineRide() {
+    if (!selectedRideId || !selectedRideData) {
+        showToast("لا يوجد رحلة محددة", "error");
+        return;
+    }
+
+    const status = selectedRideData.status || "";
+    if (!["accepted", "arrived"].includes(status)) {
+        showToast("لا يمكن الاعتذار في هذه المرحلة", "error");
+        return;
+    }
+
+    if (!confirm("هل أنت متأكد أنك تريد الاعتذار عن هذه الرحلة؟\nسيتم إرجاع الطلب للراكب.")) {
+        return;
+    }
+
+    try {
+        setDriverStatus("جاري الاعتذار...");
+
+        await updateDoc(doc(db, "rides", selectedRideId), {
+            status: "driver_declined",
+            declinedAt: serverTimestamp(),
+            declinedBy: myUser.uid,
+            declinedReason: "اعتذار السائق قبل بدء الرحلة"
+        });
+
+        // إشعار الراكب
+        if (selectedRideData.passengerId) {
+            await notify({
+                userId: selectedRideData.passengerId,
+                title: "اعتذار السائق",
+                body: "السائق اعتذر عن الرحلة. جاري البحث عن سائق آخر...",
+                tag: "ride-declined"
+            });
+        }
+
+        showToast("تم الاعتذار عن الرحلة بنجاح", "success");
+        playSound("notification");
+
+        // إعادة تعيين الواجهة
+        resetSelectedRideUi("تم الاعتذار عن الرحلة");
+        loadAvailableRides?.(); // أو watchRidesForDriver()
+
+    } catch (error) {
+        console.error("Decline ride error:", error);
+        showToast("حدث خطأ أثناء الاعتذار", "error");
+    }
+}
 async function tryAutoCompleteCurrentRide() { if (!selectedRideId || !selectedRideData || selectedRideData.status !== "started" || !isDriverNearDropoff(selectedRideData)) return; await completeRideCore({ auto: true }); }
 function finalizeDriverRideCleanup(successMessage = "تمت الرحلة بنجاح ✅") { try { closeDriverDrawer(); closeDriverChatModal(); resetSelectedRideUi(successMessage); setDriverStatus("متاح"); } catch (e) { console.error("Driver cleanup error:", e); } }
 function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
