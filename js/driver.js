@@ -669,6 +669,8 @@ driverStartRideBtn?.addEventListener("click", async () => {
   } catch (err) { console.error(err); setDriverStatus("خطأ"); }
 });
 btnComplete?.addEventListener("click", async () => { if (!selectedRideId) return; await completeRideCore({ auto: false }); });
+// ربط زر الاعتذار
+btnDeclineRide?.addEventListener("click", declineRide);
 
 editProfileBtn?.addEventListener("click", async () => {
   closeDriverDrawer(); if (!admin || !myUser) return;
