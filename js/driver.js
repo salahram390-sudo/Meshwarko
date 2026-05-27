@@ -378,7 +378,8 @@ function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   btnTrackToggle.disabled = true; 
   btnCancel.disabled = true; 
   btnArrived.disabled = true; 
-  btnComplete.disabled = true; 
+btnDeclineRide.disabled = true;   // ← أضف ده
+btnComplete.disabled = true;
   driverStartRideBtn.disabled = true;
   
   if (btnChatDriver) btnChatDriver.disabled = true;
