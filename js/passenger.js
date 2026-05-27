@@ -220,6 +220,32 @@ function clampPrice(v) {
   if (!Number.isFinite(n)) return 15;
   return Math.min(3000, Math.max(15, Math.round(n / 5) * 5));
 }
+// زيادة أو نقصان السعر بخطوة 5
+function changePrice(delta) {
+  let current = Number(priceSlider.value) || 15;
+  let newPrice = Math.max(15, Math.min(3000, current + delta));
+  priceSlider.value = newPrice;
+  updatePriceUI();
+}
+
+// ربط الأزرار
+function setupPriceControls() {
+  const minusBtn = document.getElementById('priceMinus');
+  const plusBtn = document.getElementById('pricePlus');
+  const slider = document.getElementById('priceSlider');
+
+  if (minusBtn) minusBtn.addEventListener('click', () => changePrice(-5));
+  if (plusBtn)  plusBtn.addEventListener('click', () => changePrice(5));
+
+  // التأكد إن الـ Slider دايماً بخطوات 5
+  if (slider) {
+    slider.addEventListener('input', () => {
+      let val = Number(slider.value);
+      slider.value = Math.round(val / 5) * 5;   // يجبره على مضاعفات 5
+      updatePriceUI();
+    });
+  }
+}
 function buildPricingSummary(distanceMeters, durationSec, manualPrice) {
   const km = Number(distanceMeters || 0) / 1000;
   const mins = Number(durationSec || 0) / 60;
