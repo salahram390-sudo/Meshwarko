@@ -120,13 +120,22 @@
       <div class="muted" id="distanceValue">—</div>
     </div>
 
-    <div class="form-row">
-      <label class="label">السعر (15 → 3000) خطوة 5 جنيه</label>
-      <input id="priceSlider" class="slider" type="range" min="15" max="3000" step="5" value="50" />
-      <div class="row-between muted small">
-        <span>15</span><span>1500</span><span>3000</span>
-      </div>
-    </div>
+    <div class="form-row" style="margin-top:10px">
+  <label class="label">السعر (خطوة 5 جنيه)</label>
+  
+  <div class="price-control" style="display:flex; align-items:center; gap:10px; margin:8px 0;">
+    <button id="priceMinus" class="price-btn" style="width:45px; height:45px; font-size:20px; border-radius:50%;">-</button>
+    
+    <input id="priceSlider" class="slider" type="range" min="15" max="3000" step="5" value="50" style="flex:1;"/>
+    
+    <button id="pricePlus" class="price-btn" style="width:45px; height:45px; font-size:20px; border-radius:50%;">+</button>
+  </div>
+
+  <div class="row-between muted small">
+    <span>15</span><span>1500</span><span>3000</span>
+  </div>
+</div>
+    
     <p class="hint" id="surgeHint">يتم تحسين السعر حسب المسافة وزمن الذروة تلقائيًا.</p>
   </div>
           
