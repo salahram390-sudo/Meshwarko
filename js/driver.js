@@ -311,6 +311,8 @@ notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الو
 }
 
 // ====================== اعتذار السائق عن الرحلة ======================
+let declineCallback = null;
+
 async function declineRide() {
     if (!selectedRideId || !selectedRideData) {
         notify({ title: "خطأ", body: "لا يوجد رحلة محددة", tag: "error" });
@@ -323,43 +325,59 @@ async function declineRide() {
         return;
     }
 
-    if (!confirm("هل أنت متأكد أنك تريد الاعتذار عن هذه الرحلة؟\nسيتم إرجاع الطلب للراكب ليبحث عن سائق آخر.")) {
-        return;
-    }
+    // عرض الـ Modal الاحترافي
+    const modal = document.getElementById('declineConfirmModal');
+    modal.classList.remove('hidden');
+    document.getElementById('declineBackdrop').classList.add('show');
 
-    try {
-        setDriverStatus("جاري الاعتذار...");
+    // إعداد الأزرار
+    declineCallback = async () => {
+        try {
+            setDriverStatus("جاري الاعتذار...");
 
-        await updateDoc(doc(db, "rides", selectedRideId), {
-            status: "driver_declined",
-            declinedAt: serverTimestamp(),
-            declinedBy: myUser.uid,
-            declinedReason: "اعتذار السائق قبل بدء الرحلة"
-        });
-
-        // إشعار الراكب
-        if (selectedRideData.passengerId) {
-            await notify({
-                userId: selectedRideData.passengerId,
-                title: "اعتذار السائق",
-                body: "السائق اعتذر عن الرحلة. جاري البحث عن سائق آخر...",
-                tag: "ride-declined"
+            await updateDoc(doc(db, "rides", selectedRideId), {
+                status: "driver_declined",
+                declinedAt: serverTimestamp(),
+                declinedBy: myUser.uid,
+                declinedReason: "اعتذار السائق قبل بدء الرحلة"
             });
+
+            if (selectedRideData.passengerId) {
+                await notify({
+                    userId: selectedRideData.passengerId,
+                    title: "اعتذار السائق",
+                    body: "السائق اعتذر عن الرحلة. جاري البحث عن سائق آخر...",
+                    tag: "ride-declined"
+                });
+            }
+
+            notify({ title: "تم الاعتذار", body: "تم إرجاع الطلب بنجاح", tag: "success" });
+            playSound("notification");
+
+            resetSelectedRideUi("تم الاعتذار عن الرحلة");
+            watchRidesForDriver();
+
+        } catch (error) {
+            console.error("Decline ride error:", error);
+            notify({ title: "خطأ", body: "حدث خطأ أثناء الاعتذار", tag: "error" });
         }
-
-        notify({ title: "تم الاعتذار", body: "تم إرجاع الطلب بنجاح", tag: "success" });
-        playSound("notification");
-
-        // إعادة تعيين الواجهة
-        resetSelectedRideUi("تم الاعتذار عن الرحلة");
-        watchRidesForDriver();   // تحديث قائمة الطلبات
-
-    } catch (error) {
-        console.error("Decline ride error:", error);
-        notify({ title: "خطأ", body: "حدث خطأ أثناء الاعتذار", tag: "error" });
-        setDriverStatus("خطأ");
-    }
+    };
 }
+
+// إغلاق الـ Modal
+function closeDeclineModal() {
+    const modal = document.getElementById('declineConfirmModal');
+    modal.classList.add('hidden');
+    document.getElementById('declineBackdrop').classList.remove('show');
+    declineCallback = null;
+}
+
+// ربط الأزرار (ضعها بعد تعريف الدوال)
+document.getElementById('declineCancelBtn')?.addEventListener('click', closeDeclineModal);
+document.getElementById('declineConfirmBtn')?.addEventListener('click', () => {
+    if (declineCallback) declineCallback();
+    closeDeclineModal();
+});
 
 async function tryAutoCompleteCurrentRide() { if (!selectedRideId || !selectedRideData || selectedRideData.status !== "started" || !isDriverNearDropoff(selectedRideData)) return; await completeRideCore({ auto: true }); }
 function finalizeDriverRideCleanup(successMessage = "تمت الرحلة بنجاح ✅") { try { closeDriverDrawer(); closeDriverChatModal(); resetSelectedRideUi(successMessage); setDriverStatus("متاح"); } catch (e) { console.error("Driver cleanup error:", e); } }
