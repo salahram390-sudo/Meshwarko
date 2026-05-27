@@ -721,7 +721,7 @@ btnCancel?.addEventListener("click", async () => {
 
     // تجاهل الطلب الجديد (requested)
     if (status === "requested" && !selectedRideData.driverId) {
-        
+        ignoredRideIds.add(selectedRideId);
         resetSelectedRideUi("تم تجاهل الطلب");
 
         // إخفاء الكارت من القائمة
