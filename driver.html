@@ -163,7 +163,25 @@
       </div>
     </div>
 
-    <div id="toastRoot"></div>
+    <!-- Modal تأكيد الاعتذار -->
+<div id="declineConfirmModal" class="modal hidden" role="dialog">
+  <div class="modal-backdrop" id="declineBackdrop"></div>
+  <div class="modal-card" style="max-width: 380px;">
+    <div class="modal-head">
+      <div class="modal-title">تأكيد الاعتذار</div>
+    </div>
+    <div class="modal-body" style="padding: 20px; text-align: center; font-size: 15.5px; line-height: 1.5;">
+      هل أنت متأكد أنك تريد الاعتذار عن هذه الرحلة؟<br>
+      <strong style="color:#ff5252;">سيتم إرجاع الطلب للراكب ليبحث عن سائق آخر.</strong>
+    </div>
+    <div class="modal-actions" style="display:flex; gap:10px; padding:15px;">
+      <button id="declineCancelBtn" class="btn ghost" style="flex:1;">إلغاء</button>
+      <button id="declineConfirmBtn" class="btn danger" style="flex:1;">نعم، اعتذر</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastRoot"></div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
