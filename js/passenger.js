@@ -816,66 +816,151 @@ function watchCurrentRide(userId) {
 async function handleRideSnapshot(rideSnap) {
   if (!rideSnap.exists()) return hardResetPassengerUI();
   if (!currentRideId || rideSnap.id !== currentRideId) return;
-  const ride = rideSnap.data(); const authUid = auth.currentUser?.uid || null;
-selectedRideData = { ...ride, id: rideSnap.id };
-  const soundKey = `${rideSnap.id}:${ride.status}:${ride.offerPrice || ride.price || 0}:${ride.driverId || ""}`;
+
+  const ride = rideSnap.data();
+  const authUid = auth.currentUser?.uid || null;
+  selectedRideData = { ...ride, id: rideSnap.id };
+
+  const soundKey = `\( {rideSnap.id}: \){ride.status}:\( {ride.offerPrice || ride.price || 0}: \){ride.driverId || ""}`;
 
   if (lastRideSoundKey !== soundKey) {
-  // إدارة صوت الطلب المستمر (loop)
-  if (ride.status === "requested") {
-    startRequestSound();
-  } else {
-    stopRequestSound();   // وقف الصوت في كل الحالات غير "requested"
-  }
-
-  // أصوات منفصلة للأحداث
-  if (ride.status === "offered") {
-    playSound("offer");
-  } else if (ride.status === "accepted") {
-    playSound("accepted");
-  } else if (ride.status === "arrived") {
-    playSound("arrived");
-  } else if (ride.status === "started") {
-    playSound("started");
-  } else if (ride.status === "completed") {
-    playSound("success");
-  } else if (ride.status === "canceled") {
-    playSound("cancel");
-  }
-
-  lastRideSoundKey = soundKey;
-}
-  
-  if (!authUid || ride.passengerId !== authUid) { if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; } return hardResetPassengerUI(); }
-  if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
-
-    if (ride.status === "completed") {
-      if (completedToastShownFor !== rideSnap.id) { completedToastShownFor = rideSnap.id; notify({ title: "تمت الرحلة بنجاح 🎉", body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅", tag: "ride-completed" }); }
-      stopDriverTracking();
-removeRouteLayer(routeLayerRef);
-removeRouteLayer(driverRouteLayerRef);
-setText(distanceValue, "");
-setText(routeMeta, "تم الوصول إلى مكان الوصول وإنهاء الرحلة بنجاح.");
-setStatus("تمت الرحلة");
-currentRideId = rideSnap.id;
-      if (!ride.passengerRating) { renderStars(0); setText(rateHint, ""); showRatingModal(); return; }
-      finalizePassengerRideCleanup(); return;
+    if (ride.status === "requested") {
+      startRequestSound();
+    } else {
+      stopRequestSound();
     }
-    if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
-    removeRouteLayer(routeLayerRef); removeRouteLayer(driverRouteLayerRef); setText(distanceValue, ""); setText(routeMeta, ""); stopDriverTracking(); hardResetPassengerUI(); return;
+
+    if (ride.status === "offered") playSound("offer");
+    else if (ride.status === "accepted") playSound("accepted");
+    else if (ride.status === "arrived") playSound("arrived");
+    else if (ride.status === "started") playSound("started");
+    else if (ride.status === "completed") playSound("success");
+    else if (ride.status === "canceled") playSound("cancel");
+    else if (ride.status === "driver_declined") playSound("cancel");
+
+    lastRideSoundKey = soundKey;
   }
+
+  if (!authUid || ride.passengerId !== authUid) {
+    if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
+    return hardResetPassengerUI();
+  }
+
+  // ====================== معالجة حالة اعتذار السائق ======================
+  if (ride.status === "driver_declined") {
+    notify({
+      title: "السائق اعتذر",
+      body: "السائق اعتذر عن الرحلة. جاري إعادة الطلب للبحث عن سائق آخر...",
+      tag: "driver-declined"
+    });
+
+    setStatus("السائق اعتذر عن الرحلة");
+    setText(routeMeta, "السائق اعتذر. سيتم إعادة الطلب تلقائياً...");
+
+    // إعادة الطلب إلى حالة البحث
+    try {
+      await updateDoc(doc(db, "rides", currentRideId), {
+        status: "requested",
+        driverId: null,
+        driverName: null,
+        driverPhone: null,
+        driverVehicleType: null,
+        driverVehicleCode: null,
+        offerPrice: null,
+        offeredAt: null,
+        declinedAt: null,
+        declinedBy: null,
+        declinedReason: null
+      });
+    } catch (e) {
+      console.error("Failed to reset ride after decline:", e);
+    }
+
+    return; // مش هنكمل الباقي
+  }
+
+  // ====================== باقي الحالات العادية ======================
+  if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
+    if (ride.status === "completed") {
+      if (completedToastShownFor !== rideSnap.id) {
+        completedToastShownFor = rideSnap.id;
+        notify({ title: "تمت الرحلة بنجاح 🎉", body: "تم الوصول لمكان الوصول وإنهاء الرحلة بنجاح ✅", tag: "ride-completed" });
+      }
+      stopDriverTracking();
+      removeRouteLayer(routeLayerRef);
+      removeRouteLayer(driverRouteLayerRef);
+      setText(distanceValue, "");
+      setText(routeMeta, "تم الوصول إلى مكان الوصول وإنهاء الرحلة بنجاح.");
+      setStatus("تمت الرحلة");
+      currentRideId = rideSnap.id;
+      if (!ride.passengerRating) {
+        renderStars(0);
+        setText(rateHint, "");
+        showRatingModal();
+        return;
+      }
+      finalizePassengerRideCleanup();
+      return;
+    }
+
+    if (currentRideDocUnsub) { currentRideDocUnsub(); currentRideDocUnsub = null; }
+    removeRouteLayer(routeLayerRef);
+    removeRouteLayer(driverRouteLayerRef);
+    setText(distanceValue, "");
+    setText(routeMeta, "");
+    stopDriverTracking();
+    hardResetPassengerUI();
+    return;
+  }
+
   currentRideId = rideSnap.id;
   currentPickup = ride.pickup?.lat && ride.pickup?.lon ? { lat: Number(ride.pickup.lat), lon: Number(ride.pickup.lon) } : null;
+
   updateRideActionVisibility(ride);
-  btnRequest.disabled = true; btnCancel.disabled = !(ride.status === "requested" || ride.status === "offered"); btnAcceptOffer.disabled = ride.status !== "offered"; btnRejectOffer.disabled = ride.status !== "offered"; btnTrack.disabled = !(["accepted", "arrived", "started"].includes(ride.status)); btnComplete.disabled = !(["accepted", "arrived", "started"].includes(ride.status)); btnCall.disabled = !(["accepted", "arrived", "started"].includes(ride.status)); btnWhats.disabled = !(["accepted", "arrived", "started"].includes(ride.status)); if (btnChatPassenger) btnChatPassenger.disabled = !(["accepted", "arrived", "started"].includes(ride.status));
-  if (ride.status === "requested") { setText(routeMeta, "جاري البحث عن سائق..."); setStatus("جاري البحث"); stopDriverTracking(); }
-  else if (ride.status === "offered") { setText(routeMeta, "وصل عرض سعر من السائق. اختر قبول أو رفض."); setStatus("وصل عرض"); stopDriverTracking(); }
-  else if (ride.status === "accepted") { setText(routeMeta, "السائق في الطريق إليك..."); setStatus("السائق في الطريق"); if (ride.driverId) startDriverTracking(ride.driverId); }
-  else if (ride.status === "arrived") { setText(routeMeta, "السائق وصل لمكان القيام ✅"); setStatus("السائق وصل"); if (ride.driverId) startDriverTracking(ride.driverId); }
-  else if (ride.status === "started") { setText(routeMeta, "بدأت الرحلة ✅"); setStatus("الرحلة بدأت"); if (ride.driverId) startDriverTracking(ride.driverId); }
-  if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) { arrivedToastShownFor = currentRideId; notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" }); }
-  const driverProfile = ["accepted", "arrived", "started"].includes(ride.status) ? { name: ride.driverName || "", phone: ride.driverPhone || "", vehicleType: ride.driverVehicleType || ride.vehicleType || "", vehicleCode: ride.driverVehicleCode || "" } : null;
-  renderRideCard(ride, driverProfile); if (driverProfile) setDriverContactButtons(driverProfile.phone); else setDriverContactButtons(null);
+  btnRequest.disabled = true;
+  btnCancel.disabled = !(ride.status === "requested" || ride.status === "offered");
+  btnAcceptOffer.disabled = ride.status !== "offered";
+  btnRejectOffer.disabled = ride.status !== "offered";
+  btnTrack.disabled = !(["accepted", "arrived", "started"].includes(ride.status));
+  btnComplete.disabled = !(["accepted", "arrived", "started"].includes(ride.status));
+  btnCall.disabled = !(["accepted", "arrived", "started"].includes(ride.status));
+  btnWhats.disabled = !(["accepted", "arrived", "started"].includes(ride.status));
+  if (btnChatPassenger) btnChatPassenger.disabled = !(["accepted", "arrived", "started"].includes(ride.status));
+
+  if (ride.status === "requested") {
+    setText(routeMeta, "جاري البحث عن سائق...");
+    setStatus("جاري البحث");
+    stopDriverTracking();
+  } else if (ride.status === "offered") {
+    setText(routeMeta, "وصل عرض سعر من السائق. اختر قبول أو رفض.");
+    setStatus("وصل عرض");
+    stopDriverTracking();
+  } else if (ride.status === "accepted") {
+    setText(routeMeta, "السائق في الطريق إليك...");
+    setStatus("السائق في الطريق");
+    if (ride.driverId) startDriverTracking(ride.driverId);
+  } else if (ride.status === "arrived") {
+    setText(routeMeta, "السائق وصل لمكان القيام ✅");
+    setStatus("السائق وصل");
+    if (ride.driverId) startDriverTracking(ride.driverId);
+  } else if (ride.status === "started") {
+    setText(routeMeta, "بدأت الرحلة ✅");
+    setStatus("الرحلة بدأت");
+    if (ride.driverId) startDriverTracking(ride.driverId);
+  }
+
+  if (ride.arrivedAtPickup === true && arrivedToastShownFor !== currentRideId) {
+    arrivedToastShownFor = currentRideId;
+    notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
+  }
+
+  const driverProfile = ["accepted", "arrived", "started"].includes(ride.status) 
+    ? { name: ride.driverName || "", phone: ride.driverPhone || "", vehicleType: ride.driverVehicleType || ride.vehicleType || "", vehicleCode: ride.driverVehicleCode || "" } 
+    : null;
+
+  renderRideCard(ride, driverProfile);
+  if (driverProfile) setDriverContactButtons(driverProfile.phone);
+  else setDriverContactButtons(null);
 }
 
 pickupSearchBtn.addEventListener("click", () => manualSearch("pickup"));
