@@ -1216,4 +1216,5 @@ onAuthStateChanged(auth, async (user) => {
 await initAdmin().catch(() => {});
   locateOnce(map, (loc) => { myLocation = loc; showMyLocation(map, loc, { pan: true }); });
   watchCurrentRide(user.uid);
+  setupPriceControls();
 });
