@@ -550,23 +550,100 @@ function refreshSelectedRideButtons(ride) {
   if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
   if (btnChatDriver) btnChatDriver.disabled = !canChat;
 }
+function renderSelectedRideCard(ride) {
+  if (!selectedRideEl || !ride) return;
+
+  const distanceToMe = getRideDistanceToMe(ride);
+  const status = String(ride.status || "requested");
+
+  const statusLabel = {
+    requested: "طلب جديد",
+    offered: "تم إرسال عرض",
+    accepted: "مقبول",
+    arrived: "وصلت للراكب",
+    started: "الرحلة بدأت",
+    completed: "مكتملة",
+    canceled: "ملغية",
+  }[status] || status;
+
+  const passengerBlock = ride.driverId === auth.currentUser?.uid
+    ? `
+      <div class="divider"></div>
+      <div><b>بيانات الراكب</b></div>
+      <div class="muted small">الاسم: ${escapeHtml(ride.passengerName || "-")}</div>
+      <div class="muted small">الهاتف: ${escapeHtml(ride.passengerPhone || "-")}</div>
+    `
+    : `<div class="muted small">بيانات الراكب تظهر بعد القبول.</div>`;
+
+  selectedRideEl.innerHTML = `
+    <div class="row-between">
+      <b>الحالة</b>
+      <span class="muted">${escapeHtml(statusLabel)}</span>
+    </div>
+
+    <div class="row-between">
+      <b>السعر</b>
+      <span>${moneyEGP(ride.offerPrice || ride.price || 0)}</span>
+    </div>
+
+    <div class="muted small">
+      المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")}
+    </div>
+
+    <div class="muted small">
+      نوع المركبة: ${escapeHtml(ride.vehicleType || "-")}
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="muted small"><b>مكان القيام:</b> ${escapeHtml(ride.pickupText || "—")}</div>
+    <div class="muted small"><b>مكان الوصول:</b> ${escapeHtml(ride.dropoffText || "—")}</div>
+
+    ${
+      ride.distanceMeters
+        ? `<div class="muted small"><b>مسافة الرحلة:</b> ${(Number(ride.distanceMeters) / 1000).toFixed(1)} كم</div>`
+        : ""
+    }
+
+    ${
+      Number.isFinite(distanceToMe)
+        ? `<div class="muted small"><b>يبعد عنك:</b> ${(distanceToMe / 1000).toFixed(1)} كم</div>`
+        : ""
+    }
+
+    ${
+      ride.rideNote
+        ? `<div class="muted small"><b>نبذة عن المشوار:</b> ${escapeHtml(ride.rideNote)}</div>`
+        : ""
+    }
+
+    ${passengerBlock}
+  `;
+}
 async function selectRide(id, ride) {
-  selectedRideId = id; selectedRideData = ride; syncOfferBtn(); refreshSelectedRideButtons(ride);
+  selectedRideId = id;
+  selectedRideData = { ...ride, id };
+
+  syncOfferBtn();
+  refreshSelectedRideButtons(selectedRideData);
+
   if (pickupMarker) try { map.removeLayer(pickupMarker); } catch (_) {}
   if (dropMarker) try { map.removeLayer(dropMarker); } catch (_) {}
-  if (ride?.pickup?.lat != null && ride?.pickup?.lon != null) pickupMarker = addMarker(map, [ride.pickup.lat, ride.pickup.lon], { icon: createPickupIcon() });
-  if (ride?.dropoff?.lat != null && ride?.dropoff?.lon != null) dropMarker = addMarker(map, [ride.dropoff.lat, ride.dropoff.lon], { icon: createDropoffIcon() });
-  const distanceToMe = getRideDistanceToMe(ride);
-  selectedRideEl.innerHTML = `
-    <div class="row-between"><b>السعر</b><span>${moneyEGP(ride.price)}</span></div>
-    ${ride.offerPrice ? `<div class="row-between"><b>عرض حالي</b><span>${moneyEGP(ride.offerPrice)}</span></div>` : ""}
-    <div class="muted small">المنطقة: ${escapeHtml(ride.governorate || "-")} / ${escapeHtml(ride.center || "-")} • مركبة: ${escapeHtml(ride.vehicleType || "-")}</div>
-    <div class="muted small">قيام: ${escapeHtml(ride.pickupText || "—")}</div>
-    <div class="muted small">وصول: ${escapeHtml(ride.dropoffText || "—")}</div>
-    ${ride.rideNote ? `<div class="muted small"><b>ملاحظة الراكب:</b> ${escapeHtml(ride.rideNote)}</div>` : ""}
-    <div class="muted small">${Number.isFinite(distanceToMe) ? `يبعد عنك ${(distanceToMe / 1000).toFixed(1)} كم` : ""}</div>
-    <div class="muted small">بيانات الراكب تظهر بعد القبول.</div>`;
-  await drawRideRoute(ride);
+
+  if (ride?.pickup?.lat != null && ride?.pickup?.lon != null) {
+    pickupMarker = addMarker(map, [ride.pickup.lat, ride.pickup.lon], {
+      icon: createPickupIcon()
+    });
+  }
+
+  if (ride?.dropoff?.lat != null && ride?.dropoff?.lon != null) {
+    dropMarker = addMarker(map, [ride.dropoff.lat, ride.dropoff.lon], {
+      icon: createDropoffIcon()
+    });
+  }
+
+  renderSelectedRideCard(selectedRideData);
+  await drawRideRoute(selectedRideData);
 }
 
 async function showAcceptedDetails(rideId) {
