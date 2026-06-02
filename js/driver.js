@@ -696,7 +696,10 @@ function watchRidesForDriver() {
     syncIncomingRequestSound(rides);
     ridesList.innerHTML = "";
     renderDriverHistory(mineRows.filter((r) => r.status === "completed"));
-    if (!rides.length) return void (ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`);
+    if (!rides.length) {
+  resetSelectedRideUi("لم يتم تحديد طلب.");
+  return void (ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`);
+}
     const preferredRide = rides.find((r) => r.driverId === driverUid && ["accepted", "arrived", "started"].includes(r.status)) || rides.find((r) => r.id === selectedRideId) || rides[0];
     if (preferredRide) {
   if (preferredRide.id !== selectedRideId) {
