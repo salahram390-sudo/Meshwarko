@@ -685,7 +685,16 @@ function watchRidesForDriver() {
     renderDriverHistory(mineRows.filter((r) => r.status === "completed"));
     if (!rides.length) return void (ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`);
     const preferredRide = rides.find((r) => r.driverId === driverUid && ["accepted", "arrived", "started"].includes(r.status)) || rides.find((r) => r.id === selectedRideId) || rides[0];
-    if (preferredRide && preferredRide.id !== selectedRideId) selectRide(preferredRide.id, preferredRide).catch((e) => console.warn("auto-select ride failed", e));
+    if (preferredRide) {
+  if (preferredRide.id !== selectedRideId) {
+    selectRide(preferredRide.id, preferredRide)
+      .catch((e) => console.warn("auto-select ride failed", e));
+  } else {
+    selectedRideData = { ...preferredRide };
+    refreshSelectedRideButtons(selectedRideData);
+    renderSelectedRideCard(selectedRideData);
+  }
+}
     rides.forEach((r) => {
       const item = document.createElement("div");
       item.className = "list-item" + (selectedRideId === r.id ? " active" : "");
