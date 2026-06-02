@@ -194,21 +194,34 @@ function renderDriverHistory(rides) {
 }
 
 function isRideVisibleForDriver(ride) {
-  if (!ride || !isActiveRideStatus(ride.status) || ride.archived === true) return false;
-  if (isRideExpired(ride, getRideFreshMaxAgeMs(ride.status))) return false;
+  if (!ride || ride.archived === true) return false;
+
   const myUid = auth.currentUser?.uid || null;
+  const status = String(ride.status || "");
+
+  if (!isActiveRideStatus(status)) return false;
+  if (isRideExpired(ride, getRideFreshMaxAgeMs(status))) return false;
+
+  // لو الطلب اتاخد بسائق تاني، اخفيه
   if (ride.driverId && ride.driverId !== myUid) return false;
-  if (myUser?.vehicleType && ride.vehicleType && myUser.vehicleType !== ride.vehicleType) return false;
-  if (ride.status === "requested" && ride.driverId == null) {
-    const nearestId = ride.nearestDriverId || null;
-    const nearestIds = Array.isArray(ride.nearestDriverIds) ? ride.nearestDriverIds : [];
-    if (nearestIds.length) return nearestIds.includes(myUid);
-    if (nearestId) return nearestId === myUid;
-    const distanceToMe = getRideDistanceToMe(ride);
-    if (Number.isFinite(distanceToMe) && distanceToMe > MAX_VISIBLE_RIDE_DISTANCE_M) return false;
+
+  // نفس نوع المركبة
+  if (myUser?.vehicleType && ride.vehicleType && myUser.vehicleType !== ride.vehicleType) {
+    return false;
   }
+
+  // نفس المحافظة والمركز احتياطيًا
+  if (myUser?.governorate && ride.governorate && ride.governorate !== myUser.governorate) {
+    return false;
+  }
+
+  if (myUser?.center && ride.center && ride.center !== myUser.center) {
+    return false;
+  }
+
   return true;
 }
+
 function getRideDistanceToMe(ride) {
   const myUid = auth.currentUser?.uid || null;
   const nearestRows = Array.isArray(ride?.nearestDrivers) ? ride.nearestDrivers : [];
