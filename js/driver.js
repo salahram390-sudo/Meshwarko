@@ -633,6 +633,7 @@ function renderSelectedRideCard(ride) {
   `;
 }
 async function selectRide(id, ride) {
+  showSelectedRideBox();
   selectedRideId = id;
   selectedRideData = { ...ride, id };
 
