@@ -96,6 +96,16 @@ let requestSoundActive = false;
 
 function setDriverStatus(t) { setText(driverStatus, t); }
 
+function showSelectedRideBox() {
+  if (selectedRideBox) selectedRideBox.style.display = "";
+  if (selectedRideDivider) selectedRideDivider.style.display = "";
+}
+
+function hideSelectedRideBox() {
+  if (selectedRideBox) selectedRideBox.style.display = "none";
+  if (selectedRideDivider) selectedRideDivider.style.display = "none";
+}
+
 function openDriverAccountModal() {
   if (!driverAccountModal) return;
   if (driverAccountInfo) {
