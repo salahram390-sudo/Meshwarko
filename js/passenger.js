@@ -122,6 +122,7 @@ const passengerAccountModal = $("#passengerAccountModal");
 const passengerAccountClose = $("#passengerAccountClose");
 const passengerAccountBackdrop = $("#passengerAccountBackdrop");
 const passengerAccountInfo = $("#passengerAccountInfo");
+const deleteAccountBtn = $("#deleteAccountBtn");
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
 const driverRouteLayerRef = { current: null };
