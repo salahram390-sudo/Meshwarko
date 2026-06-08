@@ -1045,11 +1045,11 @@ deleteAccountBtn?.addEventListener("click", async () => {
 
     await deleteDoc(doc(db, "users", uid));
 
-    await user.delete();
+await signOut(auth);
 
-    alert("تم حذف الحساب بنجاح");
+alert("تم حذف الحساب بنجاح");
 
-    location.href = "./index.html";
+location.href = "./index.html";
   } catch (err) {
     console.error(err);
 
