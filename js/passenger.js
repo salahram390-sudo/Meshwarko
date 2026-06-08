@@ -1019,7 +1019,38 @@ drawerWalletPassenger?.addEventListener("click", () => { closePassengerDrawer();
 drawerSupportPassenger?.addEventListener("click", () => { closePassengerDrawer(); notify({ title: "الدعم", body: "تواصل معنا عبر واتساب السائق أو أضف وسيلة دعم مخصصة لاحقًا.", tag: "support-info" }); });
 switchRoleBtn?.addEventListener("click", () => { closePassengerDrawer(); openSwitchDriverModal(); });
 logoutBtn?.addEventListener("click", async () => { closePassengerDrawer(); stopLiveDrivers(); stopDriverTracking(); await signOut(auth); location.href = "./index.html"; });
+deleteAccountBtn?.addEventListener("click", async () => {
+  const ok = confirm(
+    "هل أنت متأكد من حذف الحساب نهائياً؟ لا يمكن التراجع عن هذه العملية."
+  );
 
+  if (!ok) return;
+
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // حذف بيانات المستخدم من Firestore
+    await deleteDoc(doc(db, "users", user.uid));
+
+    // حذف حساب Firebase Authentication
+    await user.delete();
+
+    alert("تم حذف الحساب بنجاح");
+
+    location.href = "./index.html";
+  } catch (err) {
+    console.error(err);
+
+    if (err.code === "auth/requires-recent-login") {
+      alert(
+        "لأسباب أمنية يجب تسجيل الدخول مرة أخرى قبل حذف الحساب."
+      );
+    } else {
+      alert("حدث خطأ أثناء حذف الحساب");
+    }
+  }
+});
 btnRequest.addEventListener("click", async () => {
   const user = auth.currentUser; if (!user) return;
   if (!pickup || !dropoff || !Number.isFinite(lastDistanceMeters) || !Number.isFinite(lastDurationSec)) { setStatus("ناقص"); setText(routeMeta, "لازم تحدد قيام/وصول ويتعمل مسار أولاً."); return; }
