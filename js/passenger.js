@@ -5,7 +5,8 @@ import {
   doc, getDoc, updateDoc,
   collection, addDoc, getDocs,
   onSnapshot, query, where, orderBy,
-  serverTimestamp, Timestamp
+  serverTimestamp, Timestamp,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, getRideFreshMaxAgeMs, formatRideDate } from "./utils.js";
