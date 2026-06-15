@@ -301,22 +301,73 @@ export async function routeOSRM(from, to) {
   }
 }
 export function locateOnce(map, onLoc, onErr) {
-  map.locate({ setView: false, watch: false, enableHighAccuracy: true, maxZoom: 18 });
+    if (!map) {
+        console.error("Map not initialized");
+        if (onErr) onErr({ message: "الخريطة مش جاهزة" });
+        return;
+    }
 
-  const ok = (e) => {
-    map.off("locationfound", ok);
-    map.off("locationerror", bad);
-    onLoc?.({ lat: e.latitude, lon: e.longitude, accuracy: e.accuracy });
-  };
+    // أولاً نحاول Leaflet
+    map.locate({
+        setView: true,
+        maxZoom: 18,
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 0
+    });
 
-  const bad = (e) => {
-    map.off("locationfound", ok);
-    map.off("locationerror", bad);
-    onErr?.(e);
-  };
+    const ok = (e) => {
+        map.off("locationfound", ok);
+        map.off("locationerror", bad);
+        
+        const loc = {
+            lat: e.latitude,
+            lon: e.longitude,
+            accuracy: e.accuracy
+        };
+        
+        console.log("✅ تم تحديد الموقع:", loc);
+        showMyLocation(map, loc, { pan: true });
+        
+        if (onLoc) onLoc(loc);
+    };
 
-  map.on("locationfound", ok);
-  map.on("locationerror", bad);
+    const bad = (e) => {
+        map.off("locationfound", ok);
+        map.off("locationerror", bad);
+        
+        console.error("❌ Location Error:", e);
+        
+        let msg = "حدث خطأ في تحديد الموقع";
+        if (e.code === 1) msg = "❌ رفضت مشاركة الموقع";
+        else if (e.code === 2) msg = "❌ الموقع غير متاح حالياً";
+        else if (e.code === 3) msg = "❌ انتهت المهلة (جرب تاني)";
+        
+        alert(msg);
+        if (onErr) onErr(e);
+    };
+
+    map.on("locationfound", ok);
+    map.on("locationerror", bad);
+
+    // Fallback مباشر بـ navigator.geolocation (لو Leaflet فشل)
+    setTimeout(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const loc = {
+                        lat: pos.coords.latitude,
+                        lon: pos.coords.longitude,
+                        accuracy: pos.coords.accuracy
+                    };
+                    showMyLocation(map, loc, { pan: true });
+                    if (onLoc) onLoc(loc);
+                },
+                (err) => console.warn("Fallback geolocation also failed", err),
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+            );
+        }
+    }, 1000);
 }
 
 export function showMyLocation(map, loc, opts = {}) {
