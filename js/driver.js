@@ -1,5 +1,38 @@
 
 import { auth, db } from "./firebase.js";
+// ==================== FCM Notifications Setup ====================
+import { initFirebaseMessaging, listenForegroundMessages } from "./firebase.js";
+
+// تهيئة FCM للسائق
+async function initializeDriverFCM() {
+  if (!myUser?.uid) return;
+  
+  const token = await initFirebaseMessaging(myUser.uid);
+  if (token) {
+    console.log("✅ FCM Initialized for driver:", token);
+  }
+}
+
+// استقبال الإشعارات وهو مفتوح (Foreground)
+listenForegroundMessages((payload) => {
+  console.log("📩 New ride notification (foreground):", payload);
+
+  const title = payload.notification?.title || payload.data?.title || "طلب جديد";
+  const body = payload.notification?.body || payload.data?.body || "لديك طلب مشوار جديد";
+
+  notify({
+    title: title,
+    body: body,
+    tag: "new-ride-request",
+    sound: true,
+    vibrate: true
+  });
+
+  // تحديث قائمة الطلبات تلقائياً
+  setTimeout(() => {
+    if (typeof watchRidesForDriver === "function") watchRidesForDriver();
+  }, 1000);
+});
 console.log("driver.js loaded ✅");
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
