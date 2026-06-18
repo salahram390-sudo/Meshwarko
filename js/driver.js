@@ -927,22 +927,53 @@ editProfileBtn?.addEventListener("click", async () => {
 
 offerInput?.addEventListener("input", syncOfferBtn);
 
+
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { location.href = "./index.html"; return; }
-  await ensureNotificationPermission(true);
-  await initAdmin().catch(() => {});
+  if (!user) { 
+    location.href = "./index.html"; 
+    return; 
+  }
+
+  // جلب بيانات السائق من Firestore
   const me = await getDoc(doc(db, "users", user.uid));
-  if (!me.exists() || me.data().role !== "driver") { location.href = "./passenger.html"; return; }
+  if (!me.exists() || me.data().role !== "driver") { 
+    location.href = "./passenger.html"; 
+    return; 
+  }
+
   myUser = { uid: user.uid, ...me.data() };
-  if (myUser.role === "admin") { location.href = "./admin.html"; return; }
-  if (myUser.status === "blocked") { await signOut(auth); alert("هذا الحساب محظور من الإدارة."); location.href = "./index.html"; return; }
-  ownDriverPosDocRef = doc(db, "driversOnline", user.uid);
+
+  if (myUser.role === "admin") { 
+    location.href = "./admin.html"; 
+    return; 
+  }
+  if (myUser.status === "blocked") { 
+    await signOut(auth); 
+    alert("هذا الحساب محظور من الإدارة."); 
+    location.href = "./index.html"; 
+    return; 
+  }
+
+  // ←←←←← FCM تهيئة الإشعارات (هنا المكان الصحيح)
+  await initializeDriverFCM();
+
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
   setDriverStatus("متصل");
-  locateOnce(map, async (loc) => { myLocation = loc; updateOwnDriverMarker(loc.lat, loc.lon, true); await pushDriverOnline(); startDriverHeartbeat(); });
+
+  await ensureNotificationPermission(true);
+  await initAdmin().catch(() => {});
+
+  ownDriverPosDocRef = doc(db, "driversOnline", user.uid);
+  
+  locateOnce(map, async (loc) => { 
+    myLocation = loc; 
+    updateOwnDriverMarker(loc.lat, loc.lon, true); 
+    await pushDriverOnline(); 
+    startDriverHeartbeat(); 
+  });
+
   watchRidesForDriver();
 });
-
 window.addEventListener("beforeunload", () => {
   stopRequestSound();
   requestSoundActive = false;
