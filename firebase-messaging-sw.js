@@ -11,6 +11,8 @@ firebase.initializeApp({
   measurementId: "G-SDWD0EMRRF"
 });
 
+const messaging = firebase.messaging();
+
 self.addEventListener("install", function (event) {
   console.log("SW install OK");
   self.skipWaiting();
@@ -21,22 +23,51 @@ self.addEventListener("activate", function (event) {
   event.waitUntil(self.clients.claim());
 });
 
-const messaging = firebase.messaging();
-
+// 🔥 الجزء المهم: Background Message
 messaging.onBackgroundMessage(function (payload) {
-  var title = "مشوارك";
-  var body = "لديك إشعار جديد";
+  console.log("📩 Background message received:", payload);
 
-  if (payload && payload.notification && payload.notification.title) {
-    title = payload.notification.title;
+  let title = "مشوارك";
+  let body = "لديك طلب جديد";
+  let icon = "./logo.png";           // أو "./assets/logo.png"
+  let clickAction = "/driver.html";  // مهم عشان يفتح الصفحة
+
+  // استخراج البيانات من الـ notification أو الـ data
+  if (payload.notification) {
+    title = payload.notification.title || title;
+    body = payload.notification.body || body;
   }
 
-  if (payload && payload.notification && payload.notification.body) {
-    body = payload.notification.body;
+  if (payload.data) {
+    if (payload.data.title) title = payload.data.title;
+    if (payload.data.body) body = payload.data.body;
+    if (payload.data.click_action) clickAction = payload.data.click_action;
   }
 
-  self.registration.showNotification(title, {
+  const options = {
     body: body,
-    icon: "./assets/logo.png"
-  });
+    icon: icon,
+    badge: "./logo.png",
+    vibrate: [200, 100, 200],
+    data: {
+      url: clickAction
+    }
+  };
+
+  return self.registration.showNotification(title, options);
+});
+
+// عند الضغط على الإشعار
+self.addEventListener("notificationclick", function (event) {
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true })
+      .then(function (clientList) {
+        if (clientList.length > 0) {
+          return clientList[0].focus();
+        }
+        return clients.openWindow(event.notification.data.url || "/driver.html");
+      })
+  );
 });
