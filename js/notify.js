@@ -1,8 +1,7 @@
 import { $, escapeHtml } from "./utils.js";
 
 let audioCtx = null;
-let requestLoopSource = null;
-let requestLoopBuffer = null;
+let requestLoopAudio = null;
 
 export async function ensureNotificationPermission(ask = true) {
   if (!("Notification" in window)) return "unsupported";
@@ -47,31 +46,13 @@ export function playSound(type = "notify") {
   audio.play().catch(() => {});
 }
 
-let requestLoopAudio = null;
-
-async function getAudioBuffer(url) {
-  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-
-  if (audioCtx.state === "suspended") {
-    try { await audioCtx.resume(); } catch (_) {}
-  }
-
-  const res = await fetch(url);
-  const arr = await res.arrayBuffer();
-  return await audioCtx.decodeAudioData(arr);
-}
-
 export function startRequestSound() {
   try {
-    stopRequestSound(); // وقف أي صوت قديم أولاً
-
+    stopRequestSound();
     requestLoopAudio = new Audio("./assets/sounds/request.mp3");
     requestLoopAudio.loop = true;
     requestLoopAudio.volume = 0.9;
-    
-    requestLoopAudio.play().catch(e => {
-      console.warn("Request sound play failed", e);
-    });
+    requestLoopAudio.play().catch(e => console.warn("Request sound failed", e));
   } catch (e) {
     console.warn("startRequestSound failed:", e);
   }
@@ -93,7 +74,6 @@ export function stopRequestSound() {
 export function toast(title, message, ms = 3500) {
   const root = document.getElementById("toastRoot");
   if (!root) return;
-
   const el = document.createElement("div");
   el.className = "toast";
   el.innerHTML = `
@@ -105,24 +85,53 @@ export function toast(title, message, ms = 3500) {
   `;
   el.querySelector(".x").onclick = () => el.remove();
   root.appendChild(el);
-
-  setTimeout(() => {
-    if (el.isConnected) el.remove();
-  }, ms);
+  setTimeout(() => { if (el.isConnected) el.remove(); }, ms);
 }
 
-export async function notify({ title, body, tag = "mashwark", vibrate = true, sound = true, systemWhenHidden = true }) {
+// ====================== النسخة المحسنة ======================
+export async function notify({ 
+  title, 
+  body, 
+  tag = "mashwark", 
+  vibrate = true, 
+  sound = true,
+  icon = "./logo.png"
+}) {
+
+  // Toast دايماً (حتى لو التطبيق مفتوح)
   toast(title, body);
-  if (sound) beep();
+
+  if (sound) {
+    if (tag.includes("request") || tag === "new-ride-request") {
+      startRequestSound();
+    } else {
+      playSound("notify");
+    }
+  }
+
   if (vibrate && navigator.vibrate) navigator.vibrate([80, 40, 80]);
 
+  // إشعار نظامي (Browser Notification) حتى لو التطبيق مفتوح
   if (!("Notification" in window)) return;
-  if (systemWhenHidden && document.visibilityState !== "hidden") return;
 
   const perm = await ensureNotificationPermission(false);
   if (perm !== "granted") return;
 
   try {
-    new Notification(title, { body, tag });
-  } catch {}
+    const notification = new Notification(title, {
+      body: body,
+      icon: icon,
+      tag: tag,
+      badge: "./logo.png",
+      vibrate: [200, 100, 200],
+      data: { url: "/driver.html" }
+    });
+
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+  } catch (e) {
+    console.warn("System notification failed", e);
+  }
 }
