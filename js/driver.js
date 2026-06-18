@@ -727,7 +727,19 @@ function watchRidesForDriver() {
       return (b.createdAt?.toMillis?.() || b.createdAtMs || 0) - (a.createdAt?.toMillis?.() || a.createdAtMs || 0);
     });
     syncIncomingRequestSound(rides);
-    ridesList.innerHTML = "";
+
+// 🔥 إشعار + صوت قوي لما يجي طلب جديد (مهم جداً)
+if (rides.some(r => r.status === "requested" && !r.driverId)) {
+  notify({
+    title: "🔔 طلب مشوار جديد!",
+    body: "اضغط هنا للرد بسرعة",
+    tag: "new-ride-request",
+    sound: true,
+    vibrate: true
+  });
+}
+
+ridesList.innerHTML = "";
     renderDriverHistory(mineRows.filter((r) => r.status === "completed"));
     if (!rides.length) {
   resetSelectedRideUi("لم يتم تحديد طلب.");
