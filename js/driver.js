@@ -1002,3 +1002,7 @@ window.addEventListener("beforeunload", () => {
 });
 window.addEventListener("error", (e) => { alert(`JS ERROR: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`); });
 window.addEventListener("unhandledrejection", (e) => { alert(`PROMISE ERROR: ${e.reason?.message || e.reason}`); });
+// استدعاء تهيئة الإشعارات
+document.addEventListener('DOMContentLoaded', initDriverPushNotifications);
+// أو مباشرة:
+initDriverPushNotifications();
