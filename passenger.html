@@ -257,6 +257,33 @@
     <div id="toastRoot"></div>
   </div>
 
+  <!-- ====================== Service Worker + Notifications Registration ====================== -->
+  <script>
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) {
+        console.log("❌ Service Worker not supported");
+        return;
+      }
+
+      try {
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+        console.log('✅ Service Worker Registered Successfully:', registration.scope);
+
+        // طلب إذن الإشعارات
+        if ('Notification' in window) {
+          const permission = await Notification.requestPermission();
+          console.log('📢 Notification Permission:', permission);
+        }
+      } catch (err) {
+        console.error('❌ Service Worker Registration Failed:', err);
+      }
+    }
+
+    // تشغيل التسجيل
+    document.addEventListener('DOMContentLoaded', registerServiceWorker);
+    registerServiceWorker();
+  </script>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="./js/passenger.js"></script>
 
