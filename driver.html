@@ -186,7 +186,7 @@
 
 <!-- ====================== Service Worker Registration (Meshwarko) ====================== -->
 <script>
-  const BASE_PATH = '/Meshwarko/';
+  const BASE_PATH = '/Meshwarko/';   // ← هذا المسار مهم جداً
 
   async function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) {
@@ -196,8 +196,6 @@
 
     try {
       const swPath = BASE_PATH + 'firebase-messaging-sw.js';
-      console.log('Attempting to register SW from:', swPath);
-
       const registration = await navigator.serviceWorker.register(swPath, { 
         scope: BASE_PATH 
       });
@@ -211,7 +209,6 @@
 
     } catch (err) {
       console.error('❌ Service Worker Registration Failed:', err.name, err.message);
-      console.error('Full error:', err);
     }
   }
 
