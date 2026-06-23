@@ -12,52 +12,29 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// 🔥 Background Messages
 messaging.onBackgroundMessage(function (payload) {
   console.log("📩 Background message received:", payload);
 
-  const notificationTitle = payload.notification?.title || payload.data?.title || "مشوارك";
-  const notificationBody  = payload.notification?.body  || payload.data?.body  || "لديك طلب جديد";
-  const clickAction = payload.data?.click_action || "/driver.html";
+  const title = payload.notification?.title || payload.data?.title || "مشوارك";
+  const body  = payload.notification?.body  || payload.data?.body  || "لديك طلب جديد";
 
   const options = {
-    body: notificationBody,
+    body: body,
     icon: "/logo.png",
     badge: "/logo.png",
     vibrate: [200, 100, 200],
-    tag: "meshwark-notification-" + Date.now(),   // تجنب التكرار
-    requireInteraction: false,
-    data: { url: clickAction }
+    tag: "meshwark-notification",
+    data: { url: "/driver.html" }
   };
 
-  return self.registration.showNotification(notificationTitle, options);
+  return self.registration.showNotification(title, options);
 });
 
-// Click on Notification
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
-
-  const urlToOpen = event.notification.data?.url || "/driver.html";
-
-  event.waitUntil(
-    clients.matchAll({ type: "window", includeUncontrolled: true }).then(clientList => {
-      for (let client of clientList) {
-        if (client.url.includes(urlToOpen.split('?')[0]) && "focus" in client) {
-          return client.focus();
-        }
-      }
-      return clients.openWindow(urlToOpen);
-    })
-  );
+  const url = event.notification.data.url || "/driver.html";
+  event.waitUntil(clients.openWindow(url));
 });
 
-// Service Worker Lifecycle
-self.addEventListener("install", () => {
-  console.log("🔧 Service Worker Installed");
-  self.skipWaiting();
-});
-
-self.addEventListener("activate", (event) => {
-  console.log("🔧 Service Worker Activated");
-  event.waitUntil(self.clients.claim());
-});
+self.addEventListener("install", () => self.skipWaiting());
+self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));
