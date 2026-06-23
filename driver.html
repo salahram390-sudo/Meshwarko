@@ -184,71 +184,39 @@
 <div id="toastRoot"></div>
   </div>
 
-  <!-- ====================== Service Worker Registration ====================== -->
-  <script>
-    async function registerServiceWorker() {
-      if (!('serviceWorker' in navigator)) {
-        console.log("❌ Service Worker not supported in this browser");
-        return;
-      }
+<!-- ====================== Service Worker Registration (Meshwarko) ====================== -->
+<script>
+  const BASE_PATH = '/Meshwarko/';
 
-      try {
-        // تسجيل الـ Service Worker
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { 
-          scope: '/' 
-        });
-        
-        console.log('✅ Service Worker Registered Successfully:', registration.scope);
-
-        // طلب إذن الإشعارات
-        if ('Notification' in window) {
-          const permission = await Notification.requestPermission();
-          console.log('📢 Notification Permission:', permission);
-        }
-
-      } catch (err) {
-        console.error('❌ Service Worker Registration Failed:', err.name, err.message);
-      }
+  async function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) {
+      console.log("❌ Service Worker not supported");
+      return;
     }
 
-    // تشغيل التسجيل
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', registerServiceWorker);
-    } else {
-      registerServiceWorker();
-    }
-  </script>
+    try {
+      const swPath = BASE_PATH + 'firebase-messaging-sw.js';
+      console.log('Attempting to register SW from:', swPath);
 
-  <!-- ====================== Service Worker Registration (Meshwarko) ====================== -->
-  <script>
-    const BASE_PATH = '/Meshwarko/';   // ← مهم جداً
+      const registration = await navigator.serviceWorker.register(swPath, { 
+        scope: BASE_PATH 
+      });
+      
+      console.log('✅ Service Worker Registered Successfully:', registration.scope);
 
-    async function registerServiceWorker() {
-      if (!('serviceWorker' in navigator)) {
-        console.log("❌ Service Worker not supported");
-        return;
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        console.log('📢 Notification Permission:', permission);
       }
 
-      try {
-        const swPath = BASE_PATH + 'firebase-messaging-sw.js';
-        const registration = await navigator.serviceWorker.register(swPath, { 
-          scope: BASE_PATH 
-        });
-        
-        console.log('✅ Service Worker Registered Successfully:', registration.scope);
-
-        if ('Notification' in window) {
-          const permission = await Notification.requestPermission();
-          console.log('📢 Notification Permission:', permission);
-        }
-
-      } catch (err) {
-        console.error('❌ Service Worker Registration Failed:', err.name, err.message);
-      }
+    } catch (err) {
+      console.error('❌ Service Worker Registration Failed:', err.name, err.message);
+      console.error('Full error:', err);
     }
+  }
 
-    registerServiceWorker();
-  </script>
+  registerServiceWorker();
+</script>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="./js/driver.js"></script>
