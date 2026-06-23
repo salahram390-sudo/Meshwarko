@@ -1,38 +1,45 @@
 
 import { auth, db } from "./firebase.js";
-// ==================== FCM Notifications Setup ====================
-import { initFirebaseMessaging, listenForegroundMessages } from "./firebase.js";
+// ====================== FCM + Service Worker Setup (Driver) ======================
+async function initDriverPushNotifications() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
+    console.log("❌ Push notifications not supported");
+    return;
+  }
 
-// تهيئة FCM للسائق
-async function initializeDriverFCM() {
-  if (!myUser?.uid) return;
-  
-  const token = await initFirebaseMessaging(myUser.uid);
-  if (token) {
-    console.log("✅ FCM Initialized for driver:", token);
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.log("⚠️ Notification permission denied");
+      return;
+    }
+
+    console.log("✅ Notification permission granted for driver");
+
+    // تسجيل Service Worker
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+    console.log('✅ Service Worker Registered for driver:', registration.scope);
+
+    // Foreground Messages
+    if (typeof firebase !== 'undefined' && firebase.messaging) {
+      const messaging = firebase.messaging();
+      messaging.onMessage((payload) => {
+        console.log('📩 Foreground message (driver):', payload);
+        
+        notify({
+          title: payload.notification?.title || payload.data?.title || "طلب جديد",
+          body: payload.notification?.body || payload.data?.body || "لديك طلب مشوار جديد",
+          tag: "new-ride-request",
+          sound: true,
+          vibrate: true
+        });
+      });
+    }
+
+  } catch (error) {
+    console.error("❌ Driver Push Setup Failed:", error);
   }
 }
-
-// استقبال الإشعارات وهو مفتوح (Foreground)
-listenForegroundMessages((payload) => {
-  console.log("📩 New ride notification (foreground):", payload);
-
-  const title = payload.notification?.title || payload.data?.title || "طلب جديد";
-  const body = payload.notification?.body || payload.data?.body || "لديك طلب مشوار جديد";
-
-  notify({
-    title: title,
-    body: body,
-    tag: "new-ride-request",
-    sound: true,
-    vibrate: true
-  });
-
-  // تحديث قائمة الطلبات تلقائياً
-  setTimeout(() => {
-    if (typeof watchRidesForDriver === "function") watchRidesForDriver();
-  }, 1000);
-});
 console.log("driver.js loaded ✅");
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
