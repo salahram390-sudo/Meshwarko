@@ -184,16 +184,20 @@
 <div id="toastRoot"></div>
   </div>
 
-  <!-- ====================== Service Worker + Notifications Registration ====================== -->
+  <!-- ====================== Service Worker Registration ====================== -->
   <script>
     async function registerServiceWorker() {
       if (!('serviceWorker' in navigator)) {
-        console.log("❌ Service Worker not supported");
+        console.log("❌ Service Worker not supported in this browser");
         return;
       }
 
       try {
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+        // تسجيل الـ Service Worker
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { 
+          scope: '/' 
+        });
+        
         console.log('✅ Service Worker Registered Successfully:', registration.scope);
 
         // طلب إذن الإشعارات
@@ -201,18 +205,22 @@
           const permission = await Notification.requestPermission();
           console.log('📢 Notification Permission:', permission);
         }
+
       } catch (err) {
-        console.error('❌ Service Worker Registration Failed:', err);
+        console.error('❌ Service Worker Registration Failed:', err.name, err.message);
       }
     }
 
     // تشغيل التسجيل
-    document.addEventListener('DOMContentLoaded', registerServiceWorker);
-    registerServiceWorker();
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', registerServiceWorker);
+    } else {
+      registerServiceWorker();
+    }
   </script>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script type="module" src="./js/driver.js"></script>
+  <script type="module" src="./js/passenger.js"></script>
   <!--
   <script>
     (function () {
