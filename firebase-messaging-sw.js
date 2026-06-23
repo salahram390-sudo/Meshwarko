@@ -12,29 +12,29 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-messaging.onBackgroundMessage(function (payload) {
+messaging.onBackgroundMessage((payload) => {
   console.log("📩 Background message received:", payload);
 
   const title = payload.notification?.title || payload.data?.title || "مشوارك";
-  const body  = payload.notification?.body  || payload.data?.body  || "لديك طلب جديد";
+  const body = payload.notification?.body || payload.data?.body || "لديك طلب جديد";
 
   const options = {
     body: body,
-    icon: "/logo.png",
-    badge: "/logo.png",
+    icon: "/Meshwarko/logo.png",     // ← عدل المسار لو logo.png في مجلد
+    badge: "/Meshwarko/logo.png",
     vibrate: [200, 100, 200],
     tag: "meshwark-notification",
-    data: { url: "/driver.html" }
+    data: { url: "/Meshwarko/driver.html" }
   };
 
   return self.registration.showNotification(title, options);
 });
 
-self.addEventListener("notificationclick", function (event) {
+self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const url = event.notification.data.url || "/driver.html";
+  const url = event.notification.data.url || "/Meshwarko/driver.html";
   event.waitUntil(clients.openWindow(url));
 });
 
 self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));
+self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
