@@ -219,8 +219,39 @@
     }
   </script>
 
+  <!-- ====================== Service Worker Registration (Meshwarko) ====================== -->
+  <script>
+    const BASE_PATH = '/Meshwarko/';   // ← مهم جداً
+
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) {
+        console.log("❌ Service Worker not supported");
+        return;
+      }
+
+      try {
+        const swPath = BASE_PATH + 'firebase-messaging-sw.js';
+        const registration = await navigator.serviceWorker.register(swPath, { 
+          scope: BASE_PATH 
+        });
+        
+        console.log('✅ Service Worker Registered Successfully:', registration.scope);
+
+        if ('Notification' in window) {
+          const permission = await Notification.requestPermission();
+          console.log('📢 Notification Permission:', permission);
+        }
+
+      } catch (err) {
+        console.error('❌ Service Worker Registration Failed:', err.name, err.message);
+      }
+    }
+
+    registerServiceWorker();
+  </script>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script type="module" src="./js/passenger.js"></script>
+  <script type="module" src="./js/driver.js"></script>
   <script>
     (function () {
       var s = document.createElement('script');
