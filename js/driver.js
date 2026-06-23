@@ -974,7 +974,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   // ←←←←← FCM تهيئة الإشعارات (هنا المكان الصحيح)
-  await initializeDriverFCM();
+ // await initializeDriverFCM();
 
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
   setDriverStatus("متصل");
