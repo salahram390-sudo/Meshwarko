@@ -12,7 +12,7 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// 🔥 Background Message Handler
+// 🔥 Background Messages
 messaging.onBackgroundMessage(function (payload) {
   console.log("📩 Background message received:", payload);
 
@@ -22,10 +22,10 @@ messaging.onBackgroundMessage(function (payload) {
 
   const options = {
     body: notificationBody,
-    icon: "/logo.png",               // تأكد إن logo.png موجود في Root
+    icon: "/logo.png",
     badge: "/logo.png",
     vibrate: [200, 100, 200],
-    tag: "meshwark-notification",    // مهم جداً
+    tag: "meshwark-notification-" + Date.now(),   // تجنب التكرار
     requireInteraction: false,
     data: { url: clickAction }
   };
@@ -33,16 +33,16 @@ messaging.onBackgroundMessage(function (payload) {
   return self.registration.showNotification(notificationTitle, options);
 });
 
-// Notification Click Handler
+// Click on Notification
 self.addEventListener("notificationclick", function (event) {
   event.notification.close();
 
-  const urlToOpen = event.notification.data.url || "/passenger.html";
+  const urlToOpen = event.notification.data?.url || "/driver.html";
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then(clientList => {
       for (let client of clientList) {
-        if (client.url.includes(urlToOpen) && "focus" in client) {
+        if (client.url.includes(urlToOpen.split('?')[0]) && "focus" in client) {
           return client.focus();
         }
       }
@@ -51,6 +51,13 @@ self.addEventListener("notificationclick", function (event) {
   );
 });
 
-// Service Worker Install & Activate
-self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", event => event.waitUntil(self.clients.claim()));
+// Service Worker Lifecycle
+self.addEventListener("install", () => {
+  console.log("🔧 Service Worker Installed");
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  console.log("🔧 Service Worker Activated");
+  event.waitUntil(self.clients.claim());
+});
