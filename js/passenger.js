@@ -1260,3 +1260,51 @@ await initAdmin().catch(() => {});
   watchCurrentRide(user.uid);
   setupPriceControls();
 });
+// ====================== FCM + Service Worker Setup ======================
+async function initPushNotifications() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.log("❌ Push notifications not supported in this browser");
+    return;
+  }
+
+  try {
+    // طلب الإذن
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      console.log("⚠️ Notification permission denied");
+      return;
+    }
+
+    console.log("✅ Notification permission granted");
+
+    // تسجيل Service Worker
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+    console.log('✅ Service Worker Registered:', registration.scope);
+
+    // Initialize Firebase Messaging (إذا كنت بتستخدمه في الـ foreground)
+    if (typeof firebase !== 'undefined' && firebase.messaging) {
+      const messaging = firebase.messaging();
+      
+      // Handle foreground messages
+      messaging.onMessage((payload) => {
+        console.log('📩 Foreground message received:', payload);
+        notify({
+          title: payload.notification?.title || "مشوارك",
+          body: payload.notification?.body || "لديك إشعار جديد",
+          tag: "foreground-msg"
+        });
+      });
+    }
+
+  } catch (error) {
+    console.error("❌ Push Notification Setup Failed:", error);
+  }
+}
+
+// ====================== استدعاء الدالة ======================
+document.addEventListener('DOMContentLoaded', () => {
+  initPushNotifications();
+});
+
+// أو لو مش عايز تنتظر DOMContentLoaded، حط الاستدعاء مباشرة في نهاية الملف:
+initPushNotifications();
