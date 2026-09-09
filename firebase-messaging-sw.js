@@ -33,9 +33,7 @@ messaging.onBackgroundMessage((payload) => {
       "لديك إشعار جديد",
 
     icon: "/Meshwarko/assets/logo.png",
-
     badge: "/Meshwarko/assets/logo.png",
-
     data: payload.data || {}
   };
 
