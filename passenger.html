@@ -257,33 +257,6 @@
     <div id="toastRoot"></div>
   </div>
 
-  <!-- ====================== Service Worker + Notifications Registration ====================== -->
-  <script>
-    async function registerServiceWorker() {
-      if (!('serviceWorker' in navigator)) {
-        console.log("❌ Service Worker not supported");
-        return;
-      }
-
-      try {
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
-        console.log('✅ Service Worker Registered Successfully:', registration.scope);
-
-        // طلب إذن الإشعارات
-        if ('Notification' in window) {
-          const permission = await Notification.requestPermission();
-          console.log('📢 Notification Permission:', permission);
-        }
-      } catch (err) {
-        console.error('❌ Service Worker Registration Failed:', err);
-      }
-    }
-
-    // تشغيل التسجيل
-    document.addEventListener('DOMContentLoaded', registerServiceWorker);
-    registerServiceWorker();
-  </script>
-
 <!-- ====================== Service Worker Registration (Meshwarko) ====================== -->
 <script>
   const BASE_PATH = '/Meshwarko/';   // ← هذا المسار مهم جداً
