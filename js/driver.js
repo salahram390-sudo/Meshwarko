@@ -1,5 +1,9 @@
-
-import { auth, db } from "./firebase.js";
+import {
+  auth,
+  db,
+  initFirebaseMessaging,
+  listenForegroundMessages
+} from "./firebase.js";
 // ====================== FCM + Service Worker Setup (Driver) ======================
 async function initDriverPushNotifications() {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) {
