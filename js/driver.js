@@ -4,41 +4,39 @@ import {
   initFirebaseMessaging,
   listenForegroundMessages
 } from "./firebase.js";
-// ====================== FCM + Service Worker Setup (Driver) ======================
+// ====================== FCM Push Notifications (Driver) ======================
 async function initDriverPushNotifications() {
-  if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-    console.log("❌ Push notifications not supported");
-    return;
-  }
-
   try {
-    const permission = await Notification.requestPermission();
-    if (permission !== 'granted') {
-      console.log("⚠️ Notification permission denied");
-      return;
-    }
+    const token = await initFirebaseMessaging(
+      myUser?.uid || auth.currentUser?.uid
+    );
 
-    console.log("✅ Notification permission granted for driver");
+    console.log("Driver FCM initialized:", !!token);
 
-    // تسجيل Service Worker
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
-    console.log('✅ Service Worker Registered for driver:', registration.scope);
+    listenForegroundMessages((payload) => {
+      console.log("📩 Foreground FCM (driver):", payload);
 
-    // Foreground Messages
-    if (typeof firebase !== 'undefined' && firebase.messaging) {
-      const messaging = firebase.messaging();
-      messaging.onMessage((payload) => {
-        console.log('📩 Foreground message (driver):', payload);
-        
-        notify({
-          title: payload.notification?.title || payload.data?.title || "طلب جديد",
-          body: payload.notification?.body || payload.data?.body || "لديك طلب مشوار جديد",
-          tag: "new-ride-request",
-          sound: true,
-          vibrate: true
-        });
+      const title =
+        payload.notification?.title ||
+        payload.data?.title ||
+        "طلب جديد";
+
+      const body =
+        payload.notification?.body ||
+        payload.data?.body ||
+        "لديك طلب مشوار جديد";
+
+      notify({
+        title,
+        body,
+        tag:
+          payload.data?.type === "new_ride_request"
+            ? "new-ride-request"
+            : "meshwarko-push",
+        sound: true,
+        vibrate: true
       });
-    }
+    });
 
   } catch (error) {
     console.error("❌ Driver Push Setup Failed:", error);
