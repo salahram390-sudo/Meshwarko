@@ -1,6 +1,7 @@
 importScripts(
   "https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"
 );
+
 importScripts(
   "https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"
 );
@@ -30,8 +31,11 @@ messaging.onBackgroundMessage((payload) => {
     body:
       payload.notification?.body ||
       "لديك إشعار جديد",
+
     icon: "/Meshwarko/assets/logo.png",
+
     badge: "/Meshwarko/assets/logo.png",
+
     data: payload.data || {}
   };
 
@@ -46,6 +50,7 @@ self.addEventListener("notificationclick", (event) => {
       type: "window",
       includeUncontrolled: true
     }).then((clientList) => {
+
       for (const client of clientList) {
         if ("focus" in client) {
           return client.focus();
@@ -57,6 +62,7 @@ self.addEventListener("notificationclick", (event) => {
           "https://salahram390-sudo.github.io/Meshwarko/"
         );
       }
+
     })
   );
 });
