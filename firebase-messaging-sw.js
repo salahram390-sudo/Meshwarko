@@ -1,11 +1,31 @@
-console.log("✅ TEST SW LOADED");
+importScripts(
+  "https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"
+);
 
-self.addEventListener("install", () => {
-  console.log("✅ TEST SW INSTALLED");
-  self.skipWaiting();
+importScripts(
+  "https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js"
+);
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBY72SkEi6HX4R9fSYAQhnYCLVbPu-W4Ko",
+  authDomain: "meshwarkomm.firebaseapp.com",
+  projectId: "meshwarkomm",
+  storageBucket: "meshwarkomm.firebasestorage.app",
+  messagingSenderId: "889669815551",
+  appId: "1:889669815551:web:b47e9dcf775e4c1eff10ca"
 });
 
-self.addEventListener("activate", (event) => {
-  console.log("✅ TEST SW ACTIVATED");
-  event.waitUntil(self.clients.claim());
+const messaging = firebase.messaging();
+
+messaging.onBackgroundMessage((payload) => {
+  console.log("✅ BACKGROUND MESSAGE:", payload);
+
+  const title = payload.notification?.title || "مشوارك";
+  const body = payload.notification?.body || "لديك إشعار جديد";
+
+  self.registration.showNotification(title, {
+    body: body,
+    icon: "/Meshwarko/assets/logo.png",
+    badge: "/Meshwarko/assets/logo.png"
+  });
 });
