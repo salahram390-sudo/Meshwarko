@@ -11,6 +11,18 @@ async function initDriverPushNotifications() {
       myUser?.uid || auth.currentUser?.uid
     );
 
+    // --- كود ربط OneSignal للسائق ---
+const driverUid = myUser?.uid || auth.currentUser?.uid;
+if (driverUid && window.OneSignalDeferred) {
+  window.OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.login(driverUid);
+    console.log("✅ OneSignal linked to DRIVER UID:", driverUid);
+  });
+} else {
+  console.warn("⚠️ OneSignalDeferred not found in driver.js or no UID");
+}
+// --------------------------------
+
     console.log("Driver FCM initialized:", !!token);
 
     listenForegroundMessages((payload) => {
