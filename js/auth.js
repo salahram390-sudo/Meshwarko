@@ -361,19 +361,22 @@ onAuthStateChanged(auth, async (user) => {
         return;
       }
 
-      try {
-  await ensureNotificationPermission(true);
-  
-  // --- كود ربط OneSignal (الطريقة الآمنة) ---
-  if (window.OneSignalDeferred) {
-    window.OneSignalDeferred.push(async function (OneSignal) {
-      await OneSignal.login(user.uid);
-      console.log("✅ OneSignal linked to UID:", user.uid);
-    });
-  } else {
-    console.warn("⚠️ OneSignalDeferred not found");
+      console.log("👉 Checking OneSignal...");
+
+// نضمن إن OneSignalDeferred موجودة
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+window.OneSignalDeferred.push(async function (OneSignal) {
+  console.log("👉 Inside OneSignalDeferred, trying to login...");
+  try {
+    await OneSignal.login(user.uid);
+    console.log("✅ OneSignal linked to UID:", user.uid);
+  } catch (e) {
+    console.error("❌ OneSignal login error:", e);
   }
-  // ------------------------------------------
+});
+
+console.log("👉 OneSignal login pushed to queue.");
 
   // هنخلي FCM شغال برضه عادي
   await initFirebaseMessaging(user.uid);
