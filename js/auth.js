@@ -362,10 +362,18 @@ onAuthStateChanged(auth, async (user) => {
       }
 
       try {
-        await ensureNotificationPermission(true);
-        await initFirebaseMessaging(user.uid);
-      } catch (err) {
-        console.warn("FCM init warning:", err?.message || err);
+  await ensureNotificationPermission(true);
+  
+  // السطرين دول هما اللي هنضيفهم عشان نربط المستخدم
+  if (window.OneSignal) {
+    await OneSignal.login(user.uid);
+    console.log("OneSignal linked to UID:", user.uid);
+  }
+
+  // ملحوظة: شيل أو علق السطر ده لو ظهرت مشاكل، لأن OneSignal هي اللي هتتولى الإشعارات
+  // await initFirebaseMessaging(user.uid); 
+} catch (err) {
+  console.warn("Notification init warning:", err?.message || err);
       }
 
     } catch (err) {
