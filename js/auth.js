@@ -364,18 +364,22 @@ onAuthStateChanged(auth, async (user) => {
       try {
   await ensureNotificationPermission(true);
   
-  // السطرين دول هما اللي هنضيفهم عشان نربط المستخدم
-  if (window.OneSignal) {
-    await OneSignal.login(user.uid);
-    console.log("OneSignal linked to UID:", user.uid);
+  // --- كود ربط OneSignal (الطريقة الآمنة) ---
+  if (window.OneSignalDeferred) {
+    window.OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.login(user.uid);
+      console.log("✅ OneSignal linked to UID:", user.uid);
+    });
+  } else {
+    console.warn("⚠️ OneSignalDeferred not found");
   }
+  // ------------------------------------------
 
-  // ملحوظة: شيل أو علق السطر ده لو ظهرت مشاكل، لأن OneSignal هي اللي هتتولى الإشعارات
-  // await initFirebaseMessaging(user.uid); 
+  // هنخلي FCM شغال برضه عادي
+  await initFirebaseMessaging(user.uid);
 } catch (err) {
   console.warn("Notification init warning:", err?.message || err);
-      }
-
+}
     } catch (err) {
       console.warn("AUTH STATE ERROR:", err?.message || err);
       adminEntryBtn?.classList.add("hidden");
