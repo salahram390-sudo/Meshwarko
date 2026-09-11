@@ -1,5 +1,15 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+  <script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.init({
+      appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
+      serviceWorkerParam: { scope: "/push/onesignal/" },
+      serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js"
+    });
+  });
+</script>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
