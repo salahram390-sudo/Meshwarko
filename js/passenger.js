@@ -1249,6 +1249,17 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
 onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = "./index.html"; return; }
   await initFirebaseMessaging(user.uid);
+  
+  // --- كود ربط OneSignal ---
+if (window.OneSignalDeferred) {
+  window.OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.login(user.uid);
+    console.log("✅ OneSignal linked to UID:", user.uid);
+  });
+} else {
+  console.warn("⚠️ OneSignalDeferred not found in passenger.js");
+}
+// --------------------------
 
 listenForegroundMessages((payload) => {
   notify({
