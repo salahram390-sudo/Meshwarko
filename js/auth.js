@@ -360,6 +360,9 @@ onAuthStateChanged(auth, async (user) => {
         location.replace(`./${targetPage}`);
         return;
       }
+      
+      try {
+  await ensureNotificationPermission(true);
 
       console.log("👉 Checking OneSignal...");
 
