@@ -1110,9 +1110,12 @@ try {
     const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
     
     await fetch(workerUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+  method: "POST",
+  headers: { 
+    "Content-Type": "application/json",
+    "Authorization": "Bearer meshwarko_secret_2026" // <-- السطر الجديد ده
+  },
+  body: JSON.stringify({
         driverUids: nearbyDriverUids,
         title: "طلب مشوار جديد 🚗",
         body: `راكب في ${savedCenter} - ${savedGov} • المسافة: ${(lastDistanceMeters / 1000).toFixed(1)} كم • السعر: ${price} ج`,
