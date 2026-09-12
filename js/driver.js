@@ -994,13 +994,16 @@ onAuthStateChanged(auth, async (user) => {
   await initAdmin().catch(() => {});
 
   ownDriverPosDocRef = doc(db, "driversOnline", user.uid);
-  
-  locateOnce(map, async (loc) => { 
-    myLocation = loc; 
-    updateOwnDriverMarker(loc.lat, loc.lon, true); 
-    await pushDriverOnline(); 
-    startDriverHeartbeat(); 
-  });
+
+// 1. شغل النبضة فوراً بمجرد الدخول
+startDriverHeartbeat();
+
+// 2. جيب الموقع وحدثه لو متاح
+locateOnce(map, async (loc) => { 
+  myLocation = loc; 
+  updateOwnDriverMarker(loc.lat, loc.lon, true); 
+  await pushDriverOnline(); 
+});
 
   watchRidesForDriver();
 });
