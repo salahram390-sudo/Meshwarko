@@ -1096,11 +1096,43 @@ vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dro
       distanceMeters: lastDistanceMeters, durationSec: lastDurationSec, pricing: buildPricingSummary(lastDistanceMeters, lastDurationSec, price), price, archived: false, passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
       nearestDriverId: nearestMeta.nearestDriverId || null, nearestDriverIds: nearestMeta.nearestDriverIds || [], nearestDrivers: nearestMeta.nearestDrivers || [], rideNote: rideNoteValue
     });
-     currentRideId = rideRef.id;
+          currentRideId = rideRef.id;
 startRequestSound();
 setText(routeMeta, "تم إرسال الطلب. جاري البحث عن سائق...");
 setStatus("جاري البحث");
 notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
+
+// ================== إرسال إشعار للسائقين القريبين ==================
+try {
+  const nearbyDriverUids = nearestMeta.nearestDriverIds || [];
+  
+  if (nearbyDriverUids.length > 0) {
+    const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
+    
+    await fetch(workerUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        driverUids: nearbyDriverUids,
+        title: "طلب مشوار جديد 🚗",
+        body: `راكب في ${savedCenter} - ${savedGov} • المسافة: ${(lastDistanceMeters / 1000).toFixed(1)} كم • السعر: ${price} ج`,
+        data: {
+          type: "new_ride_request",
+          rideId: rideRef.id,
+          pickupLat: String(pickup.lat),
+          pickupLon: String(pickup.lon)
+        }
+      })
+    });
+    
+    console.log(`✅ تم إرسال الإشعار لـ ${nearbyDriverUids.length} سائق قريب`);
+  } else {
+    console.warn("⚠️ لا يوجد سائقين قريبين لإرسال الإشعار لهم");
+  }
+} catch (notifyErr) {
+  console.error("❌ فشل إرسال إشعار للسائقين:", notifyErr);
+}
+// ===================================================================
   } catch (e) {
   stopRequestSound();
   console.error("ADD DOC ERROR:", e); const msg = String(e?.message || e || "");
