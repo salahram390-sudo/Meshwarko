@@ -530,10 +530,28 @@ function updateOwnDriverMarker(lat, lon, pan = false) {
 }
 async function pushDriverOnline() {
   const u = auth.currentUser;
-  if (!u || !myUser || !myLocation || !ownDriverPosDocRef) return;
+  if (!u || !myUser || !ownDriverPosDocRef) return;
+  
+  // لو الموقع لسه مجاش، نستخدم إحداثيات مؤقتة عشان النبضة تفضل شغالة
+  const lat = myLocation?.lat || 26.56; 
+  const lon = myLocation?.lon || 31.70;
+
   try {
-    await setDoc(ownDriverPosDocRef, { uid: u.uid, name: myUser.name || "", governorate: myUser.governorate || "", center: myUser.center || "", vehicleType: myUser.vehicleType || "", lat: myLocation.lat, lon: myLocation.lon, lastSeenMs: Date.now(), updatedAt: serverTimestamp() }, { merge: true });
-  } catch (e) { console.error("pushDriverOnline error", e); }
+    await setDoc(ownDriverPosDocRef, { 
+      uid: u.uid, 
+      name: myUser.name || "", 
+      governorate: myUser.governorate || "", 
+      center: myUser.center || "", 
+      vehicleType: myUser.vehicleType || "", 
+      lat: lat, 
+      lon: lon, 
+      lastSeenMs: Date.now(), 
+      updatedAt: serverTimestamp() 
+    }, { merge: true });
+    console.log("✅ Heartbeat updated"); // ضفنا اللوج ده عشان نتأكد
+  } catch (e) { 
+    console.error("pushDriverOnline error", e); 
+  }
 }
 async function cleanupDriverOnline() { try { if (ownDriverPosDocRef) await deleteDoc(ownDriverPosDocRef); } catch (e) { console.warn("cleanupDriverOnline failed", e); } }
 function startDriverHeartbeat() { if (!heartbeatInterval) heartbeatInterval = setInterval(pushDriverOnline, 2000); }
