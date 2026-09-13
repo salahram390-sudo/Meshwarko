@@ -365,6 +365,23 @@ async function completeRideCore({ auto = false } = {}) {
     if (ride.status === "completed" || ride.status === "canceled") return;
     if (ride.status !== "started") return;
     await updateDoc(rideRef, { status: "completed", completedAt: serverTimestamp(), archived: true, autoCompleted: auto });
+    // ============ إشعار الراكب: انتهت الرحلة ============
+try {
+  if (ride?.passengerId) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      body: JSON.stringify({
+        driverUids: [ride.passengerId],
+        title: "وصلت! 🎉",
+        body: "تم إنهاء الرحلة بنجاح. لا تنسَ تقييم السائق",
+        data: { type: "ride_completed", rideId: selectedRideId }
+      })
+    });
+    console.log("✅ تم إرسال إشعار للراكب: انتهت الرحلة");
+  }
+} catch (err) { console.error("❌ فشل إشعار الإنهاء:", err?.message || err); }
+// ====================================================
     if (ride && myUser) {
       const price = Number(ride.price || 0); const walletBalance = Number(myUser.walletBalance || 0) + price; const totalEarnings = Number(myUser.totalEarnings || 0) + price; const completedTrips = Number(myUser.completedTrips || 0) + 1;
       await updateDoc(doc(db, "users", myUser.uid), { walletBalance, totalEarnings, completedTrips, updatedAt: serverTimestamp() }).catch(() => {});
