@@ -2,7 +2,6 @@ import {
   auth,
   db,
   initFirebaseMessaging,
-  listenForegroundMessages
 } from "./firebase.js";
 // ====================== FCM Push Notifications (Driver) ======================
 async function initDriverPushNotifications() {
