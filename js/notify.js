@@ -118,7 +118,9 @@ export async function notify({
   if (perm !== "granted") return;
 
   try {
-    const notification = new Notification(title, {
+    if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.ready.then((registration) => {
+    registration.showNotification(title, {
       body: body,
       icon: icon,
       tag: tag,
@@ -126,11 +128,8 @@ export async function notify({
       vibrate: [200, 100, 200],
       data: { url: "/driver.html" }
     });
-
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-    };
+  }).catch((e) => console.warn("SW notification failed", e));
+    }
   } catch (e) {
     console.warn("System notification failed", e);
   }
