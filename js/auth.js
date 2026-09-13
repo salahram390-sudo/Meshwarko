@@ -280,7 +280,24 @@ registerForm?.addEventListener("submit", async (e) => {
     }
 
     await setDoc(doc(db, "users", cred.user.uid), { ...common, ...profile });
-    
+
+    // ============ إشعار للأدمن: مستخدم جديد ============
+try {
+  const adminUid = "ضع هنا UID الأدمن"; // ← هنجيبه بعدين
+  if (adminUid) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      body: JSON.stringify({
+        driverUids: [adminUid],
+        title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
+        body: `${name} سجل في التطبيق`,
+        data: { type: "new_user", userId: cred.user.uid }
+      })
+    });
+    console.log("✅ إشعار: مستخدم جديد للأدمن");
+  }
+} catch (e) { console.error("❌ فشل إشعار الأدمن:", e?.message); }
 await redirectLoggedUser(cred.user);
   } catch (err) {
     setText(regHint, friendlyAuthError(err));
