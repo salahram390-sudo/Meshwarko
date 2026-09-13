@@ -1108,6 +1108,10 @@ try {
   
   if (nearbyDriverUids.length > 0) {
     const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
+
+console.log("🔍 workerUrl:", workerUrl);
+console.log("🔍 driverUids:", nearbyDriverUids);
+console.log("🔍 Authorization header: Bearer meshwarko_secret_2026");
     
     await fetch(workerUrl, {
   method: "POST",
