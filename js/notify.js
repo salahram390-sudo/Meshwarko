@@ -88,7 +88,6 @@ export function toast(title, message, ms = 3500) {
   setTimeout(() => { if (el.isConnected) el.remove(); }, ms);
 }
 
-// ====================== النسخة المحسنة ======================
 export async function notify({ 
   title, 
   body, 
@@ -98,7 +97,7 @@ export async function notify({
   icon = "./logo.png"
 }) {
 
-  // Toast دايماً (حتى لو التطبيق مفتوح)
+  // Toast + صوت + اهتزاز فقط (الإشعارات النظامية بتاعت OneSignal)
   toast(title, body);
 
   if (sound) {
@@ -110,27 +109,4 @@ export async function notify({
   }
 
   if (vibrate && navigator.vibrate) navigator.vibrate([80, 40, 80]);
-
-  // إشعار نظامي (Browser Notification) حتى لو التطبيق مفتوح
-  if (!("Notification" in window)) return;
-
-  const perm = await ensureNotificationPermission(false);
-  if (perm !== "granted") return;
-
-  try {
-    if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.ready.then((registration) => {
-    registration.showNotification(title, {
-      body: body,
-      icon: icon,
-      tag: tag,
-      badge: "./logo.png",
-      vibrate: [200, 100, 200],
-      data: { url: "/driver.html" }
-    });
-  }).catch((e) => console.warn("SW notification failed", e));
-    }
-  } catch (e) {
-    console.warn("System notification failed", e);
-  }
 }
