@@ -1126,11 +1126,11 @@ const localPickupLon = pickup?.lon;
         title: "طلب مشوار جديد 🚗",
         body: `راكب في ${savedCenter} - ${savedGov} • المسافة: ${(lastDistanceMeters / 1000).toFixed(1)} كم • السعر: ${price} ج`,
         data: {
-          type: "new_ride_request",
-          rideId: rideRef.id,
-          pickupLat: String(pickup.lat),
-          pickupLon: String(pickup.lon)
-        }
+  type: "new_ride_request",
+  rideId: rideRef.id,
+  pickupLat: String(localPickupLat || ""),
+  pickupLon: String(localPickupLon || "")
+}
       })
     });
     
