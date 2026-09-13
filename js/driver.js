@@ -571,7 +571,7 @@ async function pushDriverOnline() {
   }
 }
 async function cleanupDriverOnline() { try { if (ownDriverPosDocRef) await deleteDoc(ownDriverPosDocRef); } catch (e) { console.warn("cleanupDriverOnline failed", e); } }
-function startDriverHeartbeat() { if (!heartbeatInterval) heartbeatInterval = setInterval(pushDriverOnline, 2000); }
+function startDriverHeartbeat() { if (!heartbeatInterval) heartbeatInterval = setInterval(pushDriverOnline, 10000); }
 function stopDriverHeartbeat() { if (heartbeatInterval) clearInterval(heartbeatInterval); heartbeatInterval = null; }
 
 function startLiveTracking(rideId) {
