@@ -311,6 +311,8 @@ export function locateOnce(map, onLoc, onErr) {
   let done = false;
 
   const success = (pos, source) => {
+    if (done) return;
+    done = true;
     const loc = {
       lat: pos.coords.latitude,
       lon: pos.coords.longitude,
@@ -321,35 +323,32 @@ export function locateOnce(map, onLoc, onErr) {
       localStorage.setItem("lastKnownLocation", JSON.stringify({ ...loc, ts: Date.now() }));
     } catch (_) {}
     onLoc?.(loc);
-    done = true;
   };
 
-  const fail = (err) => {
-    if (done) return;
-    done = true;
-    console.error("❌ فشل الموقع:", err.message);
-    onErr?.(err);
-  };
-
-  // شغّل watchPosition اللي بيديك الموقع أول ما يبقى متاح فوراً
-  const watchId = navigator.geolocation.watchPosition(
-    (pos) => {
-      success(pos, "watch");
-      // بعد أول نجاح، وقف المراقبة
-      if (done) navigator.geolocation.clearWatch(watchId);
-    },
+  // ⚡ محاولة سريعة: شبكة/WiFi (3 ثواني بالكتير)
+  navigator.geolocation.getCurrentPosition(
+    (pos) => success(pos, "شبكة"),
     (err) => {
-      console.warn("⚠️ watchPosition فشل:", err.message);
-      // لو فشل، جرب مرة واحدة
+      console.warn("⚠️ فشلت الشبكة، بنجرب GPS...", err.message);
+      
+      // 🛰️ محاولة GPS (15 ثانية)
       navigator.geolocation.getCurrentPosition(
-        (pos) => success(pos, "محاولة"),
-        fail,
-        { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
+        (pos) => success(pos, "GPS"),
+        (err2) => {
+          console.error("❌ فشل GPS:", err2.message);
+          onErr?.(err2);
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
       );
     },
-    { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
+    { 
+      enableHighAccuracy: false,  // ← مش بيستخدم GPS
+      timeout: 3000,               // ← 3 ثواني بس
+      maximumAge: 300000           // ← يستخدم أي موقع مخزّن من 5 دقايق
+    }
   );
 }
+
 export function showMyLocation(map, loc, opts = {}) {
   ensureStyles();
   const pan = !!opts.pan;
