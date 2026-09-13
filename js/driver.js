@@ -952,6 +952,25 @@ driverStartRideBtn?.addEventListener("click", async () => {
   setDriverStatus("بدء الرحلة...");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), { status: "started", startedAt: serverTimestamp() });
+    // ============ إشعار الراكب: بدأت الرحلة ============
+try {
+  const rideSnap = await getDoc(doc(db, "rides", selectedRideId));
+  const ride = rideSnap.data();
+  if (ride?.passengerId) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      body: JSON.stringify({
+        driverUids: [ride.passengerId],
+        title: "بدأت الرحلة 🚗",
+        body: "رحلة سعيدة! وصلتك في أمان",
+        data: { type: "ride_started", rideId: selectedRideId }
+      })
+    });
+    console.log("✅ تم إرسال إشعار للراكب: بدأت الرحلة");
+  }
+} catch (err) { console.error("❌ فشل إشعار البداية:", err?.message || err); }
+// ==================================================
     if (selectedRideData) { selectedRideData = { ...selectedRideData, status: "started", startedAt: Timestamp.now() }; refreshSelectedRideButtons(selectedRideData); }
     notify({ title: "بدأت الرحلة", body: "تم بدء الرحلة مع الراكب.", tag: "ride-started" }); setDriverStatus("الرحلة بدأت");
   } catch (err) { console.error(err); setDriverStatus("خطأ"); }
