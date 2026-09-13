@@ -1124,7 +1124,7 @@ const localPickupLon = pickup?.lon;
   body: JSON.stringify({
         driverUids: nearbyDriverUids,
         title: "طلب مشوار جديد 🚗",
-        body: `راكب في ${savedCenter} - ${savedGov} • المسافة: ${(lastDistanceMeters / 1000).toFixed(1)} كم • السعر: ${price} ج`,
+        body: `راكب في ${savedCenter || ""} - ${savedGov || ""} • المسافة: ${((lastDistanceMeters || 0) / 1000).toFixed(1)} كم • السعر: ${price || 0} ج`,
         data: {
   type: "new_ride_request",
   rideId: rideRef.id,
