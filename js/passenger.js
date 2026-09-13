@@ -1133,7 +1133,7 @@ try {
     console.warn("⚠️ لا يوجد سائقين قريبين لإرسال الإشعار لهم");
   }
 } catch (notifyErr) {
-  console.error("❌ فشل إرسال إشعار للسائقين:", notifyErr);
+  console.error("❌ فشل إرسال إشعار للسائقين:", notifyErr?.message || notifyErr?.toString() || JSON.stringify(notifyErr));
 }
 // ===================================================================
   } catch (e) {
