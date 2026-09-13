@@ -25,31 +25,6 @@ if (driverUid && window.OneSignalDeferred) {
 
     console.log("Driver FCM initialized:", !!token);
 
-    listenForegroundMessages((payload) => {
-      console.log("📩 Foreground FCM (driver):", payload);
-
-      const title =
-        payload.notification?.title ||
-        payload.data?.title ||
-        "طلب جديد";
-
-      const body =
-        payload.notification?.body ||
-        payload.data?.body ||
-        "لديك طلب مشوار جديد";
-
-      notify({
-        title,
-        body,
-        tag:
-          payload.data?.type === "new_ride_request"
-            ? "new-ride-request"
-            : "meshwarko-push",
-        sound: true,
-        vibrate: true
-      });
-    });
-
   } catch (error) {
     console.error("❌ Driver Push Setup Failed:", error);
   }
