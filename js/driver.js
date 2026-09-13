@@ -880,6 +880,34 @@ btnAccept?.addEventListener("click", async () => {
     }
     if (!["requested", "offered"].includes(status)) throw new Error(`لا يمكن قبول الطلب الآن لأن حالته الحالية هي: ${status || "غير معروفة"}`);
     await updateDoc(rideRef, { status: "accepted", driverId: myUser.uid, driverName: myUser.name || "", driverPhone: myUser.phone || "", driverVehicleType: myUser.vehicleType || "", driverVehicleCode: myUser.vehicleCode || "", price: liveRide.offerPrice || liveRide.price || 0, acceptedAt: serverTimestamp(), expiresAt: null, expiresAtMs: null });
+    // ================== إشعار للراكب بقبول الطلب ==================
+try {
+  if (liveRide.passengerId) {
+    const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
+    
+    await fetch(workerUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer meshwarko_secret_2026"
+      },
+      body: JSON.stringify({
+        driverUids: [liveRide.passengerId],  // ← الراكب هنا
+        title: "تم قبول طلبك ✅",
+        body: `السائق ${myUser.name || ""} في الطريق إليك`,
+        data: {
+          type: "ride_accepted",
+          rideId: selectedRideId
+        }
+      })
+    });
+    
+    console.log("✅ تم إرسال إشعار للراكب بقبول الطلب");
+  }
+} catch (err) {
+  console.error("❌ فشل إرسال إشعار للراكب:", err?.message || err);
+}
+// ================================================================
     selectedRideData = { ...liveRide, id: selectedRideId, status: "accepted", driverId: myUser.uid, driverName: myUser.name || "", driverPhone: myUser.phone || "", driverVehicleType: myUser.vehicleType || "", driverVehicleCode: myUser.vehicleCode || "", price: liveRide.offerPrice || liveRide.price || 0, expiresAt: null, expiresAtMs: null };
     refreshSelectedRideButtons(selectedRideData); await showAcceptedDetails(selectedRideId);
     if (selectedRideId) { startLiveTracking(selectedRideId); watchPassengerEndRequest(selectedRideId); }
