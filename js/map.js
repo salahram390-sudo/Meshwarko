@@ -309,10 +309,13 @@ export function locateOnce(map, onLoc, onErr) {
   }
 
   let done = false;
+  let watchId = null;
 
   const success = (pos, source) => {
     if (done) return;
     done = true;
+    if (watchId) navigator.geolocation.clearWatch(watchId);
+    
     const loc = {
       lat: pos.coords.latitude,
       lon: pos.coords.longitude,
@@ -325,26 +328,38 @@ export function locateOnce(map, onLoc, onErr) {
     onLoc?.(loc);
   };
 
-  // ⚡ محاولة سريعة: شبكة/WiFi (3 ثواني بالكتير)
-  navigator.geolocation.getCurrentPosition(
-    (pos) => success(pos, "شبكة"),
+  // ⚡ استخدام الموقع المخزّن فوراً لو موجود
+  try {
+    const cached = localStorage.getItem("lastKnownLocation");
+    if (cached) {
+      const c = JSON.parse(cached);
+      if (c.lat && c.lon && Date.now() - (c.ts || 0) < 30 * 60 * 1000) {
+        console.log("⚡ موقع مخزّن:", c);
+        onLoc?.({ lat: c.lat, lon: c.lon, accuracy: c.accuracy });
+      }
+    }
+  } catch (_) {}
+
+  // 🎯 watchPosition: بيفضل يحاول لحد ما يجيب الموقع
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => success(pos, "watch"),
     (err) => {
-      console.warn("⚠️ فشلت الشبكة، بنجرب GPS...", err.message);
-      
-      // 🛰️ محاولة GPS (15 ثانية)
+      console.warn("⚠️ watchPosition فشل:", err.message);
+      // لو فشل watchPosition، جرب getCurrentPosition كخطة بديلة
       navigator.geolocation.getCurrentPosition(
-        (pos) => success(pos, "GPS"),
+        (pos) => success(pos, "احتياطي"),
         (err2) => {
-          console.error("❌ فشل GPS:", err2.message);
+          if (done) return;
+          console.error("❌ فشل الموقع:", err2.message);
           onErr?.(err2);
         },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 30000, maximumAge: 300000 }
       );
     },
-    { 
-      enableHighAccuracy: false,  // ← مش بيستخدم GPS
-      timeout: 3000,               // ← 3 ثواني بس
-      maximumAge: 300000           // ← يستخدم أي موقع مخزّن من 5 دقايق
+    {
+      enableHighAccuracy: true,   // ← دقة عالية
+      timeout: 30000,             // ← 30 ثانية
+      maximumAge: 300000          // ← يستخدم أي موقع مخزّن
     }
   );
 }
