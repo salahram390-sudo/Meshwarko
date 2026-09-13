@@ -1322,13 +1322,6 @@ if (window.OneSignalDeferred) {
 }
 // --------------------------
 
-listenForegroundMessages((payload) => {
-  notify({
-    title: payload.notification?.title || "مشوارك",
-    body: payload.notification?.body || "لديك إشعار جديد",
-    tag: "foreground-msg"
-  });
-});
   await ensureNotificationPermission(true);
   const me = await getDoc(doc(db, "users", user.uid)); myData = me.exists() ? me.data() : {};
   if (myData.role === "admin") { location.href = "./admin.html"; return; }
