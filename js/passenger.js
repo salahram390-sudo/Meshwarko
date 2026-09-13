@@ -1112,7 +1112,9 @@ try {
 console.log("🔍 workerUrl:", workerUrl);
 console.log("🔍 driverUids:", nearbyDriverUids);
 console.log("🔍 Authorization header: Bearer meshwarko_secret_2026");
-    
+    // حفظ الإحداثيات في متغيرات محلية عشان نضمن إنها مش هتتصفر
+const localPickupLat = pickup?.lat;
+const localPickupLon = pickup?.lon;
     await fetch(workerUrl, {
   method: "POST",
   headers: { 
