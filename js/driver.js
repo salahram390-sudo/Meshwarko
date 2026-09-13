@@ -413,6 +413,23 @@ async function declineRide() {
                 declinedReason: "اعتذار السائق قبل بدء الرحلة"
             });
 
+          // ============ إشعار الراكب: السائق اعتذر ============
+try {
+  if (selectedRideData.passengerId) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      body: JSON.stringify({
+        driverUids: [selectedRideData.passengerId],
+        title: "السائق اعتذر ⚠️",
+        body: "السائق اعتذر عن الرحلة. جاري البحث عن سائق آخر...",
+        data: { type: "driver_declined", rideId: selectedRideId }
+      })
+    });
+    console.log("✅ إشعار: السائق اعتذر");
+  }
+} catch (e) { console.error("❌ فشل:", e?.message); }
+
             if (selectedRideData.passengerId) {
                 await notify({
                     userId: selectedRideData.passengerId,
