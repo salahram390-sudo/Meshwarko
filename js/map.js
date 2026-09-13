@@ -301,53 +301,55 @@ export async function routeOSRM(from, to) {
   }
 }
 
+
 export function locateOnce(map, onLoc, onErr) {
   if (!navigator.geolocation) {
     onErr?.({ message: "المتصفح لا يدعم تحديد الموقع" });
     return;
   }
 
-  // اعرض الموقع المخزّن فوراً
-  const cached = localStorage.getItem("lastKnownLocation");
-  if (cached) {
-    try {
-      const c = JSON.parse(cached);
-      onLoc?.({ lat: c.lat, lon: c.lon, accuracy: c.accuracy || 9999 });
-    } catch (_) {}
-  }
-
   let done = false;
 
   const success = (pos, source) => {
-    if (done) return;
-    done = true;
-    const loc = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy };
+    const loc = {
+      lat: pos.coords.latitude,
+      lon: pos.coords.longitude,
+      accuracy: pos.coords.accuracy
+    };
     console.log(`✅ الموقع (${source}):`, loc);
-    try { localStorage.setItem("lastKnownLocation", JSON.stringify({ ...loc, ts: Date.now() })); } catch (_) {}
+    try {
+      localStorage.setItem("lastKnownLocation", JSON.stringify({ ...loc, ts: Date.now() }));
+    } catch (_) {}
     onLoc?.(loc);
+    done = true;
   };
 
-  // محاولة واحدة بس! دقة منخفضة = سريعة
-  navigator.geolocation.getCurrentPosition(
-    (pos) => success(pos, "سريع"),
+  const fail = (err) => {
+    if (done) return;
+    done = true;
+    console.error("❌ فشل الموقع:", err.message);
+    onErr?.(err);
+  };
+
+  // شغّل watchPosition اللي بيديك الموقع أول ما يبقى متاح فوراً
+  const watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      success(pos, "watch");
+      // بعد أول نجاح، وقف المراقبة
+      if (done) navigator.geolocation.clearWatch(watchId);
+    },
     (err) => {
-      console.warn("⚠️ فشل السريع، بنجرب GPS...", err.message);
-      // لو فشل، جرب مرة واحدة كمان
+      console.warn("⚠️ watchPosition فشل:", err.message);
+      // لو فشل، جرب مرة واحدة
       navigator.geolocation.getCurrentPosition(
-        (pos) => success(pos, "GPS"),
-        (err2) => {
-          if (done) return;
-          done = true;
-          console.error("❌ فشل الموقع:", err2.message);
-          onErr?.(err2);
-        },
-        { enableHighAccuracy: true, timeout: 8000, maximumAge: 120000 }
+        (pos) => success(pos, "محاولة"),
+        fail,
+        { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }
       );
     },
-    { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 }
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 300000 }
   );
 }
-
 export function showMyLocation(map, loc, opts = {}) {
   ensureStyles();
   const pan = !!opts.pan;
