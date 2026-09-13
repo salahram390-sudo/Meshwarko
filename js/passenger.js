@@ -1316,7 +1316,30 @@ listenForegroundMessages((payload) => {
   setText(meBadge, `${myData.name || "مستخدم"} • راكب`);
   if (myData.vehicleType) passengerVehicle = myData.vehicleType;
 await initAdmin().catch(() => {});
-  locateOnce(map, (loc) => { myLocation = loc; showMyLocation(map, loc, { pan: true }); });
+  // ============== تشغيل الموقع تلقائياً عند فتح الصفحة ==============
+(function autoLocate() {
+  // 1) اعرض آخر موقع مخزّن فوراً (أقل من ثانية)
+  try {
+    const cached = localStorage.getItem("lastKnownLocation");
+    if (cached) {
+      const c = JSON.parse(cached);
+      if (c.lat && c.lon && Date.now() - (c.ts || 0) < 30 * 60 * 1000) {
+        myLocation = { lat: c.lat, lon: c.lon };
+        showMyLocation(map, myLocation, { pan: true });
+        console.log("⚡ موقع مخزّن ظهر فوراً:", myLocation);
+      }
+    }
+  } catch (_) {}
+
+  // 2) اطلب الموقع الحقيقي في الخلفية وحدّثه لما يجي
+  locateOnce(map, (loc) => {
+    myLocation = loc;
+    showMyLocation(map, loc, { pan: true });
+    console.log("🎯 تم تحديث الموقع الحقيقي:", loc);
+  }, (err) => {
+    console.warn("⚠️ تعذر الحصول على الموقع الحقيقي:", err?.message);
+  });
+})();
   watchCurrentRide(user.uid);
   setupPriceControls();
 });
