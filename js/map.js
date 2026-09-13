@@ -307,61 +307,44 @@ export function locateOnce(map, onLoc, onErr) {
     return;
   }
 
+  // اعرض الموقع المخزّن فوراً
+  const cached = localStorage.getItem("lastKnownLocation");
+  if (cached) {
+    try {
+      const c = JSON.parse(cached);
+      onLoc?.({ lat: c.lat, lon: c.lon, accuracy: c.accuracy || 9999 });
+    } catch (_) {}
+  }
+
   let done = false;
 
-  const success = (pos) => {
+  const success = (pos, source) => {
     if (done) return;
     done = true;
-    const loc = { 
-      lat: pos.coords.latitude, 
-      lon: pos.coords.longitude, 
-      accuracy: pos.coords.accuracy 
-    };
-    console.log("✅ تم تحديد الموقع:", loc);
+    const loc = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy };
+    console.log(`✅ الموقع (${source}):`, loc);
+    try { localStorage.setItem("lastKnownLocation", JSON.stringify({ ...loc, ts: Date.now() })); } catch (_) {}
     onLoc?.(loc);
-    
-    // في الخلفية: حاول تجيب موقع أدق (بدون ما توقف الواجهة)
-    navigator.geolocation.getCurrentPosition(
-      (betterPos) => {
-        const betterLoc = {
-          lat: betterPos.coords.latitude,
-          lon: betterPos.coords.longitude,
-          accuracy: betterPos.coords.accuracy
-        };
-        if (betterLoc.accuracy < loc.accuracy) {
-          console.log("🎯 تم تحسين الموقع:", betterLoc);
-          onLoc?.(betterLoc);
-        }
-      },
-      () => {}, // لو فشل، متعملش حاجة
-      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
-    );
   };
 
-  // المحاولة السريعة: دقة منخفضة + استخدام موقع مخزّن من 5 دقايق
+  // محاولة واحدة بس! دقة منخفضة = سريعة
   navigator.geolocation.getCurrentPosition(
-    success,
+    (pos) => success(pos, "سريع"),
     (err) => {
-      console.warn("⚠️ المحاولة السريعة فشلت، بنجرب GPS...", err.message);
-      
-      // لو فشلت السريعة، جرب GPS
+      console.warn("⚠️ فشل السريع، بنجرب GPS...", err.message);
+      // لو فشل، جرب مرة واحدة كمان
       navigator.geolocation.getCurrentPosition(
-        success,
+        (pos) => success(pos, "GPS"),
         (err2) => {
           if (done) return;
           done = true;
-          console.error("❌ فشل تحديد الموقع:", err2.message);
+          console.error("❌ فشل الموقع:", err2.message);
           onErr?.(err2);
-          alert("تعذر تحديد موقعك. تأكد من تفعيل GPS والسماح بالموقع.");
         },
-        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 120000 }
       );
     },
-    { 
-      enableHighAccuracy: false,  // ← الأهم: شبكة بدل GPS
-      timeout: 3000,               // ← 3 ثواني بس
-      maximumAge: 300000           // ← يستخدم موقع مخزّن من 5 دقايق فوراً
-    }
+    { enableHighAccuracy: false, timeout: 5000, maximumAge: 600000 }
   );
 }
 
