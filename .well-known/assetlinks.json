@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.salahram390_sudo.twa",
+    "sha256_cert_fingerprints": ["25:3C:44:A7:4B:10:94:37:5A:B4:D5:0C:DB:AE:3A:98:70:1A:7C:DF:94:8E:4A:18:44:D4:59:30:9F:56:73:DF"]
+  }
+}]
