@@ -300,6 +300,7 @@ export async function routeOSRM(from, to) {
     };
   }
 }
+
 export function locateOnce(map, onLoc, onErr) {
   if (!navigator.geolocation) {
     onErr?.({ message: "المتصفح لا يدعم تحديد الموقع" });
@@ -318,33 +319,49 @@ export function locateOnce(map, onLoc, onErr) {
     };
     console.log("✅ تم تحديد الموقع:", loc);
     onLoc?.(loc);
-  };
-
-  const tryLowAccuracy = () => {
-    if (done) return;
-    console.log("🔄 المحاولة بإعدادات أقل صرامة...");
+    
+    // في الخلفية: حاول تجيب موقع أدق (بدون ما توقف الواجهة)
     navigator.geolocation.getCurrentPosition(
-      success,
-      (err2) => {
-        if (done) return;
-        done = true;
-        console.error("❌ فشل تحديد الموقع:", err2.message);
-        onErr?.(err2);
-        alert("تعذر تحديد موقعك. تأكد من:\n1. تفعيل GPS\n2. السماح بالموقع في المتصفح\n3. إنك في مكان مفتوح");
+      (betterPos) => {
+        const betterLoc = {
+          lat: betterPos.coords.latitude,
+          lon: betterPos.coords.longitude,
+          accuracy: betterPos.coords.accuracy
+        };
+        if (betterLoc.accuracy < loc.accuracy) {
+          console.log("🎯 تم تحسين الموقع:", betterLoc);
+          onLoc?.(betterLoc);
+        }
       },
-      { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
+      () => {}, // لو فشل، متعملش حاجة
+      { enableHighAccuracy: true, timeout: 8000, maximumAge: 30000 }
     );
   };
 
-  // المحاولة الأولى: دقة عالية (GPS) مع مهلة 10 ثواني
+  // المحاولة السريعة: دقة منخفضة + استخدام موقع مخزّن من 5 دقايق
   navigator.geolocation.getCurrentPosition(
     success,
     (err) => {
-      console.warn("⚠️ المحاولة الأولى فشلت:", err.message);
-      // المحاولة الثانية: دقة أقل (أسرع، تعتمد على الشبكة)
-      tryLowAccuracy();
+      console.warn("⚠️ المحاولة السريعة فشلت، بنجرب GPS...", err.message);
+      
+      // لو فشلت السريعة، جرب GPS
+      navigator.geolocation.getCurrentPosition(
+        success,
+        (err2) => {
+          if (done) return;
+          done = true;
+          console.error("❌ فشل تحديد الموقع:", err2.message);
+          onErr?.(err2);
+          alert("تعذر تحديد موقعك. تأكد من تفعيل GPS والسماح بالموقع.");
+        },
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+      );
     },
-    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+    { 
+      enableHighAccuracy: false,  // ← الأهم: شبكة بدل GPS
+      timeout: 3000,               // ← 3 ثواني بس
+      maximumAge: 300000           // ← يستخدم موقع مخزّن من 5 دقايق فوراً
+    }
   );
 }
 
