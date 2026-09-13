@@ -924,6 +924,25 @@ btnArrived?.addEventListener("click", async () => {
   setDriverStatus("وصل لموقع الراكب");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), { status: "arrived", arrivedAtPickup: true, arrivedAt: serverTimestamp() });
+    // ============ إشعار الراكب: السائق وصل ============
+try {
+  const rideSnap = await getDoc(doc(db, "rides", selectedRideId));
+  const ride = rideSnap.data();
+  if (ride?.passengerId) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      body: JSON.stringify({
+        driverUids: [ride.passengerId],
+        title: "السائق وصل 📍",
+        body: `${myUser?.name || "السائق"} وصل لمكان القيام، استعد للركوب`,
+        data: { type: "driver_arrived", rideId: selectedRideId }
+      })
+    });
+    console.log("✅ تم إرسال إشعار للراكب: السائق وصل");
+  }
+} catch (err) { console.error("❌ فشل إشعار الوصول:", err?.message || err); }
+// ================================================
     btnArrived.disabled = true; notify({ title: "وصلت", body: "تم إشعار الراكب أنك وصلت", tag: "arrived" });
   } catch (e) { console.error(e); setDriverStatus("خطأ"); }
 });
