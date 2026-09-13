@@ -1166,6 +1166,26 @@ btnCancel.addEventListener("click", async () => {
       archived: true 
     });
 
+    // ============ إشعار السائق: الراكب ألغى ============
+try {
+  const rideSnap = await getDoc(doc(db, "rides", currentRideId));
+  const ride = rideSnap.data();
+  if (ride?.driverId) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      body: JSON.stringify({
+        driverUids: [ride.driverId],
+        title: "الراكب ألغى الطلب ❌",
+        body: "تم إلغاء الرحلة من جانب الراكب",
+        data: { type: "ride_cancelled", rideId: currentRideId }
+      })
+    });
+    console.log("✅ تم إرسال إشعار للسائق: الراكب ألغى");
+  }
+} catch (err) { console.error("❌ فشل إشعار الإلغاء:", err?.message || err); }
+// ===================================================
+
     cleanupRideState(); 
     rideUiNone(); 
 
