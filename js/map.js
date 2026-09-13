@@ -301,22 +301,51 @@ export async function routeOSRM(from, to) {
   }
 }
 export function locateOnce(map, onLoc, onErr) {
-  map.locate({ setView: false, watch: false, enableHighAccuracy: true, maxZoom: 18 });
+  if (!navigator.geolocation) {
+    onErr?.({ message: "المتصفح لا يدعم تحديد الموقع" });
+    return;
+  }
 
-  const ok = (e) => {
-    map.off("locationfound", ok);
-    map.off("locationerror", bad);
-    onLoc?.({ lat: e.latitude, lon: e.longitude, accuracy: e.accuracy });
+  let done = false;
+
+  const success = (pos) => {
+    if (done) return;
+    done = true;
+    const loc = { 
+      lat: pos.coords.latitude, 
+      lon: pos.coords.longitude, 
+      accuracy: pos.coords.accuracy 
+    };
+    console.log("✅ تم تحديد الموقع:", loc);
+    onLoc?.(loc);
   };
 
-  const bad = (e) => {
-    map.off("locationfound", ok);
-    map.off("locationerror", bad);
-    onErr?.(e);
+  const tryLowAccuracy = () => {
+    if (done) return;
+    console.log("🔄 المحاولة بإعدادات أقل صرامة...");
+    navigator.geolocation.getCurrentPosition(
+      success,
+      (err2) => {
+        if (done) return;
+        done = true;
+        console.error("❌ فشل تحديد الموقع:", err2.message);
+        onErr?.(err2);
+        alert("تعذر تحديد موقعك. تأكد من:\n1. تفعيل GPS\n2. السماح بالموقع في المتصفح\n3. إنك في مكان مفتوح");
+      },
+      { enableHighAccuracy: false, timeout: 20000, maximumAge: 60000 }
+    );
   };
 
-  map.on("locationfound", ok);
-  map.on("locationerror", bad);
+  // المحاولة الأولى: دقة عالية (GPS) مع مهلة 10 ثواني
+  navigator.geolocation.getCurrentPosition(
+    success,
+    (err) => {
+      console.warn("⚠️ المحاولة الأولى فشلت:", err.message);
+      // المحاولة الثانية: دقة أقل (أسرع، تعتمد على الشبكة)
+      tryLowAccuracy();
+    },
+    { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
+  );
 }
 
 export function showMyLocation(map, loc, opts = {}) {
