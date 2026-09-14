@@ -1313,23 +1313,28 @@ onAuthStateChanged(auth, async (user) => {
   
   // ============ OneSignal: Web + Median ============
 if (window.median && window.median.onesignal) {
-  // داخل تطبيق Median
   try {
     await window.median.onesignal.register();
-    await window.median.onesignal.externalUserId.set(user.uid);
+    console.log("✅ OneSignal registered");
+    
+    // ⚠️ مهم: نستخدم Promise.race عشان لوعلق، نكمل بعد 3 ثواني
+    await Promise.race([
+      window.median.onesignal.externalUserId.set(user.uid),
+      new Promise(resolve => setTimeout(resolve, 3000))
+    ]);
+    console.log("✅ External User ID set:", user.uid);
+    
     window.median.onesignal.enableForegroundNotifications(true);
-    console.log("✅ OneSignal (Median) linked to UID:", user.uid);
   } catch (e) {
     console.warn("⚠️ Median OneSignal error:", e);
   }
 } else if (window.OneSignalDeferred) {
-  // في المتصفح
   window.OneSignalDeferred.push(async function (OneSignal) {
     await OneSignal.login(user.uid);
     console.log("✅ OneSignal (Web) linked to UID:", user.uid);
   });
 } else {
-  console.warn("⚠️ OneSignal not available");
+  console.warn("⚠️ OneSignal not available in passenger.js");
 }
 // ================================================
 
