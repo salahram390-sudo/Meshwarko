@@ -20,26 +20,29 @@ const driverUid = myUser?.uid || auth.currentUser?.uid;
 
 if (driverUid) {
   if (window.median && window.median.onesignal) {
-  try {
-    console.log("🔍 Step 1: Calling register...");
-    const regResult = await window.median.onesignal.register();
-    console.log("✅ Step 2: register result:", regResult);
-    
-    console.log("🔍 Step 3: Setting externalUserId:", driverUid);
-    await window.median.onesignal.externalUserId.set(driverUid);
-    console.log("✅ Step 4: externalUserId set");
-    
-    window.median.onesignal.enableForegroundNotifications(true);
-    console.log("✅ Step 5: foreground enabled");
-    
-    const info = await window.median.onesignal.onesignalInfo?.();
-    console.log("✅ OneSignal Info:", info);
-  } catch (e) {
-    console.error("❌ Median OneSignal error:", e);
+    try {
+      await window.median.onesignal.register();
+      console.log("✅ OneSignal registered");
+      
+      // ⚠️ مهم: نستخدم Promise.race عشان لوعلق، نكمل بعد 3 ثواني
+      await Promise.race([
+        window.median.onesignal.externalUserId.set(driverUid),
+        new Promise(resolve => setTimeout(resolve, 3000))
+      ]);
+      console.log("✅ External User ID set:", driverUid);
+      
+      window.median.onesignal.enableForegroundNotifications(true);
+    } catch (e) {
+      console.warn("⚠️ Median OneSignal error:", e);
+    }
+  } else if (window.OneSignalDeferred) {
+    window.OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.login(driverUid);
+      console.log("✅ OneSignal (Web) linked to DRIVER UID:", driverUid);
+    });
+  } else {
+    console.warn("⚠️ OneSignal not available in driver.js");
   }
-} else {
-  console.warn("⚠️ median.onesignal not available");
-}
 } else {
   console.warn("⚠️ driverUid is empty");
 }
