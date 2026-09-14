@@ -1311,16 +1311,20 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = "./index.html"; return; }
   await initFirebaseMessaging(user.uid);
   
-  // --- كود ربط OneSignal ---
-if (window.OneSignalDeferred) {
-  window.OneSignalDeferred.push(async function (OneSignal) {
-    await OneSignal.login(user.uid);
-    console.log("✅ OneSignal linked to UID:", user.uid);
-  });
+  // ============ OneSignal via Median ============
+if (window.median && window.median.onesignal) {
+  try {
+    await window.median.onesignal.register();
+    await window.median.onesignal.externalUserId.set(user.uid);
+    window.median.onesignal.enableForegroundNotifications(true);
+    console.log("✅ OneSignal (Median) linked to UID:", user.uid);
+  } catch (e) {
+    console.warn("⚠️ Median OneSignal error:", e);
+  }
 } else {
-  console.warn("⚠️ OneSignalDeferred not found in passenger.js");
+  console.warn("⚠️ median.onesignal not found in passenger.js");
 }
-// --------------------------
+// =============================================
 
   await ensureNotificationPermission(true);
   const me = await getDoc(doc(db, "users", user.uid)); myData = me.exists() ? me.data() : {};
