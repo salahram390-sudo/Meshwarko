@@ -303,6 +303,11 @@ export async function routeOSRM(from, to) {
 
 
 export function locateOnce(map, onLoc, onErr) {
+  // إذا كنا داخل تطبيق Median، نطلب تفعيل خدمات الموقع أولاً
+  if (window.median && window.median.android && window.median.android.geoLocation) {
+    window.median.android.geoLocation.promptLocationServices();
+  }
+
   if (!navigator.geolocation) {
     onErr?.({ message: "المتصفح لا يدعم تحديد الموقع" });
     return;
@@ -328,39 +333,32 @@ export function locateOnce(map, onLoc, onErr) {
     onLoc?.(loc);
   };
 
-  // ⚡ استخدام الموقع المخزّن فوراً لو موجود
   try {
     const cached = localStorage.getItem("lastKnownLocation");
     if (cached) {
       const c = JSON.parse(cached);
       if (c.lat && c.lon && Date.now() - (c.ts || 0) < 30 * 60 * 1000) {
-        console.log("⚡ موقع مخزّن:", c);
         onLoc?.({ lat: c.lat, lon: c.lon, accuracy: c.accuracy });
       }
     }
   } catch (_) {}
 
-  // 🎯 watchPosition: بيفضل يحاول لحد ما يجيب الموقع
   watchId = navigator.geolocation.watchPosition(
     (pos) => success(pos, "watch"),
     (err) => {
       console.warn("⚠️ watchPosition فشل:", err.message);
-      // لو فشل watchPosition، جرب getCurrentPosition كخطة بديلة
       navigator.geolocation.getCurrentPosition(
         (pos) => success(pos, "احتياطي"),
         (err2) => {
           if (done) return;
+          done = true;
           console.error("❌ فشل الموقع:", err2.message);
           onErr?.(err2);
         },
         { enableHighAccuracy: true, timeout: 30000, maximumAge: 300000 }
       );
     },
-    {
-      enableHighAccuracy: true,   // ← دقة عالية
-      timeout: 30000,             // ← 30 ثانية
-      maximumAge: 300000          // ← يستخدم أي موقع مخزّن
-    }
+    { enableHighAccuracy: true, timeout: 30000, maximumAge: 300000 }
   );
 }
 
