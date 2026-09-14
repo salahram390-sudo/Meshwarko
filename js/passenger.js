@@ -1170,7 +1170,7 @@ btnCancel.addEventListener("click", async () => {
 try {
   const rideSnap = await getDoc(doc(db, "rides", currentRideId));
   const ride = rideSnap.data();
-  if (ride?.driverId) {
+  if (ride && ride.driverId && typeof ride.driverId === 'string' && ride.driverId.length > 0) {
     await fetch("https://meshwarko-push.salahram390.workers.dev", {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
