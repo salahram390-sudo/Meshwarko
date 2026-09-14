@@ -10,8 +10,14 @@ async function initDriverPushNotifications() {
       myUser?.uid || auth.currentUser?.uid
     );
 
-    // ============ OneSignal via Median ============
+    // ============ OneSignal: Web + Median ============
+console.log("🔍 OneSignal setup starting...");
+console.log("🔍 driverUid:", myUser?.uid, "| authUid:", auth.currentUser?.uid);
+console.log("🔍 median exists?", !!window.median);
+console.log("🔍 median.onesignal exists?", !!(window.median && window.median.onesignal));
+
 const driverUid = myUser?.uid || auth.currentUser?.uid;
+
 if (driverUid) {
   if (window.median && window.median.onesignal) {
     try {
@@ -22,11 +28,18 @@ if (driverUid) {
     } catch (e) {
       console.warn("⚠️ Median OneSignal error:", e);
     }
+  } else if (window.OneSignalDeferred) {
+    window.OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.login(driverUid);
+      console.log("✅ OneSignal (Web) linked to DRIVER UID:", driverUid);
+    });
   } else {
-    console.warn("⚠️ median.onesignal not found");
+    console.warn("⚠️ OneSignal not available in driver.js");
   }
+} else {
+  console.warn("⚠️ driverUid is empty");
 }
-// =============================================
+// ================================================
 
     console.log("Driver FCM initialized:", !!token);
 
