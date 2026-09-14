@@ -1311,8 +1311,9 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = "./index.html"; return; }
   await initFirebaseMessaging(user.uid);
   
-  // ============ OneSignal via Median ============
+  // ============ OneSignal: Web + Median ============
 if (window.median && window.median.onesignal) {
+  // داخل تطبيق Median
   try {
     await window.median.onesignal.register();
     await window.median.onesignal.externalUserId.set(user.uid);
@@ -1321,10 +1322,16 @@ if (window.median && window.median.onesignal) {
   } catch (e) {
     console.warn("⚠️ Median OneSignal error:", e);
   }
+} else if (window.OneSignalDeferred) {
+  // في المتصفح
+  window.OneSignalDeferred.push(async function (OneSignal) {
+    await OneSignal.login(user.uid);
+    console.log("✅ OneSignal (Web) linked to UID:", user.uid);
+  });
 } else {
-  console.warn("⚠️ median.onesignal not found in passenger.js");
+  console.warn("⚠️ OneSignal not available");
 }
-// =============================================
+// ================================================
 
   await ensureNotificationPermission(true);
   const me = await getDoc(doc(db, "users", user.uid)); myData = me.exists() ? me.data() : {};
