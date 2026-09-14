@@ -31,7 +31,6 @@ function beep() {
 
 export function playSound(type = "notify") {
   let file = "./assets/sounds/notify.mp3";
-
   if (type === "request") file = "./assets/sounds/request.mp3";
   else if (type === "success") file = "./assets/sounds/success.mp3";
   else if (type === "offer") file = "./assets/sounds/offer.mp3";
@@ -40,6 +39,11 @@ export function playSound(type = "notify") {
   else if (type === "started") file = "./assets/sounds/started.mp3";
   else if (type === "cancel") file = "./assets/sounds/cancel.mp3";
   else if (type === "message") file = "./assets/sounds/message.mp3";
+
+  // طلب Audio Focus من Median (لو موجود)
+  if (window.median && window.median.android && window.median.android.audio) {
+    try { window.median.android.audio.requestFocus(); } catch (_) {}
+  }
 
   const audio = new Audio(file);
   audio.volume = 1.0;
