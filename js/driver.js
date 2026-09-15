@@ -29,6 +29,14 @@ if (driverUid) {
   new Promise(resolve => setTimeout(resolve, 3000))
 ]);
       console.log("✅ External User ID set:", driverUid);
+
+      // إضافة Tags
+try {
+  await window.median.onesignal.tags.add("role", "driver");
+  console.log("✅ Tag added: driver");
+} catch (e) {
+  console.warn("⚠️ Tag add failed:", e);
+}
       
       window.median.onesignal.enableForegroundNotifications(true);
     } catch (e) {
