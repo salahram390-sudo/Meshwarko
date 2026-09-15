@@ -420,33 +420,80 @@ function renderSearchingRideCard(ride) {
   const startedAt = rideCreatedAtMs(ride);
   const render = () => {
     const elapsedSec = Math.floor((Date.now() - startedAt) / 1000);
-    const nearbyStored = Array.isArray(ride?.nearestDrivers) ? ride.nearestDrivers.length : Array.isArray(ride?.nearestDriverIds) ? ride.nearestDriverIds.length : 0;
+    const nearbyStored = Array.isArray(ride?.nearestDrivers)
+      ? ride.nearestDrivers.length
+      : Array.isArray(ride?.nearestDriverIds)
+        ? ride.nearestDriverIds.length
+        : 0;
     const nearbyNow = Math.max(driverMarkers.size, nearbyStored);
     const offersCount = Number(ride?.offersCount || 0);
     const viewersCount = Number(ride?.driverViews || 0);
     const priceText = moneyEGP(ride?.price || 0);
+
     rideCard.innerHTML = `
       <div class="searching-ride-card">
-        <div class="searching-head"><div class="searching-radar"><div class="searching-radar-center"></div></div><div><div class="searching-title">جارٍ البحث عن سائقين قريبين...</div><div class="searching-sub">يتم الآن إرسال طلبك داخل المنطقة المختارة ومتابعة السائقين المتاحين لحظة بلحظة.</div></div></div>
+        <div class="searching-radar">
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="ring"></div>
+          <div class="outer-ring"></div>
+          <div class="center-dot">🚗</div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+
+        <div class="searching-title">جارٍ البحث عن سائقين...</div>
+        <div class="searching-sub">
+          يتم الآن إرسال طلبك داخل المنطقة المختارة ومتابعة السائقين المتاحين لحظة بلحظة.
+        </div>
+
         <div class="searching-stats">
-          <div class="search-stat"><span class="n">${nearbyNow}</span><span class="t">قريبين الآن</span></div>
-          <div class="search-stat"><span class="n">${offersCount}</span><span class="t">عروض</span></div>
-          <div class="search-stat"><span class="n">${viewersCount}</span><span class="t">شاهدوا الطلب</span></div>
-          <div class="search-stat"><span class="n">${formatSearchElapsed(elapsedSec)}</span><span class="t">الوقت</span></div>
+          <div class="search-stat">
+            <span class="n">${nearbyNow}</span>
+            <span class="t">قريبين الآن</span>
+          </div>
+          <div class="search-stat">
+            <span class="n">${offersCount}</span>
+            <span class="t">عروض</span>
+          </div>
+          <div class="search-stat">
+            <span class="n">${viewersCount}</span>
+            <span class="t">شاهدوا الطلب</span>
+          </div>
+          <div class="search-stat">
+            <span class="n">${formatSearchElapsed(elapsedSec)}</span>
+            <span class="t">الوقت</span>
+          </div>
         </div>
+
         <div class="searching-progress"><span></span></div>
+
         <div class="searching-summary">
-          <div class="searching-row"><span class="muted">من</span><b>${escapeHtml(ride?.pickupText || "—")}</b></div>
-          <div class="searching-row"><span class="muted">إلى</span><b>${escapeHtml(ride?.dropoffText || "—")}</b></div>
-          <div class="searching-row"><span class="muted">السعر الحالي</span><b>${priceText}</b></div>
+          <div class="searching-row">
+            <span class="muted">من</span>
+            <b>${escapeHtml(ride?.pickupText || "—")}</b>
+          </div>
+          <div class="searching-row">
+            <span class="muted">إلى</span>
+            <b>${escapeHtml(ride?.dropoffText || "—")}</b>
+          </div>
+          <div class="searching-row">
+            <span class="muted">السعر الحالي</span>
+            <b>${priceText}</b>
+          </div>
         </div>
-        <div class="searching-note">يمكنك تعديل السعر أو إلغاء الطلب قبل قبول أي سائق.</div>
+
+        <div class="searching-note">
+          يمكنك تعديل السعر أو إلغاء الطلب قبل قبول أي سائق.
+        </div>
       </div>`;
   };
   render();
   rideSearchTimer = setInterval(render, 1000);
 }
-
 function canUseDriverOnlineRow(d) {
   const lat = Number(d?.lat), lon = Number(d?.lon ?? d?.lng), lastSeenMs = Number(d?.lastSeenMs || 0);
   if (![lat, lon].every(Number.isFinite) || !lastSeenMs) return false;
