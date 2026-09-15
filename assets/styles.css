@@ -2442,17 +2442,13 @@ body.splash-active {
   box-shadow: none !important;
 }
 
-/* إزالة برواز كارت "حالة الطلب" */
-#rideCard,
-.ride-card,
-.panel-body > .card {
+/* إزالة الإطار الذهبي من كارت "حالة الطلب" */
+.ride-status-card {
   border: none !important;
   background: #050607 !important;
   box-shadow: none !important;
 }
 
-#rideCard::after,
-.ride-card::after,
-.panel-body > .card::after {
+.ride-status-card::after {
   display: none !important;
 }
