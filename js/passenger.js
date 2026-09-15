@@ -1317,11 +1317,10 @@ if (window.median && window.median.onesignal) {
     await window.median.onesignal.register();
     console.log("✅ OneSignal registered");
     
-    // ⚠️ مهم: نستخدم Promise.race عشان لوعلق، نكمل بعد 3 ثواني
     await Promise.race([
-      window.median.onesignal.externalUserId.set(user.uid),
-      new Promise(resolve => setTimeout(resolve, 3000))
-    ]);
+  window.median.onesignal.login(user.uid),
+  new Promise(resolve => setTimeout(resolve, 3000))
+]);
     console.log("✅ External User ID set:", user.uid);
     
     window.median.onesignal.enableForegroundNotifications(true);
