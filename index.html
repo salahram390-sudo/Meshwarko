@@ -229,34 +229,7 @@
   </script>
 
   <script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const splash = document.getElementById("splash");
-    const logo = splash?.querySelector(".splash-logo");
-    const stage = splash?.querySelector(".splash-stage");
-    const appRoot = document.getElementById("appRoot");
-
-    if (!splash || !logo || !stage || !appRoot) return;
-
-    // بداية خفيفة ثم اختفاء احترافي
-    setTimeout(() => {
-      logo.classList.add("hide");
-      stage.classList.add("settle");
-    }, 3500);
-
-    // نُبقي الخلفية السوداء وحدها قليلًا
-    setTimeout(() => {
-      splash.classList.add("hide");
-    }, 4300);
-
-    // إظهار التطبيق بعد انتهاء السبلاتش بالكامل
-    setTimeout(() => {
-      splash.remove();
-      document.body.classList.remove("splash-active");
-      appRoot.classList.remove("app-hidden");
-      appRoot.classList.add("app-ready");
-      appRoot.style.display = "flex";
-    }, 5000);
-  });
+  
   </script>
 </body>
 </html>
