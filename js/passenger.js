@@ -1323,6 +1323,14 @@ if (window.median && window.median.onesignal) {
 ]);
     console.log("✅ External User ID set:", user.uid);
     
+    // إضافة Tags
+try {
+  await window.median.onesignal.tags.add("role", "passenger");
+  console.log("✅ Tag added: passenger");
+} catch (e) {
+  console.warn("⚠️ Tag add failed:", e);
+}
+    
     window.median.onesignal.enableForegroundNotifications(true);
   } catch (e) {
     console.warn("⚠️ Median OneSignal error:", e);
