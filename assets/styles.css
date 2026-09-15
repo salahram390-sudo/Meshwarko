@@ -1598,23 +1598,14 @@ input[type="range"] {
   }
 }
 
-/* =========================
-   Premium Searching Card
-========================= */
-
 .searching-ride-card {
   position: relative;
-  overflow: hidden;
-  border-radius: 24px;
-  padding: 30px 18px 24px;
-  border: 1px solid rgba(212, 175, 55, 0.25);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12), transparent 55%),
-    linear-gradient(180deg, #1a1814 0%, #0E0D08 100%);
-  box-shadow:
-    0 20px 45px rgba(0, 0, 0, 0.35),
-    0 0 0 1px rgba(212, 175, 55, 0.08) inset,
-    0 0 60px rgba(212, 175, 55, 0.06);
+  overflow: visible;
+  border-radius: 0;
+  padding: 20px 0 0 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 /* ============ الرادار ============ */
