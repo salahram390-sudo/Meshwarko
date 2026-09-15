@@ -1758,7 +1758,7 @@ input[type="range"] {
   width: 40%;
   background: linear-gradient(90deg, transparent, #D4AF37, #FFD700, #D4AF37, transparent);
   border-radius: 999px;
-  animation: progressSlide 2s ease-in-out infinite;
+  animation: progressSlide 2.5s ease-in-out infinite;
 }
 
 /* ============ ملخص الرحلة ============ */
