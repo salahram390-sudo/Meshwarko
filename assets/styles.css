@@ -1854,8 +1854,9 @@ input[type="range"] {
 }
 
 @keyframes progressSlide {
-  0% { margin-left: -40%; }
-  100% { margin-left: 100%; }
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
 }
 
 /* =========================
@@ -2439,4 +2440,19 @@ body.splash-active {
 .request-btn:disabled {
   opacity: 0.55;
   box-shadow: none !important;
+}
+
+/* إزالة برواز كارت "حالة الطلب" */
+#rideCard,
+.ride-card,
+.panel-body > .card {
+  border: none !important;
+  background: #050607 !important;
+  box-shadow: none !important;
+}
+
+#rideCard::after,
+.ride-card::after,
+.panel-body > .card::after {
+  display: none !important;
 }
