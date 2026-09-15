@@ -24,11 +24,10 @@ if (driverUid) {
       await window.median.onesignal.register();
       console.log("✅ OneSignal registered");
       
-      // ⚠️ مهم: نستخدم Promise.race عشان لوعلق، نكمل بعد 3 ثواني
       await Promise.race([
-        window.median.onesignal.externalUserId.set(driverUid),
-        new Promise(resolve => setTimeout(resolve, 3000))
-      ]);
+  window.median.onesignal.login(driverUid),
+  new Promise(resolve => setTimeout(resolve, 3000))
+]);
       console.log("✅ External User ID set:", driverUid);
       
       window.median.onesignal.enableForegroundNotifications(true);
