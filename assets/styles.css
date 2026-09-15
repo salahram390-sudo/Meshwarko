@@ -1866,17 +1866,6 @@ input[type="range"] {
   100% { margin-left: 100%; }
 }
 
-.searching-radar {
-  position: relative;
-  width: 74px;
-  height: 74px;
-  border-radius: 999px;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(circle at center, rgba(168, 85, 247, 0.18), rgba(168, 85, 247, 0.04));
-}
-
 .searching-radar::before,
 .searching-radar::after {
   content: "";
