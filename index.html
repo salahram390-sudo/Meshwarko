@@ -229,7 +229,15 @@
   </script>
 
   <script>
-  
+  window.addEventListener("DOMContentLoaded", () => {
+  const appRoot = document.getElementById("appRoot");
+  if (appRoot) {
+    appRoot.classList.remove("app-hidden");
+    appRoot.classList.add("app-ready");
+    appRoot.style.display = "flex";
+  }
+  document.documentElement.style.visibility = "visible";
+});
   </script>
 </body>
 </html>
