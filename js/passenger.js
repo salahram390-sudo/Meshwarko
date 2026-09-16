@@ -1240,7 +1240,7 @@ const localPickupLon = pickup?.lon;
   method: "POST",
   headers: { 
     "Content-Type": "application/json",
-    "Authorization": "Bearer meshwarko_secret_2026" // <-- السطر الجديد ده
+  "Authorization": "Bearer YVd/YhTgJ4Wwddeu88v/LqvSexujDKetSne/N537Hlo="
   },
   body: JSON.stringify({
         driverUids: nearbyDriverUids,
