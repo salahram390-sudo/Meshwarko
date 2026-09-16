@@ -2405,3 +2405,101 @@ input[type="range"] {
   font-size: 15px;
   border-radius: 16px;
 }
+
+/* ========== Custom Select Bottom Sheet ========== */
+.custom-select-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.custom-select-sheet.hidden { display: none !important; }
+
+.custom-select-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.custom-select-panel {
+  position: relative;
+  z-index: 1;
+  width: min(560px, 100vw);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #1a1814 0%, #0E0D08 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-bottom: none;
+  border-radius: 22px 22px 0 0;
+  overflow: hidden;
+  animation: sheetUp 0.25s ease-out;
+}
+@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.custom-select-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+  flex: 0 0 auto;
+}
+.custom-select-title {
+  color: #FFD700;
+  font-size: 16px;
+  font-weight: 700;
+}
+.custom-select-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  background: rgba(255, 255, 255, 0.04);
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-select-options {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 6px 0 20px;
+}
+.custom-select-option {
+  width: 100%;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 15px;
+  text-align: right;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: inherit;
+}
+.custom-select-option:active {
+  background: rgba(212, 175, 55, 0.1);
+}
+.custom-select-option.active {
+  color: #FFD700;
+  background: rgba(212, 175, 55, 0.08);
+}
+.custom-select-option.active::after {
+  content: "✓";
+  color: #FFD700;
+  font-weight: 700;
+}
