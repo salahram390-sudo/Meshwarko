@@ -526,7 +526,7 @@ try {
   if (selectedRideData.passengerId) {
     await fetch("https://meshwarko-push.salahram390.workers.dev", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer YVd/YhTgJ4Wwddeu88v/LqvSexujDKetSne/N537Hlo=" },
       body: JSON.stringify({
         driverUids: [selectedRideData.passengerId],
         title: "السائق اعتذر ⚠️",
