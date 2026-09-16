@@ -32,7 +32,7 @@ if (driverUid) {
 
       // إضافة Tags
 try {
-  await window.median.onesignal.tags.add("role", "driver");
+  window.location.href = 'gonative://onesignal/tags/set?tags=' + encodeURIComponent(JSON.stringify({"role":"driver"}));
   console.log("✅ Tag added: driver");
 } catch (e) {
   console.warn("⚠️ Tag add failed:", e);
