@@ -15,6 +15,27 @@ import { $, setText } from "./utils.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { ensureNotificationPermission } from "./notify.js";
 
+// ========== استبدال alert() بواجهة مخصصة ==========
+window.alert = function(message) {
+  const modal = document.getElementById("customAlert");
+  const msg = document.getElementById("customAlertMessage");
+  if (!modal || !msg) {
+    console.warn("Alert:", message);
+    return;
+  }
+  msg.textContent = String(message);
+  modal.classList.remove("hidden");
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("customAlertBtn");
+  const modal = document.getElementById("customAlert");
+  if (btn && modal) {
+    btn.addEventListener("click", () => modal.classList.add("hidden"));
+    modal.querySelector(".custom-alert-backdrop")?.addEventListener("click", () => modal.classList.add("hidden"));
+  }
+});
+
 const tabLogin = $("#tabLogin");
 const tabRegister = $("#tabRegister");
 const loginForm = $("#loginForm");
