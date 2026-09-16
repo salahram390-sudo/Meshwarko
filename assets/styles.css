@@ -2451,6 +2451,7 @@ input[type="range"] {
   padding: 16px 18px;
   border-bottom: 1px solid rgba(212, 175, 55, 0.15);
   flex: 0 0 auto;
+  background: #000000;   /* ← ← ← السطر الجديد */
 }
 .custom-select-title {
   color: #FFD700;
