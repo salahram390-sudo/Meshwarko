@@ -1294,7 +1294,7 @@ try {
   if (ride && ride.driverId && typeof ride.driverId === 'string' && ride.driverId.length > 0) {
     await fetch("https://meshwarko-push.salahram390.workers.dev", {
       method: "POST",
-      headers: { "Content-Type": "application/json", "Authorization": "Bearer meshwarko_secret_2026" },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer YVd/YhTgJ4Wwddeu88v/LqvSexujDKetSne/N537Hlo=" },
       body: JSON.stringify({
         driverUids: [ride.driverId],
         title: "الراكب ألغى الطلب ❌",
