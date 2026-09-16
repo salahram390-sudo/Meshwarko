@@ -1,5 +1,8 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
+  <script>
+  document.documentElement.style.visibility = "hidden";
+</script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -246,5 +249,10 @@
     <div class="custom-select-options" id="customSelectOptions"></div>
   </div>
 </div>
+  <script>
+  setTimeout(() => {
+    document.documentElement.style.visibility = "visible";
+  }, 2000);
+</script>
 </body>
 </html>
