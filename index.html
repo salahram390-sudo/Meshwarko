@@ -239,16 +239,17 @@
   </script>
 
   <script>
-  window.addEventListener("DOMContentLoaded", () => {
+// إظهار الصفحة بعد 3 ثواني كحد أقصى (لو auth.js اتأخر)
+setTimeout(() => {
   const appRoot = document.getElementById("appRoot");
-  if (appRoot) {
+  if (appRoot && appRoot.classList.contains("app-hidden")) {
     appRoot.classList.remove("app-hidden");
     appRoot.classList.add("app-ready");
     appRoot.style.display = "flex";
+    document.documentElement.style.visibility = "visible";
   }
-  document.documentElement.style.visibility = "visible";
-});
-  </script>
+}, 3000);
+</script>
   <div id="customAlert" class="custom-alert hidden">
   <div class="custom-alert-backdrop"></div>
   <div class="custom-alert-card">
