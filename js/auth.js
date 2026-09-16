@@ -15,6 +15,59 @@ import { $, setText } from "./utils.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { ensureNotificationPermission } from "./notify.js";
 
+// ========== Custom Select Bottom Sheet ==========
+function initCustomSelects() {
+  const sheet = document.getElementById("customSelectSheet");
+  const optionsEl = document.getElementById("customSelectOptions");
+  const titleEl = document.getElementById("customSelectTitle");
+  const closeBtn = document.getElementById("customSelectClose");
+  if (!sheet || !optionsEl || !titleEl) return;
+
+  const closeSheet = () => sheet.classList.add("hidden");
+  closeBtn?.addEventListener("click", closeSheet);
+  sheet.querySelector(".custom-select-backdrop")?.addEventListener("click", closeSheet);
+
+  const openSheet = (selectEl, label) => {
+    titleEl.textContent = label || "اختر";
+    optionsEl.innerHTML = "";
+    const currentVal = selectEl.value;
+    [...selectEl.options].forEach((opt) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "custom-select-option" + (opt.value === currentVal ? " active" : "");
+      btn.textContent = opt.textContent || opt.value || "—";
+      btn.addEventListener("click", () => {
+        selectEl.value = opt.value;
+        selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+        closeSheet();
+      });
+      optionsEl.appendChild(btn);
+    });
+    sheet.classList.remove("hidden");
+  };
+
+  document.querySelectorAll(".select-wrap").forEach((wrap) => {
+    const select = wrap.querySelector("select");
+    if (!select) return;
+    select.addEventListener("mousedown", (e) => e.preventDefault());
+    select.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const label = wrap.closest(".form-row")?.querySelector(".label")?.textContent?.trim() || "اختر";
+      openSheet(select, label);
+    }, { passive: false });
+    select.addEventListener("click", (e) => {
+      e.preventDefault();
+      const label = wrap.closest(".form-row")?.querySelector(".label")?.textContent?.trim() || "اختر";
+      openSheet(select, label);
+    });
+  });
+}
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initCustomSelects);
+} else {
+  initCustomSelects();
+}
+
 // ========== استبدال alert() بواجهة مخصصة ==========
 window.alert = function(message) {
   const modal = document.getElementById("customAlert");
