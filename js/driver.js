@@ -1163,6 +1163,7 @@ offerInput?.addEventListener("input", syncOfferBtn);
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { 
+    document.documentElement.style.visibility = "visible";
     location.href = "./index.html"; 
     return; 
   }
