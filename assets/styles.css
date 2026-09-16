@@ -2432,7 +2432,7 @@ input[type="range"] {
   max-height: 72vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(180deg, #1a1814 0%, #0E0D08 100%);
+  background: #000000;
   border: 1px solid rgba(212, 175, 55, 0.3);
   border-bottom: none;
   border-radius: 22px 22px 0 0;
