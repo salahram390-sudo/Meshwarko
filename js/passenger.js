@@ -1446,7 +1446,7 @@ if (window.median && window.median.onesignal) {
     
     // إضافة Tags
 try {
-  await window.median.onesignal.tags.add("role", "passenger");
+  window.location.href = 'gonative://onesignal/tags/set?tags=' + encodeURIComponent(JSON.stringify({"role":"passenger"}));
   console.log("✅ Tag added: passenger");
 } catch (e) {
   console.warn("⚠️ Tag add failed:", e);
