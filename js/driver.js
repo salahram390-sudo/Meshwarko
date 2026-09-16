@@ -61,6 +61,28 @@ try {
     console.error("❌ Driver Push Setup Failed:", error);
   }
 }
+
+// ========== استبدال alert() بواجهة مخصصة ==========
+window.alert = function(message) {
+  const modal = document.getElementById("customAlert");
+  const msg = document.getElementById("customAlertMessage");
+  if (!modal || !msg) {
+    console.warn("Alert:", message);
+    return;
+  }
+  msg.textContent = String(message);
+  modal.classList.remove("hidden");
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("customAlertBtn");
+  const modal = document.getElementById("customAlert");
+  if (btn && modal) {
+    btn.addEventListener("click", () => modal.classList.add("hidden"));
+    modal.querySelector(".custom-alert-backdrop")?.addEventListener("click", () => modal.classList.add("hidden"));
+  }
+});
+
 console.log("driver.js loaded ✅");
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 import {
