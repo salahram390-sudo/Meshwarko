@@ -1005,7 +1005,7 @@ try {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": "Bearer meshwarko_secret_2026"
+        "Authorization": "Bearer YVd/YhTgJ4Wwddeu88v/LqvSexujDKetSne/N537Hlo="
       },
       body: JSON.stringify({
         driverUids: [liveRide.passengerId],  // ← الراكب هنا
