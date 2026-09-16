@@ -14,6 +14,26 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { $, escapeHtml, moneyEGP, formatRideDate } from "./utils.js";
 import { notify, ensureNotificationPermission } from "./notify.js";
+// ========== استبدال alert() بواجهة مخصصة ==========
+window.alert = function(message) {
+  const modal = document.getElementById("customAlert");
+  const msg = document.getElementById("customAlertMessage");
+  if (!modal || !msg) {
+    console.warn("Alert:", message);
+    return;
+  }
+  msg.textContent = String(message);
+  modal.classList.remove("hidden");
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("customAlertBtn");
+  const modal = document.getElementById("customAlert");
+  if (btn && modal) {
+    btn.addEventListener("click", () => modal.classList.add("hidden"));
+    modal.querySelector(".custom-alert-backdrop")?.addEventListener("click", () => modal.classList.add("hidden"));
+  }
+});
 localStorage.setItem("lastAppPage", "admin.html");
 
 const adminBadge = $("#adminBadge");
