@@ -1430,6 +1430,7 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { location.href = "./index.html"; return; }
+  document.documentElement.style.visibility = "visible";
   await initFirebaseMessaging(user.uid);
   
   // ============ OneSignal: Web + Median ============
