@@ -1473,7 +1473,11 @@ try {
 
   await ensureNotificationPermission(true);
   const me = await getDoc(doc(db, "users", user.uid)); myData = me.exists() ? me.data() : {};
-  if (myData.role === "admin") { location.href = "./admin.html"; return; }
+  if (myData.role === "admin") { 
+  localStorage.removeItem("lastAppPage");
+  location.href = "./admin.html"; 
+  return; 
+}
   if (myData.status === "blocked") { await signOut(auth); alert("هذا الحساب محظور من الإدارة."); location.href = "./index.html"; return; }
   setText(meBadge, `${myData.name || "مستخدم"} • راكب`);
   if (myData.vehicleType) passengerVehicle = myData.vehicleType;
