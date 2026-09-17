@@ -936,6 +936,7 @@ logoutBtn?.addEventListener("click", async () => {
 stopRequestSound();
 requestSoundActive = false;
 await signOut(auth);
+  localStorage.removeItem("lastRole");
 location.href = "./index.html";
 });
 switchRoleBtn?.addEventListener("click", async () => {
