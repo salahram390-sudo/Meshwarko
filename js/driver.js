@@ -1159,7 +1159,7 @@ editProfileBtn?.addEventListener("click", async () => {
 });
 
 offerInput?.addEventListener("input", syncOfferBtn);
-
+onAuthStateChanged(auth, async (user) => {
 
 if (!user) {
   localStorage.removeItem("lastAppPage");
