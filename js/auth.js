@@ -14,6 +14,7 @@ import {
 import { $, setText } from "./utils.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { ensureNotificationPermission } from "./notify.js";
+let isAuthProcessing = false;
 
 // ========== Custom Select Bottom Sheet ==========
 function initCustomSelects() {
