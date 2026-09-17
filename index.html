@@ -5,13 +5,11 @@
     // إخفاء الصفحة فوراً
     document.documentElement.style.visibility = "hidden";
     
-    // تحويل سريع لو عارفين الصفحة الأخيرة
-    try {
-      var lastPage = localStorage.getItem("lastAppPage");
-      if (lastPage === "passenger.html" || lastPage === "driver.html" || lastPage === "admin.html") {
-        window.location.replace("./" + lastPage);
-      }
-    } catch (e) {}
+    <script>
+  (function () {
+    document.documentElement.style.visibility = "hidden";
+  })();
+</script>
   })();
 </script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
