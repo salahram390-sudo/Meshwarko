@@ -1144,6 +1144,7 @@ logoutBtn?.addEventListener("click", async () => {
   stopLiveDrivers();
   stopDriverTracking();
   await signOut(auth);
+  localStorage.removeItem("lastRole");
   location.href = "./index.html";
 });
 
