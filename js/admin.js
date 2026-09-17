@@ -115,6 +115,8 @@ let allDriversOnline = [];
 
 logoutBtn?.addEventListener("click", async () => {
   await signOut(auth);
+  localStorage.removeItem("lastRole");   // ← ← ← السطر الجديد
+  localStorage.removeItem("lastAppPage");   // ← ← ← السطر الجديد
   location.href = "./index.html";
 });
 
