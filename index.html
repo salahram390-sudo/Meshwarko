@@ -1,11 +1,22 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
   <style>
+  /* خلفية سوداء افتراضية لكل الصفحة */
+  html, body {
+    background: #0E0D08 !important;
+    margin: 0;
+    padding: 0;
+  }
+  
   /* إخفاء كل حاجة لحد ما auth.js يقول "ready" */
-  html:not(.ready),
-  body:not(.ready) {
+  html:not(.ready) > *,
+  body:not(.ready) > * {
     visibility: hidden !important;
     opacity: 0 !important;
+  }
+  
+  html:not(.ready),
+  body:not(.ready) {
     overflow: hidden !important;
   }
 </style>
