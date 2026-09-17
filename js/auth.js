@@ -435,6 +435,10 @@ onAuthStateChanged(auth, async (user) => {
     try {
       const snap = await getDoc(doc(db, "users", user.uid));
       const profile = snap.exists() ? snap.data() : null;
+      // حفظ الدور في localStorage
+try {
+  localStorage.setItem("lastRole", profile?.role || "passenger");
+} catch (_) {}
 
       if (!snap.exists()) {
         await signOut(auth);
