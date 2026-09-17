@@ -213,6 +213,7 @@ async function initAdmin() {
 
 loginForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  isAuthProcessing = true;
   setText(loginHint, "جارٍ تسجيل الدخول...");
 
   try {
@@ -301,6 +302,8 @@ console.log("LOGIN UID:", cred.user.uid);
 await redirectLoggedUser(u);
 
   } catch (err) {
+    } finally {
+    isAuthProcessing = false;
     console.log("LOGIN ERROR:", err.code, err.message, err);
     setText(loginHint, "خطأ: " + (err.code || "unknown"));
   }
