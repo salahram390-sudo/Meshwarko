@@ -1,25 +1,23 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-  <style>
-  /* خلفية سوداء افتراضية لكل الصفحة */
-  html, body {
-    background: #0E0D08 !important;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* إخفاء كل حاجة لحد ما auth.js يقول "ready" */
-  html:not(.ready) > *,
-  body:not(.ready) > * {
-    visibility: hidden !important;
-    opacity: 0 !important;
-  }
-  
-  html:not(.ready),
-  body:not(.ready) {
-    overflow: hidden !important;
-  }
-</style>
+  <script>
+  (function () {
+    // تحويل فوري من localStorage (بدون انتظار Firebase)
+    try {
+      var role = localStorage.getItem("lastRole");
+      if (role === "driver") {
+        window.location.replace("./driver.html");
+        return;
+      } else if (role === "passenger") {
+        window.location.replace("./passenger.html");
+        return;
+      } else if (role === "admin") {
+        window.location.replace("./admin.html");
+        return;
+      }
+    } catch (_) {}
+  })();
+</script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
