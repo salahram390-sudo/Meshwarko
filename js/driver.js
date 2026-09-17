@@ -1170,10 +1170,11 @@ if (!user) {
 
   // جلب بيانات السائق من Firestore
   const me = await getDoc(doc(db, "users", user.uid));
-  if (!me.exists() || me.data().role !== "driver") { 
-    location.href = "./passenger.html"; 
-    return; 
-  }
+  if (!me.exists() || me.data().role !== "driver") {
+  localStorage.removeItem("lastAppPage");
+  location.href = "./passenger.html";
+  return;
+}
 
   myUser = { uid: user.uid, ...me.data() };
 
