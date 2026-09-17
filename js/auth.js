@@ -302,15 +302,16 @@ console.log("LOGIN UID:", cred.user.uid);
 await redirectLoggedUser(u);
 
   } catch (err) {
-    } finally {
-    isAuthProcessing = false;
     console.log("LOGIN ERROR:", err.code, err.message, err);
     setText(loginHint, "خطأ: " + (err.code || "unknown"));
+    } finally {
+    isAuthProcessing = false;
   }
 });
 
 registerForm?.addEventListener("submit", async (e) => {
   e.preventDefault();
+  isAuthProcessing = true;
   setText(regHint, "جارٍ إنشاء الحساب...");
 
   try {
@@ -378,6 +379,8 @@ try {
 await redirectLoggedUser(cred.user);
   } catch (err) {
     setText(regHint, friendlyAuthError(err));
+    } finally {
+    isAuthProcessing = false;
   }
 });
 
