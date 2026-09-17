@@ -1144,7 +1144,8 @@ logoutBtn?.addEventListener("click", async () => {
   stopLiveDrivers();
   stopDriverTracking();
   await signOut(auth);
-  localStorage.removeItem("lastRole");
+  localStorage.removeItem("lastRole");   // ← ← ← السطر الجديد
+  localStorage.removeItem("lastAppPage");   // ← ← ← السطر الجديد
   location.href = "./index.html";
 });
 
