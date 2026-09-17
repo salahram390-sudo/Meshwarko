@@ -438,14 +438,14 @@ onAuthStateChanged(auth, async (user) => {
 
       if (!snap.exists()) {
         await signOut(auth);
-        document.documentElement.style.visibility = "visible";
+        document.documentElement.classList.add("ready");
         return;
       }
 
       if (profile?.status === "blocked") {
         await signOut(auth);
         alert("هذا الحساب محظور من الإدارة.");
-        document.documentElement.style.visibility = "visible";
+        document.documentElement.classList.add("ready");
         return;
       }
 
@@ -494,7 +494,7 @@ console.log("👉 OneSignal login pushed to queue.");
     adminEntryBtn?.classList.add("hidden");
   }
 
-  document.documentElement.style.visibility = "visible";
+  document.documentElement.classList.add("ready");
 });
 
 initAdmin().catch(() => {});
