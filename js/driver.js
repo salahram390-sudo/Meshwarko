@@ -1161,12 +1161,12 @@ editProfileBtn?.addEventListener("click", async () => {
 offerInput?.addEventListener("input", syncOfferBtn);
 
 
-onAuthStateChanged(auth, async (user) => {
-  if (!user) { 
-    document.documentElement.style.visibility = "visible";
-    location.href = "./index.html"; 
-    return; 
-  }
+if (!user) {
+  localStorage.removeItem("lastAppPage");
+  document.documentElement.style.visibility = "visible";
+  location.href = "./index.html";
+  return;
+}
 
   // جلب بيانات السائق من Firestore
   const me = await getDoc(doc(db, "users", user.uid));
