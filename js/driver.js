@@ -933,11 +933,12 @@ logoutBtn?.addEventListener("click", async () => {
   closeDriverDrawer(); stopLiveTracking(); stopDriverHeartbeat(); await cleanupDriverOnline();
   if (chatUnsubDriver) { chatUnsubDriver(); chatUnsubDriver = null; }
   closeDriverChatModal();
-stopRequestSound();
-requestSoundActive = false;
-await signOut(auth);
-  localStorage.removeItem("lastRole");
-location.href = "./index.html";
+  stopRequestSound();
+  requestSoundActive = false;
+  await signOut(auth);
+  localStorage.removeItem("lastRole");   // ← ← ← السطر الجديد
+  localStorage.removeItem("lastAppPage");   // ← ← ← السطر الجديد
+  location.href = "./index.html";
 });
 switchRoleBtn?.addEventListener("click", async () => {
   closeDriverDrawer();
