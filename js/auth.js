@@ -427,6 +427,8 @@ function getSafeTargetPage(profile) {
 }
 
 onAuthStateChanged(auth, async (user) => {
+  if (isAuthProcessing) return;
+  
   if (user) {
     btnLogout?.classList.remove("hidden");
 
