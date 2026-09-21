@@ -587,7 +587,6 @@ function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
   selectedRideData = null; 
   completedHandledForRideId = null;
   
-  selectedRideEl.innerHTML = `<div class="muted">${escapeHtml(message)}</div>`;
   hideSelectedRideBox();
   clearRouteAndMarkers(); 
   btnSendOffer.disabled = true; 
