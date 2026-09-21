@@ -1117,23 +1117,40 @@ ridesList.innerHTML = "";
       ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
     </div>
 
-    <div class="drv-ride-route">
-    <div class="drv-ride-route-row pickup">
-  <div class="drv-ride-route-marker">
-    <span class="drv-ride-route-dot green"></span>
-    <span class="drv-ride-route-label">من</span>
-  </div>
-  <div class="drv-ride-route-text">${escapeHtml((r.pickupText || "—").split("،").slice(-2).join("، ").trim())}</div>
-</div>
-<div class="drv-ride-route-line"></div>
-<div class="drv-ride-route-row dropoff">
-  <div class="drv-ride-route-marker">
-    <span class="drv-ride-route-dot red"></span>
-    <span class="drv-ride-route-label">إلى</span>
-  </div>
-  <div class="drv-ride-route-text">${escapeHtml((r.dropoffText || "—").split("،").slice(-2).join("، ").trim())}</div>
-</div>
-</div>
+    rides.forEach((r) => {
+  const isMine = r.driverId === driverUid;
+  const item = document.createElement("div");
+  item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
+  
+  const dist = getRideDistanceToMe(r);
+  const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
+  
+  const vehicleIcon = {
+    "tuktuk": "🛺",
+    "sedan": "🚗",
+    "microbus": "🚐",
+    "tricycle": "🛺",
+    "truck": "🚚",
+    "delivery_bike": "🛵",
+    "tmanya": "🚌"
+  }[r.vehicleType] || "🚗";
+
+  item.innerHTML = `
+    <div class="drv-ride-header">
+      <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
+        ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
+      </div>
+      <div class="drv-ride-price">${moneyEGP(r.offerPrice || r.price)}</div>
+    </div>
+
+    <div class="drv-ride-meta">
+      <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
+      ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
+    </div>
+  `;
+  item.onclick = () => selectRide(r.id, r);
+  ridesList.appendChild(item);
+});
 
   `;
   item.onclick = () => selectRide(r.id, r);
