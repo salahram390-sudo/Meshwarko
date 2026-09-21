@@ -1126,12 +1126,11 @@ function watchRidesForDriver() {
       }[r.vehicleType] || "🚗";
 
       item.innerHTML = `
-        <div class="drv-ride-header">
-          <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
-            ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
-          </div>
-          <div class="drv-ride-price">${moneyEGP(r.offerPrice || r.price)}</div>
-        </div>
+  <div class="drv-ride-header">
+    <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
+      ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
+    </div>
+  </div>
 
         <div class="drv-ride-meta">
           <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
