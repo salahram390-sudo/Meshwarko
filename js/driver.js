@@ -1028,7 +1028,6 @@ function watchRidesForDriver() {
       } else {
         selectedRideData = { ...preferredRide };
         refreshSelectedRideButtons(selectedRideData);
-        renderSelectedRideCard(selectedRideData);
       }
     }
 
