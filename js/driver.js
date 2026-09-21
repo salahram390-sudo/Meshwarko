@@ -747,10 +747,11 @@ function refreshSelectedRideButtons(ride) {
   btnDeclineRide.disabled = !canDecline;     // ← مهم جداً
   btnComplete.disabled = !canComplete;
 
-  if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
+    if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
   if (btnChatDriver) btnChatDriver.disabled = !canChat;
-}
 
+  updateDriverRideUI(ride);
+}
 // ==========================================
 // 🎨 Driver Professional Ride UI Controller
 // ==========================================
