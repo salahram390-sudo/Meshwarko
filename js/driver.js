@@ -989,8 +989,10 @@ function renderSelectedRideCard(ride) {
         : ""
     }
 
-    ${passengerBlock}
+        ${passengerBlock}
   `;
+
+  updateDriverRideUI(ride);
 }
 async function selectRide(id, ride) {
   showSelectedRideBox();
