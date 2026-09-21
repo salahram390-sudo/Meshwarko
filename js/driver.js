@@ -176,7 +176,6 @@ const btnLocate = $("#btnLocate");
 const btnClear = $("#btnClear");
 const btnRefresh = $("#btnRefresh");
 const ridesList = $("#ridesList");
-const selectedRideEl = $("#selectedRide");
 const selectedRideBox = $("#selectedRideBox");
 const selectedRideDivider = $("#selectedRideDivider");
 const offerInput = $("#offerInput");
