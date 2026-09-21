@@ -750,6 +750,178 @@ function refreshSelectedRideButtons(ride) {
   if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
   if (btnChatDriver) btnChatDriver.disabled = !canChat;
 }
+
+// ==========================================
+// 🎨 Driver Professional Ride UI Controller
+// ==========================================
+function updateDriverRideUI(ride) {
+  const badgeEl = document.getElementById("driverRideBadge");
+  const badgeTextEl = document.getElementById("driverRideBadgeText");
+  const primaryBtn = document.getElementById("driverPrimaryBtn");
+  const secBtn1 = document.getElementById("driverSecondaryBtn1");
+  const secBtn2 = document.getElementById("driverSecondaryBtn2");
+  const offerWrap = document.getElementById("driverOfferWrap");
+  const passengerInfo = document.getElementById("driverRidePassengerInfo");
+
+  if (!ride || !selectedRideBox) {
+    if (selectedRideBox) selectedRideBox.style.display = "none";
+    return;
+  }
+
+  const status = String(ride.status || "requested");
+  const mine = ride.driverId === auth.currentUser?.uid;
+
+  // Meta
+  const priceEl = document.getElementById("driverRidePrice");
+  const distEl = document.getElementById("driverRideDistance");
+  const pickupEl = document.getElementById("driverRidePickup");
+  const dropoffEl = document.getElementById("driverRideDropoff");
+  const vehicleEl = document.getElementById("driverRideVehicle");
+
+  if (priceEl) priceEl.textContent = moneyEGP(ride.offerPrice || ride.price || 0);
+  const dist = getRideDistanceToMe(ride);
+  if (distEl) distEl.textContent = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "—";
+  if (pickupEl) pickupEl.textContent = ride.pickupText || "—";
+  if (dropoffEl) dropoffEl.textContent = ride.dropoffText || "—";
+  if (vehicleEl) vehicleEl.textContent = ride.vehicleType || "—";
+
+  // Hide offer wrap by default
+  offerWrap?.classList.add("hidden");
+
+  // Reset classes
+  if (primaryBtn) primaryBtn.className = "drv-primary-btn";
+  if (secBtn1) secBtn1.className = "drv-secondary-btn";
+  if (secBtn2) secBtn2.className = "drv-secondary-btn drv-danger";
+  if (primaryBtn) { primaryBtn.style.display = ""; primaryBtn.disabled = false; primaryBtn.onclick = null; }
+  if (secBtn1) secBtn1.style.display = "";
+  if (secBtn2) secBtn2.style.display = "";
+
+  // Passenger info
+  if (passengerInfo) {
+    if (mine && ["accepted", "arrived", "started"].includes(status)) {
+      passengerInfo.classList.remove("hidden");
+      passengerInfo.innerHTML = `
+        <div class="drv-passenger-title">👤 بيانات الراكب</div>
+        <div class="drv-passenger-row"><span>الاسم:</span><b>${escapeHtml(ride.passengerName || "-")}</b></div>
+        <div class="drv-passenger-row"><span>الهاتف:</span><b>${escapeHtml(ride.passengerPhone || "-")}</b></div>
+      `;
+    } else {
+      passengerInfo.classList.add("hidden");
+    }
+  }
+
+  // ============ حسب المرحلة ============
+
+  // 1) طلب جديد
+  if (status === "requested" && !ride.driverId) {
+    if (badgeEl) badgeEl.className = "drv-badge drv-badge-new";
+    if (badgeTextEl) badgeTextEl.textContent = "طلب جديد";
+
+    if (primaryBtn) {
+      primaryBtn.textContent = "✅ اقبل بسعر الطلب";
+      primaryBtn.onclick = () => btnAccept.click();
+    }
+    if (secBtn1) {
+      secBtn1.textContent = "💰 اقترح سعر";
+      secBtn1.onclick = () => {
+        offerWrap?.classList.toggle("hidden");
+        if (!offerWrap?.classList.contains("hidden")) offerInput?.focus();
+      };
+    }
+    if (secBtn2) {
+      secBtn2.textContent = "❌ تجاهل";
+      secBtn2.onclick = () => btnCancel.click();
+    }
+  }
+
+  // 2) عرض سعر - بانتظار الرد
+  else if (status === "offered" && mine) {
+    if (badgeEl) badgeEl.className = "drv-badge drv-badge-offered";
+    if (badgeTextEl) badgeTextEl.textContent = "بانتظار رد الراكب";
+
+    if (primaryBtn) {
+      primaryBtn.textContent = "⏳ بانتظار الرد...";
+      primaryBtn.disabled = true;
+    }
+    if (secBtn1) {
+      secBtn1.textContent = "💰 تعديل السعر";
+      secBtn1.onclick = () => offerWrap?.classList.toggle("hidden");
+    }
+    if (secBtn2) {
+      secBtn2.textContent = "❌ إلغاء";
+      secBtn2.onclick = () => btnCancel.click();
+    }
+  }
+
+  // 3) مقبول - في الطريق للراكب
+  else if (status === "accepted" && mine) {
+    if (badgeEl) badgeEl.className = "drv-badge drv-badge-accepted";
+    if (badgeTextEl) badgeTextEl.textContent = "في الطريق للراكب";
+
+    if (primaryBtn) {
+      primaryBtn.className = "drv-primary-btn drv-blue";
+      primaryBtn.textContent = "📍 وصلت للراكب";
+      primaryBtn.onclick = () => btnArrived.click();
+    }
+    if (secBtn1) {
+      secBtn1.textContent = "💬 محادثة";
+      secBtn1.onclick = () => btnChatDriver.click();
+    }
+    if (secBtn2) {
+      secBtn2.textContent = "❌ إلغاء";
+      secBtn2.onclick = () => btnCancel.click();
+    }
+  }
+
+  // 4) وصلت للراكب
+  else if (status === "arrived" && mine) {
+    if (badgeEl) badgeEl.className = "drv-badge drv-badge-arrived";
+    if (badgeTextEl) badgeTextEl.textContent = "وصلت للراكب";
+
+    if (primaryBtn) {
+      primaryBtn.className = "drv-primary-btn drv-green";
+      primaryBtn.textContent = "🚀 ابدأ الرحلة";
+      primaryBtn.onclick = () => driverStartRideBtn.click();
+    }
+    if (secBtn1) {
+      secBtn1.textContent = "💬 محادثة";
+      secBtn1.onclick = () => btnChatDriver.click();
+    }
+    if (secBtn2) {
+      secBtn2.textContent = "⚠️ اعتذر";
+      secBtn2.onclick = () => btnDeclineRide.click();
+    }
+  }
+
+  // 5) الرحلة جارية
+  else if (status === "started" && mine) {
+    if (badgeEl) badgeEl.className = "drv-badge drv-badge-started";
+    if (badgeTextEl) badgeTextEl.textContent = "الرحلة جارية";
+
+    if (primaryBtn) {
+      primaryBtn.className = "drv-primary-btn drv-green";
+      primaryBtn.textContent = "🏁 إنهاء الرحلة";
+      primaryBtn.onclick = () => btnComplete.click();
+    }
+    if (secBtn1) {
+      secBtn1.textContent = "💬 محادثة";
+      secBtn1.onclick = () => btnChatDriver.click();
+    }
+    if (secBtn2) secBtn2.style.display = "none";
+  }
+
+  // 6) منتهية / ملغية
+  else if (status === "completed" || status === "canceled") {
+    if (badgeEl) badgeEl.className = "drv-badge drv-badge-done";
+    if (badgeTextEl) badgeTextEl.textContent = status === "completed" ? "✓ مكتملة" : "✕ ملغية";
+
+    if (primaryBtn) primaryBtn.style.display = "none";
+    if (secBtn1) secBtn1.style.display = "none";
+    if (secBtn2) secBtn2.style.display = "none";
+  }
+}
+// ==========================================
+
 function renderSelectedRideCard(ride) {
   if (!selectedRideEl || !ride) return;
 
