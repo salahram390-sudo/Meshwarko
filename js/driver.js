@@ -1121,10 +1121,10 @@ ridesList.innerHTML = "";
   const isMine = r.driverId === driverUid;
   const item = document.createElement("div");
   item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
-  
+
   const dist = getRideDistanceToMe(r);
   const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
-  
+
   const vehicleIcon = {
     "tuktuk": "🛺",
     "sedan": "🚗",
@@ -1148,11 +1148,7 @@ ridesList.innerHTML = "";
       ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
     </div>
   `;
-  item.onclick = () => selectRide(r.id, r);
-  ridesList.appendChild(item);
-});
 
-  `;
   item.onclick = () => selectRide(r.id, r);
   ridesList.appendChild(item);
 });
