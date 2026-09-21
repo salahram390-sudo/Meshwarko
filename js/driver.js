@@ -782,8 +782,8 @@ function updateDriverRideUI(ride) {
   if (priceEl) priceEl.textContent = moneyEGP(ride.offerPrice || ride.price || 0);
   const dist = getRideDistanceToMe(ride);
   if (distEl) distEl.textContent = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "—";
-  if (pickupEl) pickupEl.textContent = ride.pickupText || "—";
-  if (dropoffEl) dropoffEl.textContent = ride.dropoffText || "—";
+  if (pickupEl) pickupEl.textContent = (ride.pickupText || "—").split("،").slice(-2).join("، ").trim();
+if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").slice(-2).join("، ").trim();
   if (vehicleEl) vehicleEl.textContent = ride.vehicleType || "—";
 
   // Hide offer wrap by default
