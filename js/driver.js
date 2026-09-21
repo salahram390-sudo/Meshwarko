@@ -1042,117 +1042,129 @@ async function showAcceptedDetails(rideId) {
 function watchRidesForDriver() {
   if (ridesUnsub) { ridesUnsub(); ridesUnsub = null; }
   if (!myUser?.governorate || !myUser?.center || !auth.currentUser?.uid) return;
+  
   const driverUid = auth.currentUser.uid;
-  const qOpen = query(collection(db, "rides"), where("status", "==", "requested"), where("driverId", "==", null), where("archived", "==", false), where("governorate", "==", myUser.governorate), where("center", "==", myUser.center));
+  const qOpen = query(collection(db, "rides"), 
+    where("status", "==", "requested"), 
+    where("driverId", "==", null), 
+    where("archived", "==", false), 
+    where("governorate", "==", myUser.governorate), 
+    where("center", "==", myUser.center)
+  );
   const qMine = query(collection(db, "rides"), where("driverId", "==", driverUid));
+  
   let openRows = [], mineRows = [];
+  
   const renderMerged = () => {
     const mergedMap = new Map();
-    [...openRows, ...mineRows].forEach((r) => { if (isRideVisibleForDriver(r) && !ignoredRideIds.has(r.id)) mergedMap.set(r.id, r); });
+    [...openRows, ...mineRows].forEach((r) => { 
+      if (isRideVisibleForDriver(r) && !ignoredRideIds.has(r.id)) mergedMap.set(r.id, r); 
+    });
+    
     const rides = Array.from(mergedMap.values()).sort((a, b) => {
-      const aMine = a.driverId === driverUid ? 1 : 0, bMine = b.driverId === driverUid ? 1 : 0;
+      const aMine = a.driverId === driverUid ? 1 : 0;
+      const bMine = b.driverId === driverUid ? 1 : 0;
       if (aMine !== bMine) return bMine - aMine;
       const da = getRideDistanceToMe(a), db = getRideDistanceToMe(b);
       if (Number.isFinite(da) || Number.isFinite(db)) return da - db;
       return (b.createdAt?.toMillis?.() || b.createdAtMs || 0) - (a.createdAt?.toMillis?.() || a.createdAtMs || 0);
     });
+    
     syncIncomingRequestSound(rides);
 
-// 🔥 إشعار + صوت قوي لما يجي طلب جديد (مهم جداً)
-if (rides.some(r => r.status === "requested" && !r.driverId)) {
-  notify({
-    title: "🔔 طلب مشوار جديد!",
-    body: "اضغط هنا للرد بسرعة",
-    tag: "new-ride-request",
-    sound: true,
-    vibrate: true
-  });
-}
+    // إشعار + صوت لما يجي طلب جديد
+    if (rides.some(r => r.status === "requested" && !r.driverId)) {
+      notify({
+        title: "🔔 طلب مشوار جديد!",
+        body: "اضغط هنا للرد بسرعة",
+        tag: "new-ride-request",
+        sound: true,
+        vibrate: true
+      });
+    }
 
-ridesList.innerHTML = "";
+    ridesList.innerHTML = "";
     renderDriverHistory(mineRows.filter((r) => r.status === "completed"));
+
     if (!rides.length) {
-  resetSelectedRideUi("لم يتم تحديد طلب.");
-  return void (ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`);
-}
-    const preferredRide = rides.find((r) => r.driverId === driverUid && ["accepted", "arrived", "started"].includes(r.status)) || rides.find((r) => r.id === selectedRideId) || rides[0];
+      resetSelectedRideUi("لم يتم تحديد طلب.");
+      return void (ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`);
+    }
+
+    const preferredRide = 
+      rides.find((r) => r.driverId === driverUid && ["accepted", "arrived", "started"].includes(r.status)) 
+      || rides.find((r) => r.id === selectedRideId) 
+      || rides[0];
+
     if (preferredRide) {
-  if (preferredRide.id !== selectedRideId) {
-    selectRide(preferredRide.id, preferredRide)
-      .catch((e) => console.warn("auto-select ride failed", e));
-  } else {
-    selectedRideData = { ...preferredRide };
-    refreshSelectedRideButtons(selectedRideData);
-    renderSelectedRideCard(selectedRideData);
-  }
-}
+      if (preferredRide.id !== selectedRideId) {
+        selectRide(preferredRide.id, preferredRide).catch((e) => console.warn("auto-select ride failed", e));
+      } else {
+        selectedRideData = { ...preferredRide };
+        refreshSelectedRideButtons(selectedRideData);
+        renderSelectedRideCard(selectedRideData);
+      }
+    }
+
+    // ============ رسم كل الطلبات في القائمة ============
     rides.forEach((r) => {
-  const isMine = r.driverId === driverUid;
-  const item = document.createElement("div");
-  item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
-  
-  const dist = getRideDistanceToMe(r);
-  const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
-  
-  const vehicleIcon = {
-    "tuktuk": "🛺",
-    "sedan": "🚗",
-    "microbus": "🚐",
-    "tricycle": "🛺",
-    "truck": "🚚",
-    "delivery_bike": "🛵",
-    "tmanya": "🚌"
-  }[r.vehicleType] || "🚗";
+      const isMine = r.driverId === driverUid;
+      const item = document.createElement("div");
+      item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
 
-  item.innerHTML = `
-    <div class="drv-ride-header">
-      <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
-        ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
-      </div>
-      <div class="drv-ride-price">${moneyEGP(r.offerPrice || r.price)}</div>
-    </div>
+      const dist = getRideDistanceToMe(r);
+      const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
 
-    <div class="drv-ride-meta">
-      <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
-      ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
-    </div>
+      const vehicleIcon = {
+        "tuktuk": "🛺",
+        "sedan": "🚗",
+        "microbus": "🚐",
+        "tricycle": "🛺",
+        "truck": "🚚",
+        "delivery_bike": "🛵",
+        "tmanya": "🚌"
+      }[r.vehicleType] || "🚗";
 
-    rides.forEach((r) => {
-  const isMine = r.driverId === driverUid;
-  const item = document.createElement("div");
-  item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
+      item.innerHTML = `
+        <div class="drv-ride-header">
+          <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
+            ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
+          </div>
+          <div class="drv-ride-price">${moneyEGP(r.offerPrice || r.price)}</div>
+        </div>
 
-  const dist = getRideDistanceToMe(r);
-  const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
+        <div class="drv-ride-meta">
+          <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
+          ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
+        </div>
+      `;
 
-  const vehicleIcon = {
-    "tuktuk": "🛺",
-    "sedan": "🚗",
-    "microbus": "🚐",
-    "tricycle": "🛺",
-    "truck": "🚚",
-    "delivery_bike": "🛵",
-    "tmanya": "🚌"
-  }[r.vehicleType] || "🚗";
-
-  item.innerHTML = `
-    <div class="drv-ride-header">
-      <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
-        ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
-      </div>
-      <div class="drv-ride-price">${moneyEGP(r.offerPrice || r.price)}</div>
-    </div>
-
-    <div class="drv-ride-meta">
-      <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
-      ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
-    </div>
-  `;
-
-  item.onclick = () => selectRide(r.id, r);
-  ridesList.appendChild(item);
-});
+      item.onclick = () => selectRide(r.id, r);
+      ridesList.appendChild(item);
+    });
   };
+  // ========================================================
+
+  const unsubOpen = onSnapshot(qOpen, (snap) => { 
+    openRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); 
+    renderMerged(); 
+  }, (err) => { 
+    console.error("qOpen snapshot error:", err); 
+    const isPermission = String(err?.code || err?.message || "").includes("permission"); 
+    ridesList.innerHTML = `<div class="muted small">${isPermission ? "Firestore Rules تمنع قراءة الطلبات." : "تعذر تحميل الطلبات المفتوحة."}</div>`; 
+  });
+  
+  const unsubMine = onSnapshot(qMine, (snap) => { 
+    mineRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); 
+    renderMerged(); 
+  }, (err) => console.error("qMine snapshot error:", err));
+  
+  ridesUnsub = () => { 
+    try { unsubOpen(); } catch (_) {} 
+    try { unsubMine(); } catch (_) {} 
+  };
+}
+
   const unsubOpen = onSnapshot(qOpen, (snap) => { openRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); renderMerged(); }, (err) => { console.error("qOpen snapshot error:", err); const isPermission = String(err?.code || err?.message || "").includes("permission"); ridesList.innerHTML = `<div class="muted small">${isPermission ? "Firestore Rules تمنع قراءة الطلبات." : "تعذر تحميل الطلبات المفتوحة."}</div>`; });
   const unsubMine = onSnapshot(qMine, (snap) => { mineRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); renderMerged(); }, (err) => console.error("qMine snapshot error:", err));
   ridesUnsub = () => { try { unsubOpen(); } catch (_) {} try { unsubMine(); } catch (_) {} };
