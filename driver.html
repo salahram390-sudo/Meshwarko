@@ -128,14 +128,15 @@
   <!-- بيانات الراكب (تظهر بعد القبول) -->
   <div id="driverRidePassengerInfo" class="drv-passenger hidden"></div>
 
+            <!-- عنصر مخفي للتوافق مع الكود القديم -->
+<div id="selectedRide" style="display:none;"></div>
+
   <!-- حقل اقتراح السعر (مخفي افتراضياً) -->
   <div id="driverOfferWrap" class="drv-offer-wrap hidden">
     <input id="offerInput" class="input" type="number" min="15" max="3000" step="5" placeholder="اكتب سعرك (مثال: 80)" />
     <button id="btnSendOffer" class="btn primary" type="button">إرسال العرض</button>
   </div>
-            <!-- عنصر مخفي للتوافق مع الكود القديم -->
-<div id="selectedRide" style="display:none;"></div>
-
+            
   <!-- الزر الأساسي -->
   <button id="driverPrimaryBtn" class="drv-primary-btn" type="button">✅ اقبل بسعر الطلب</button>
 
