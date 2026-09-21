@@ -1087,17 +1087,50 @@ ridesList.innerHTML = "";
   }
 }
     rides.forEach((r) => {
-      const item = document.createElement("div");
-      item.className = "list-item" + (selectedRideId === r.id ? " active" : "");
-      item.innerHTML = `
-        <div class="row-between"><b>${r.driverId === driverUid ? "طلبي الحالي" : "طلب"}</b><span class="muted small">${moneyEGP(r.offerPrice || r.price)}</span></div>
-        <div class="muted small">مركبة: ${escapeHtml(r.vehicleType || "-")}</div>
-        <div class="muted small">قيام: ${escapeHtml(r.pickupText || "-")}</div>
-        <div class="muted small">وصول: ${escapeHtml(r.dropoffText || "-")}</div>
-        <div class="muted small">${Number.isFinite(getRideDistanceToMe(r)) ? `يبعد عنك ${(getRideDistanceToMe(r)/1000).toFixed(1)} كم` : ""}</div>`;
-      item.onclick = () => selectRide(r.id, r);
-      ridesList.appendChild(item);
-    });
+  const isMine = r.driverId === driverUid;
+  const item = document.createElement("div");
+  item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
+  
+  const dist = getRideDistanceToMe(r);
+  const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
+  
+  const vehicleIcon = {
+    "tuktuk": "🛺",
+    "sedan": "🚗",
+    "microbus": "🚐",
+    "tricycle": "🛺",
+    "truck": "🚚",
+    "delivery_bike": "🛵",
+    "tmanya": "🚌"
+  }[r.vehicleType] || "🚗";
+
+  item.innerHTML = `
+    <div class="drv-ride-header">
+      <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
+        ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
+      </div>
+      <div class="drv-ride-price">${moneyEGP(r.offerPrice || r.price)}</div>
+    </div>
+
+    <div class="drv-ride-meta">
+      <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
+      ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
+    </div>
+
+    <div class="drv-ride-route">
+      <div class="drv-ride-route-row">
+        <span class="drv-ride-route-icon">⬆️</span>
+        <span class="drv-ride-route-text">${escapeHtml(r.pickupText || "—")}</span>
+      </div>
+      <div class="drv-ride-route-row">
+        <span class="drv-ride-route-icon">⬇️</span>
+        <span class="drv-ride-route-text">${escapeHtml(r.dropoffText || "—")}</span>
+      </div>
+    </div>
+  `;
+  item.onclick = () => selectRide(r.id, r);
+  ridesList.appendChild(item);
+});
   };
   const unsubOpen = onSnapshot(qOpen, (snap) => { openRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); renderMerged(); }, (err) => { console.error("qOpen snapshot error:", err); const isPermission = String(err?.code || err?.message || "").includes("permission"); ridesList.innerHTML = `<div class="muted small">${isPermission ? "Firestore Rules تمنع قراءة الطلبات." : "تعذر تحميل الطلبات المفتوحة."}</div>`; });
   const unsubMine = onSnapshot(qMine, (snap) => { mineRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); renderMerged(); }, (err) => console.error("qMine snapshot error:", err));
