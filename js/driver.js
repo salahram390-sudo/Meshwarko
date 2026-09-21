@@ -1133,6 +1133,7 @@ ridesList.innerHTML = "";
   </div>
   <div class="drv-ride-route-text">${escapeHtml((r.dropoffText || "—").split("،").slice(-2).join("، ").trim())}</div>
 </div>
+</div>
 
   `;
   item.onclick = () => selectRide(r.id, r);
