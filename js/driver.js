@@ -1159,15 +1159,10 @@ function watchRidesForDriver() {
     renderMerged(); 
   }, (err) => console.error("qMine snapshot error:", err));
   
-  ridesUnsub = () => { 
+    ridesUnsub = () => { 
     try { unsubOpen(); } catch (_) {} 
     try { unsubMine(); } catch (_) {} 
   };
-}
-
-  const unsubOpen = onSnapshot(qOpen, (snap) => { openRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); renderMerged(); }, (err) => { console.error("qOpen snapshot error:", err); const isPermission = String(err?.code || err?.message || "").includes("permission"); ridesList.innerHTML = `<div class="muted small">${isPermission ? "Firestore Rules تمنع قراءة الطلبات." : "تعذر تحميل الطلبات المفتوحة."}</div>`; });
-  const unsubMine = onSnapshot(qMine, (snap) => { mineRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); renderMerged(); }, (err) => console.error("qMine snapshot error:", err));
-  ridesUnsub = () => { try { unsubOpen(); } catch (_) {} try { unsubMine(); } catch (_) {} };
 }
 
 logoutBtn?.addEventListener("click", async () => {
