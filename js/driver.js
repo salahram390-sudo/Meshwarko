@@ -944,8 +944,7 @@ async function selectRide(id, ride) {
       icon: createDropoffIcon()
     });
   }
-
-  renderSelectedRideCard(selectedRideData);
+  
   await drawRideRoute(selectedRideData);
 }
 
