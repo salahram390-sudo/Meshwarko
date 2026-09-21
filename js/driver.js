@@ -1118,22 +1118,22 @@ ridesList.innerHTML = "";
     </div>
 
     <div class="drv-ride-route">
-  <div class="drv-ride-route-row pickup">
-    <div class="drv-ride-route-marker">
-      <span class="drv-ride-route-dot green"></span>
-      <span class="drv-ride-route-label">من</span>
-    </div>
-    <div class="drv-ride-route-text">${escapeHtml(r.pickupText || "—")}</div>
+    <div class="drv-ride-route-row pickup">
+  <div class="drv-ride-route-marker">
+    <span class="drv-ride-route-dot green"></span>
+    <span class="drv-ride-route-label">من</span>
   </div>
-  <div class="drv-ride-route-line"></div>
-  <div class="drv-ride-route-row dropoff">
-    <div class="drv-ride-route-marker">
-      <span class="drv-ride-route-dot red"></span>
-      <span class="drv-ride-route-label">إلى</span>
-    </div>
-    <div class="drv-ride-route-text">${escapeHtml(r.dropoffText || "—")}</div>
-  </div>
+  <div class="drv-ride-route-text">${escapeHtml((r.pickupText || "—").split("،").slice(-2).join("، ").trim())}</div>
 </div>
+<div class="drv-ride-route-line"></div>
+<div class="drv-ride-route-row dropoff">
+  <div class="drv-ride-route-marker">
+    <span class="drv-ride-route-dot red"></span>
+    <span class="drv-ride-route-label">إلى</span>
+  </div>
+  <div class="drv-ride-route-text">${escapeHtml((r.dropoffText || "—").split("،").slice(-2).join("، ").trim())}</div>
+</div>
+
   `;
   item.onclick = () => selectRide(r.id, r);
   ridesList.appendChild(item);
