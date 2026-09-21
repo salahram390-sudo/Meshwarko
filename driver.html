@@ -89,28 +89,72 @@
 
           <div id="selectedRideDivider" class="divider" style="display:none;"></div>
 
-<div id="selectedRideBox" class="card-lite" style="display:none;">
-  <div class="panel-title">الطلب المحدد</div>
-            <div id="selectedRide" class="ride-card"><div class="muted">لم يتم تحديد طلب.</div></div>
+          <div id="selectedRideBox" class="card-lite ride-status-card" style="display:none;">
 
-            <div class="form-row" style="margin-top:10px">
-              <label class="label">اقتراح سعر (اختياري)</label>
-              <input id="offerInput" class="input" type="number" min="15" max="3000" step="5" placeholder="مثال: 80" />
-              <p class="hint">لو كتبت سعر واضغط إرسال، هيروح للراكب كـ عرض.</p>
-            </div>
+  <!-- شارة الحالة -->
+  <div id="driverRideBadge" class="drv-badge drv-badge-new">
+    <span class="drv-badge-dot"></span>
+    <span id="driverRideBadgeText">طلب جديد</span>
+  </div>
 
-            <div class="actions">
-              <button id="btnSendOffer" class="btn primary" type="button" disabled>إرسال عرض سعر</button>
-              <button id="btnAccept" class="btn success" type="button" disabled>قبول بسعر الطلب</button>
-              <button id="btnTrackToggle" class="btn ghost" type="button" disabled>ابدأ التتبع</button>
-              <button id="btnCancel" class="btn danger" type="button" disabled>تجاهل</button>
-              <button id="btnArrived" class="btn primary" disabled>وصلت</button>
-              <button id="driverStartRideBtn" class="btn success" type="button" disabled>بدء الرحلة</button>
-              <button id="btnDeclineRide" class="btn danger" type="button" disabled>اعتذر عن الرحلة</button>
-<button id="btnComplete" class="btn success" type="button" disabled style="display:none;">إنهاء الرحلة</button>
-              <button id="btnChatDriver" class="btn primary" type="button" disabled>محادثة</button>
-            </div>
-          </div>
+  <!-- السعر والمسافة -->
+  <div class="drv-meta-grid">
+    <div class="drv-meta-box">
+      <span class="drv-meta-value" id="driverRidePrice">—</span>
+      <span class="drv-meta-label">السعر</span>
+    </div>
+    <div class="drv-meta-box">
+      <span class="drv-meta-value" id="driverRideDistance">—</span>
+      <span class="drv-meta-label">المسافة</span>
+    </div>
+  </div>
+
+  <!-- تفاصيل المسار -->
+  <div class="drv-route">
+    <div class="drv-route-row">
+      <span class="drv-route-icon">⬆️</span>
+      <span id="driverRidePickup">—</span>
+    </div>
+    <div class="drv-route-row">
+      <span class="drv-route-icon">⬇️</span>
+      <span id="driverRideDropoff">—</span>
+    </div>
+    <div class="drv-route-row">
+      <span class="drv-route-icon">🚗</span>
+      <span id="driverRideVehicle">—</span>
+    </div>
+  </div>
+
+  <!-- بيانات الراكب (تظهر بعد القبول) -->
+  <div id="driverRidePassengerInfo" class="drv-passenger hidden"></div>
+
+  <!-- حقل اقتراح السعر (مخفي افتراضياً) -->
+  <div id="driverOfferWrap" class="drv-offer-wrap hidden">
+    <input id="offerInput" class="input" type="number" min="15" max="3000" step="5" placeholder="اكتب سعرك (مثال: 80)" />
+    <button id="btnSendOffer" class="btn primary" type="button">إرسال العرض</button>
+  </div>
+
+  <!-- الزر الأساسي -->
+  <button id="driverPrimaryBtn" class="drv-primary-btn" type="button">✅ اقبل بسعر الطلب</button>
+
+  <!-- الأزرار الثانوية -->
+  <div class="drv-secondary-grid">
+    <button id="driverSecondaryBtn1" class="drv-secondary-btn" type="button">💰 اقترح سعر</button>
+    <button id="driverSecondaryBtn2" class="drv-secondary-btn drv-danger" type="button">❌ تجاهل</button>
+  </div>
+
+  <!-- الأزرار القديمة مخفية (للحفاظ على Event Listeners) -->
+  <div class="drv-hidden-actions">
+    <button id="btnAccept" type="button"></button>
+    <button id="btnTrackToggle" type="button"></button>
+    <button id="btnCancel" type="button"></button>
+    <button id="btnArrived" type="button"></button>
+    <button id="driverStartRideBtn" type="button"></button>
+    <button id="btnDeclineRide" type="button"></button>
+    <button id="btnComplete" type="button"></button>
+    <button id="btnChatDriver" type="button"></button>
+  </div>
+</div>
 
           <div class="spacer"></div>
         </div>
