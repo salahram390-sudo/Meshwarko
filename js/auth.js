@@ -364,15 +364,18 @@ registerForm?.addEventListener("submit", async (e) => {
 try {
   const ADMIN_UID = "pW7aljtlVge5jR34akYTs9hBuwW2";
   await fetch("https://meshwarko-push.salahram390.workers.dev", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
-    body: JSON.stringify({
-      driverUids: [ADMIN_UID],
-      title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
-      body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
-      data: { type: "new_user", userId: cred.user.uid, role: role }
-    })
-  });
+  method: "POST",
+  headers: { 
+    "Content-Type": "application/json", 
+    "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+  },
+  body: JSON.stringify({
+    driverUids: [ADMIN_UID],
+    title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
+    body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
+    data: { type: "new_user", userId: cred.user.uid, role: role }
+  })
+});
   console.log("✅ إشعار: مستخدم جديد للأدمن");
 } catch (e) { console.error("❌ فشل إشعار الأدمن:", e?.message); }
 // ====================================================
