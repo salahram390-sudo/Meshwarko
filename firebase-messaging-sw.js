@@ -35,7 +35,7 @@ self.addEventListener("notificationclick", (event) => {
         if ("focus" in client) return client.focus();
       }
       if (clients.openWindow) {
-        return clients.openWindow("https://app-meshwarko.netlify.app/");
+        return clients.openWindow("https://meshwarko.pages.dev/");
       }
     })
   );
