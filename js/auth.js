@@ -429,6 +429,9 @@ function getSafeTargetPage(profile) {
 onAuthStateChanged(auth, async (user) => {
   if (isAuthProcessing) return;
   
+  // ✅ إظهار الواجهة بمجرد ما Firebase يرد
+  const appRootEl = document.getElementById("appRoot");
+  if (appRootEl) appRootEl.classList.remove("app-hidden")
   if (user) {
     btnLogout?.classList.remove("hidden");
 
