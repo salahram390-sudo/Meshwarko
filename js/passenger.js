@@ -971,7 +971,7 @@ async function handleRideSnapshot(rideSnap) {
   const authUid = auth.currentUser?.uid || null;
   selectedRideData = { ...ride, id: rideSnap.id };
 
-  const soundKey = `\( {rideSnap.id}: \){ride.status}:\( {ride.offerPrice || ride.price || 0}: \){ride.driverId || ""}`;
+  const soundKey = `${rideSnap.id}:${ride.status}:${ride.offerPrice || ride.price || 0}:${ride.driverId || ""}`;
 
   if (lastRideSoundKey !== soundKey) {
     if (ride.status === "requested") {
