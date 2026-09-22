@@ -1265,12 +1265,10 @@ btnCancel?.addEventListener("click", async () => {
         ignoredRideIds.add(selectedRideId);
         resetSelectedRideUi("تم تجاهل الطلب");
 
-        // إخفاء الكارت من القائمة
-        const card = document.querySelector(`.list-item[onclick*="selectRide('${selectedRideId}'"]`);
-        if (card) {
-            card.style.display = "none";
-            // card.remove();   // لو عايز تشيله نهائياً
-        }
+        const card = document.querySelector(`.drv-ride-item[data-ride-id="${selectedRideId}"]`);
+if (card) {
+  card.remove();
+}
 
         notify({ 
             title: "تم التجاهل", 
