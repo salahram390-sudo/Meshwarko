@@ -3,6 +3,19 @@ import {
   db,
   initFirebaseMessaging,
 } from "./firebase.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import {
+  doc, getDoc, updateDoc, setDoc, deleteDoc, addDoc,
+  collection, onSnapshot, query, where, orderBy,
+  serverTimestamp, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, isActiveRideStatus, normalizeArabicDigits, getRideFreshMaxAgeMs, formatRideDate } from "./utils.js";
+import {
+  createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
+  createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
+} from "./map.js";
+import { loadEgyptAdmin } from "./admin_data.js";
 // ====================== FCM Push Notifications (Driver) ======================
 async function initDriverPushNotifications() {
   try {
@@ -137,19 +150,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 console.log("driver.js loaded ✅");
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import {
-  doc, getDoc, updateDoc, setDoc, deleteDoc, addDoc,
-  collection, onSnapshot, query, where, orderBy,
-  serverTimestamp, Timestamp
-} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-import { $, setText, moneyEGP, escapeHtml, haversineMeters, isRideExpired, isActiveRideStatus, normalizeArabicDigits, getRideFreshMaxAgeMs, formatRideDate } from "./utils.js";
-import {
-  createMap, addMarker, routeOSRM, drawRoute, locateOnce, showMyLocation,
-  createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
-} from "./map.js";
-import { loadEgyptAdmin } from "./admin_data.js";
 import { notify, ensureNotificationPermission, playSound, startRequestSound, stopRequestSound } from "./notify.js";
 localStorage.setItem("lastAppPage", "driver.html");
 const meBadge = $("#meBadge");
