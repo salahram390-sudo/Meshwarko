@@ -3,12 +3,13 @@ importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js
 importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js');
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB725kE16HX4R0fSYAQmYCLVbPu-W4Ko",
+  apiKey: "AIzaSyBY72SkEi6HX4R9fSYAQhnYCLVbPu-W4Ko",
   authDomain: "meshwarkomm.firebaseapp.com",
   projectId: "meshwarkomm",
   storageBucket: "meshwarkomm.firebasestorage.app",
   messagingSenderId: "889669815551",
-  appId: "PASTE-APP-ID-HERE"
+  appId: "1:889669815551:web:b47e9dcf775e4c1eff10ca",
+  measurementId: "G-SDWD0EMRRF"
 };
 
 firebase.initializeApp(firebaseConfig);
