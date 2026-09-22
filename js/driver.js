@@ -346,6 +346,11 @@ function isRideVisibleForDriver(ride) {
   const myUid = auth.currentUser?.uid || null;
   const status = String(ride.status || "");
 
+  // ✅ رفض فوري للحالات المنتهية
+  if (status === "canceled" || status === "completed" || status === "driver_declined") {
+    return false;
+  }
+
   if (!isActiveRideStatus(status)) return false;
   if (isRideExpired(ride, getRideFreshMaxAgeMs(status))) return false;
 
