@@ -746,15 +746,32 @@ function refreshSelectedRideButtons(ride) {
   (mine && ["accepted", "arrived", "started", "offered"].includes(status));
   const canChat = mine && ["accepted", "arrived", "started"].includes(status);
 
-  // تفعيل / تعطيل الأزرار
-  driverStartRideBtn.disabled = !canStart; 
-  btnSendOffer.disabled = !canOffer; 
-  btnAccept.disabled = !canAccept; 
-  btnTrackToggle.disabled = !canTrack; 
-  btnCancel.disabled = !canCancel; 
-  btnArrived.disabled = !canArrive; 
-  btnDeclineRide.disabled = !canDecline;     // ← مهم جداً
-  btnComplete.disabled = !canComplete;
+  // ✅ لو الطلب منتهي — عطّل كل الأزرار فورًا
+const isFinished = ["canceled", "completed", "driver_declined"].includes(status);
+
+if (isFinished) {
+  driverStartRideBtn.disabled = true;
+  btnSendOffer.disabled = true;
+  btnAccept.disabled = true;
+  btnTrackToggle.disabled = true;
+  btnCancel.disabled = true;
+  btnArrived.disabled = true;
+  btnDeclineRide.disabled = true;
+  btnComplete.disabled = true;
+  if (btnChatDriver) btnChatDriver.disabled = true;
+  updateDriverRideUI(ride);
+  return;
+}
+
+// تفعيل / تعطيل الأزرار (الحالات العادية)
+driverStartRideBtn.disabled = !canStart; 
+btnSendOffer.disabled = !canOffer; 
+btnAccept.disabled = !canAccept; 
+btnTrackToggle.disabled = !canTrack; 
+btnCancel.disabled = !canCancel; 
+btnArrived.disabled = !canArrive; 
+btnDeclineRide.disabled = !canDecline;
+btnComplete.disabled = !canComplete;
 
     if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
   if (btnChatDriver) btnChatDriver.disabled = !canChat;
