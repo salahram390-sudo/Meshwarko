@@ -1242,7 +1242,7 @@ const localPickupLon = pickup?.lon;
   method: "POST",
   headers: { 
     "Content-Type": "application/json",
-  "Authorization": "Bearer YVd/YhTgJ4Wwddeu88v/LqvSexujDKetSne/N537Hlo="
+    "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
   },
   body: JSON.stringify({
         driverUids: nearbyDriverUids,
