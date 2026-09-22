@@ -1033,7 +1033,6 @@ function watchRidesForDriver() {
       const item = document.createElement("div");
 item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
     item.dataset.rideId = r.id;
-item.dataset.rideId = r.id;
 
       const dist = getRideDistanceToMe(r);
       const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
