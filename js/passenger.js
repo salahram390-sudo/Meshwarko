@@ -1227,39 +1227,44 @@ notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن س
 
 // ================== إرسال إشعار للسائقين القريبين ==================
 try {
-  const nearbyDriverUids = nearestMeta.nearestDriverIds || [];
-  
-  if (nearbyDriverUids.length > 0) {
-    const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
-
-console.log("🔍 workerUrl:", workerUrl);
-console.log("🔍 driverUids:", nearbyDriverUids);
-console.log("🔍 Authorization header: Bearer meshwarko_secret_2026");
-    // حفظ الإحداثيات في متغيرات محلية عشان نضمن إنها مش هتتصفر
-const localPickupLat = pickup?.lat;
-const localPickupLon = pickup?.lon;
-    await fetch(workerUrl, {
-  method: "POST",
-  headers: { 
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
-  },
-  body: JSON.stringify({
-        driverUids: nearbyDriverUids,
-        title: "طلب مشوار جديد 🚗",
-        body: `راكب في ${savedCenter || ""} - ${savedGov || ""} • المسافة: ${((lastDistanceMeters || 0) / 1000).toFixed(1)} كم • السعر: ${price || 0} ج`,
-        data: {
-  type: "new_ride_request",
-  rideId: rideRef.id,
-  pickupLat: String(localPickupLat || ""),
-  pickupLon: String(localPickupLon || "")
-}
-      })
-    });
-    
-    console.log(`✅ تم إرسال الإشعار لـ ${nearbyDriverUids.length} سائق قريب`);
+  // ⚠️ فحص: المستخدم مسجل دخول؟
+  if (!auth.currentUser) {
+    console.warn("⚠️ لا يمكن إرسال إشعار للسائقين: المستخدم غير مسجل الدخول.");
   } else {
-    console.warn("⚠️ لا يوجد سائقين قريبين لإرسال الإشعار لهم");
+    const nearbyDriverUids = nearestMeta.nearestDriverIds || [];
+    
+    if (nearbyDriverUids.length > 0) {
+      const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
+      
+      // حفظ الإحداثيات في متغيرات محلية
+      const localPickupLat = pickup?.lat;
+      const localPickupLon = pickup?.lon;
+      
+      const token = await auth.currentUser.getIdToken();
+      
+      await fetch(workerUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          driverUids: nearbyDriverUids,
+          title: "طلب مشوار جديد 🚗",
+          body: `راكب في ${savedCenter || ""} - ${savedGov || ""} • المسافة: ${((lastDistanceMeters || 0) / 1000).toFixed(1)} كم • السعر: ${price || 0} ج`,
+          data: {
+            type: "new_ride_request",
+            rideId: rideRef.id,
+            pickupLat: String(localPickupLat || ""),
+            pickupLon: String(localPickupLon || "")
+          }
+        })
+      });
+      
+      console.log(`✅ تم إرسال الإشعار لـ ${nearbyDriverUids.length} سائق قريب`);
+    } else {
+      console.warn("⚠️ لا يوجد سائقين قريبين لإرسال الإشعار لهم");
+    }
   }
 } catch (notifyErr) {
   console.error("❌ فشل إرسال إشعار للسائقين:", notifyErr?.message || notifyErr?.toString() || JSON.stringify(notifyErr));
