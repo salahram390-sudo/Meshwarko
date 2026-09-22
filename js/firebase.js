@@ -39,70 +39,10 @@ window.__db = db;
 export let messaging = null;
 
 export async function initFirebaseMessaging(uid) {
-  try {
-    console.log("FCM START, uid =", uid);
-
-    if (!uid) {
-      console.warn("FCM skipped: uid missing");
-      return null;
-    }
-
-    if (!("serviceWorker" in navigator)) {
-      console.warn("Service worker not supported");
-      return null;
-    }
-
-    const supported = await isSupported();
-    console.log("FCM supported =", supported);
-
-    if (!supported) {
-      console.warn("Firebase messaging not supported on this browser");
-      return null;
-    }
-
-    const registration = await navigator.serviceWorker.register("./firebase-messaging-sw.js");
-    console.log("SW registered =", registration);
-
-    messaging = getMessaging(app);
-
-    const permission = await Notification.requestPermission();
-    console.log("Notification permission =", permission);
-
-    if (permission !== "granted") {
-      console.warn("Notification permission not granted");
-      return null;
-    }
-
-    console.log("Before getToken");
-
-const token = await getToken(messaging, {
-  vapidKey: "BMmr4DfucDSm0JzDoBhUTp7v5xagCgBFpSmqgmNmAPJUSUJ8S9ga49SlJQRvxillsIeE4_isvJkPAsNxg4Y0uws",
-  serviceWorkerRegistration: registration,
-});
-
-console.log("After getToken");
-console.log("FCM raw token =", token);
-
-    if (!token) {
-      console.warn("No FCM token returned");
-      return null;
-    }
-
-    await updateDoc(doc(db, "users", uid), {
-      fcmToken: token,
-      fcmUpdatedAt: serverTimestamp(),
-    }).catch((err) => {
-      console.warn("Saving FCM token failed:", err?.message || err);
-    });
-
-    console.log("FCM TOKEN SAVED:", token);
-    return token;
-  } catch (err) {
-    console.error("FCM init error FULL:", err);
-console.error("FCM init error message:", err?.message);
-console.error("FCM init error code:", err?.code);
-    return null;
-  }
+  // OneSignal handles all push notifications
+  // FCM is disabled to avoid Service Worker scope conflict
+  console.log("FCM skipped — OneSignal handles push notifications");
+  return null;
 }
 
 export function listenForegroundMessages(cb) {
