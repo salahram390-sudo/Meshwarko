@@ -43,12 +43,8 @@ export async function initFirebaseMessaging(uid) {
   // FCM is disabled to avoid Service Worker scope conflict
   console.log("FCM skipped — OneSignal handles push notifications");
   return null;
-}
 
 export function listenForegroundMessages(cb) {
-  if (!messaging) return;
-  onMessage(messaging, (payload) => {
-    console.log("Foreground message:", payload);
-    if (typeof cb === "function") cb(payload);
-  });
+  // OneSignal handles all messages — FCM listener removed
+  return;
 }
