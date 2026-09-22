@@ -16,6 +16,7 @@ import {
   createCarIcon, moveCarMarkerSmooth, createPickupIcon, createDropoffIcon,
 } from "./map.js";
 import { loadEgyptAdmin } from "./admin_data.js";
+import { notify, ensureNotificationPermission, playSound, startRequestSound, stopRequestSound } from "./notify.js";
 // ====================== FCM Push Notifications (Driver) ======================
 async function initDriverPushNotifications() {
   try {
@@ -150,7 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 console.log("driver.js loaded ✅");
-import { notify, ensureNotificationPermission, playSound, startRequestSound, stopRequestSound } from "./notify.js";
+
 localStorage.setItem("lastAppPage", "driver.html");
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
