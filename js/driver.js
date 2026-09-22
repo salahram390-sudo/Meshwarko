@@ -1032,6 +1032,7 @@ function watchRidesForDriver() {
       const isMine = r.driverId === driverUid;
       const item = document.createElement("div");
 item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
+    item.dataset.rideId = r.id;
 item.dataset.rideId = r.id;
 
       const dist = getRideDistanceToMe(r);
