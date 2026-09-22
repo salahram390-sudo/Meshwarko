@@ -920,15 +920,28 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
     if (secBtn2) secBtn2.style.display = "none";
   }
 
-  // 6) منتهية / ملغية
-  else if (status === "completed" || status === "canceled") {
-    if (badgeEl) badgeEl.className = "drv-badge drv-badge-done";
-    if (badgeTextEl) badgeTextEl.textContent = status === "completed" ? "✓ مكتملة" : "✕ ملغية";
+  // 6) منتهية / ملغية / اعتذار
+else if (status === "completed" || status === "canceled" || status === "driver_declined") {
+  if (badgeEl) badgeEl.className = "drv-badge drv-badge-done";
+  if (badgeTextEl) badgeTextEl.textContent = 
+    status === "completed" ? "✓ مكتملة" : 
+    status === "canceled" ? "✕ ملغية" : 
+    "↩️ معتذر عنها";
 
-    if (primaryBtn) primaryBtn.style.display = "none";
-    if (secBtn1) secBtn1.style.display = "none";
-    if (secBtn2) secBtn2.style.display = "none";
+  if (primaryBtn) {
+    primaryBtn.style.display = "none";
+    primaryBtn.onclick = null;
+    primaryBtn.disabled = true;
   }
+  if (secBtn1) {
+    secBtn1.style.display = "none";
+    secBtn1.onclick = null;
+  }
+  if (secBtn2) {
+    secBtn2.style.display = "none";
+    secBtn2.onclick = null;
+  }
+}
 }
 // =========================================
 async function selectRide(id, ride) {
