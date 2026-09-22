@@ -1289,27 +1289,39 @@ btnCancel.addEventListener("click", async () => {
       archived: true 
     });
 
-    // ============ إشعار السائق: الراكب ألغى ============
+        // ============ إشعار السائق: الراكب ألغى ============
 try {
-  const rideSnap = await getDoc(doc(db, "rides", currentRideId));
-  const ride = rideSnap.data();
-  if (ride && ride.driverId && typeof ride.driverId === 'string' && ride.driverId.length > 0) {
-    await fetch("https://meshwarko-push.salahram390.workers.dev", {
-      method: "POST",
-      headers: { 
-  "Content-Type": "application/json", 
-  "Authorization": `Bearer ${await auth.currentUser.getIdToken()}` 
-},
-      body: JSON.stringify({
-        driverUids: [ride.driverId],
-        title: "الراكب ألغى الطلب ❌",
-        body: "تم إلغاء الرحلة من جانب الراكب",
-        data: { type: "ride_cancelled", rideId: currentRideId }
-      })
-    });
-    console.log("✅ تم إرسال إشعار للسائق: الراكب ألغى");
+  // ⚠️ فحص: المستخدم مسجل دخول؟
+  if (!auth.currentUser) {
+    console.warn("⚠️ لا يمكن إرسال إشعار الإلغاء: المستخدم غير مسجل الدخول.");
+  } else {
+    const rideSnap = await getDoc(doc(db, "rides", currentRideId));
+    if (rideSnap.exists()) {
+      const ride = rideSnap.data();
+      if (ride && ride.driverId && typeof ride.driverId === 'string' && ride.driverId.trim() !== '') {
+        const token = await auth.currentUser.getIdToken();
+        await fetch("https://meshwarko-push.salahram390.workers.dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            driverUids: [ride.driverId],
+            title: "الراكب ألغى الطلب ❌",
+            body: "تم إلغاء الرحلة من جانب الراكب",
+            data: { type: "ride_cancelled", rideId: currentRideId }
+          })
+        });
+        console.log("✅ تم إرسال إشعار للسائق: الراكب ألغى");
+      } else {
+        console.warn("⚠️ لا يمكن إرسال إشعار الإلغاء: لا يوجد driverId صالح.");
+      }
+    }
   }
-} catch (err) { console.error("❌ فشل إشعار الإلغاء:", err?.message || err); }
+} catch (err) { 
+  console.error("❌ فشل إشعار الإلغاء:", err?.message || err); 
+}
 // ===================================================
 
     cleanupRideState(); 
