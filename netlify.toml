@@ -5,3 +5,12 @@
   for = "/*"
   [headers.values]
     Cache-Control = "public, max-age=0, must-revalidate"
+    [[headers]]
+  for = "/firebase-messaging-sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/OneSignalSDKWorker.js"
+  [headers.values]
+  Cache-Control = "public, max-age=0, must-revalidate"
