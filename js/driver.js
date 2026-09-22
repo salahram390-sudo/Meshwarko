@@ -1031,7 +1031,8 @@ function watchRidesForDriver() {
     rides.forEach((r) => {
       const isMine = r.driverId === driverUid;
       const item = document.createElement("div");
-      item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
+item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
+item.dataset.rideId = r.id;
 
       const dist = getRideDistanceToMe(r);
       const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
