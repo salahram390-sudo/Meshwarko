@@ -523,6 +523,15 @@ function friendlyAuthError(err) {
 
 console.log("AUTH LOADED OK");
 
+// ============ Fail-safe: إظهار الواجهة بعد 3 ثواني ============
+setTimeout(() => {
+  const root = document.getElementById("appRoot");
+  if (root && root.classList.contains("app-hidden")) {
+    console.log("⚠️ Fail-safe: إظهار الواجهة قسرياً");
+    root.classList.remove("app-hidden");
+  }
+}, 3000);
+
 window.addEventListener("error", (e) => {
   alert(`JS Error: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`);
 });
