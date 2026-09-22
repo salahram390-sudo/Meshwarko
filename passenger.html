@@ -280,24 +280,6 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="./js/passenger.js"></script>
 
-  <!-- Firebase Messaging Service Worker Registration -->
-<script>
-  (async function registerFirebaseSW() {
-    if (!('serviceWorker' in navigator)) {
-      console.warn("❌ Service Worker not supported");
-      return;
-    }
-    try {
-      const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
-        scope: "/"
-      });
-      console.log('✅ Firebase SW Registered:', registration.scope);
-    } catch (err) {
-      console.warn('⚠️ Firebase SW Registration Failed:', err.message);
-    }
-  })();
-</script>
-
   <div id="rateModal" class="modal-backdrop">
     <div class="modal">
       <div class="row-between">
