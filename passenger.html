@@ -7,11 +7,17 @@
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function (OneSignal) {
-    await OneSignal.init({
-      appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
-      serviceWorkerParam: { scope: "/push/onesignal/" },
-      serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js"
-    });
+    try {
+      await OneSignal.init({
+        appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
+        serviceWorkerParam: { scope: "/push/onesignal/" },
+        serviceWorkerPath: "push/onesignal/OneSignalSDKWorker.js"
+      });
+      console.log("✅ OneSignal initialized");
+    } catch (e) {
+      console.warn("⚠️ OneSignal init failed (non-critical):", e?.message);
+      // لا نوقف باقي الصفحة
+    }
   });
 </script>
 <head>
