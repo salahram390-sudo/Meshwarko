@@ -365,7 +365,7 @@ try {
   const ADMIN_UID = "pW7aljtlVge5jR34akYTs9hBuwW2";
   await fetch("https://meshwarko-push.salahram390.workers.dev", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "Authorization": "Bearer YVd/YhTgJ4Wwddeu88v/LqvSexujDKetSne/N537Hlo=" },
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
     body: JSON.stringify({
       driverUids: [ADMIN_UID],
       title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
