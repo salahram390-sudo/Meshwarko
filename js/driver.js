@@ -1122,15 +1122,15 @@ item.innerHTML = `
   </div>
 
   <div class="drv-route-mini">
-    <div class="drv-route-row">
-      <span class="drv-route-icon">🟢</span>
-      <span class="drv-route-text">${escapeHtml(pickupText)}</span>
-    </div>
-    <div class="drv-route-row">
-      <span class="drv-route-icon">🔴</span>
-      <span class="drv-route-text">${escapeHtml(dropoffText)}</span>
-    </div>
+  <div class="drv-route-row">
+    <span class="drv-route-dot green"></span>
+    <span class="drv-route-text">${escapeHtml(pickupText)}</span>
   </div>
+  <div class="drv-route-row">
+    <span class="drv-route-dot red"></span>
+    <span class="drv-route-text">${escapeHtml(dropoffText)}</span>
+  </div>
+</div>
 `;
 
       item.onclick = () => selectRide(r.id, r);
