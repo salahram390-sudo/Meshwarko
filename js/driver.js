@@ -1235,7 +1235,7 @@ setDriverStatus("على الطريق");
   } catch (e) { console.error("DRIVER ACCEPT ERROR:", e); alert("ACCEPT ERROR: " + (e?.message || e)); setDriverStatus("خطأ");
           btnAccept.disabled = false;              // ←←← الجديد
   btnAccept.textContent = "✅ اقبل بسعر الطلب"; // ←←← الجديد
-}}
+}
 });
 
 btnArrived?.addEventListener("click", async () => {
