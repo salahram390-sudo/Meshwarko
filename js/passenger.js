@@ -1282,62 +1282,61 @@ try {
 btnCancel.addEventListener("click", async () => {
   if (!currentRideId) return rideUiNone();
 
-  setStatus("جاري الإلغاء...");
+  // ⚠️ احفظ الـ ID قبل أي تعديل
+  const rideIdToCancel = currentRideId;
 
-  // إيقاف الصوت فوراً وبقوة
+  setStatus("جاري الإلغاء...");
   stopRequestSound();
 
   try {
-    await updateDoc(doc(db, "rides", currentRideId), { 
-      status: "canceled", 
-      canceledAt: serverTimestamp(), 
-      archived: true 
+    // 1) حدّث حالة الرحلة أولاً
+    await updateDoc(doc(db, "rides", rideIdToCancel), {
+      status: "canceled",
+      canceledAt: serverTimestamp(),
+      archived: true
     });
 
-        // ============ إشعار السائق: الراكب ألغى ============
-try {
-  // ⚠️ فحص: المستخدم مسجل دخول؟
-  if (!auth.currentUser) {
-    console.warn("⚠️ لا يمكن إرسال إشعار الإلغاء: المستخدم غير مسجل الدخول.");
-  } else {
-    const rideSnap = await getDoc(doc(db, "rides", currentRideId));
-    if (rideSnap.exists()) {
-      const ride = rideSnap.data();
-      if (ride && ride.driverId && typeof ride.driverId === 'string' && ride.driverId.trim() !== '') {
-        const token = await auth.currentUser.getIdToken();
-        await fetch("https://meshwarko-push.salahram390.workers.dev", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            driverUids: [ride.driverId],
-            title: "الراكب ألغى الطلب ❌",
-            body: "تم إلغاء الرحلة من جانب الراكب",
-            data: { type: "ride_cancelled", rideId: currentRideId }
-          })
-        });
-        console.log("✅ تم إرسال إشعار للسائق: الراكب ألغى");
-      } else {
-        console.warn("⚠️ لا يمكن إرسال إشعار الإلغاء: لا يوجد driverId صالح.");
+    // 2) ابعت إشعار للسائق (في try-catch منفصل عشان ميأثرش على الإلغاء)
+    try {
+      if (auth.currentUser) {
+        const rideSnap = await getDoc(doc(db, "rides", rideIdToCancel));
+        if (rideSnap.exists()) {
+          const ride = rideSnap.data();
+          const driverId = ride?.driverId;
+
+          if (driverId && typeof driverId === "string" && driverId.trim().length > 0) {
+            const token = await auth.currentUser.getIdToken();
+            await fetch("https://meshwarko-push.salahram390.workers.dev", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token
+              },
+              body: JSON.stringify({
+                driverUids: [driverId],
+                title: "الراكب ألغى الطلب ❌",
+                body: "تم إلغاء الرحلة من جانب الراكب",
+                data: { type: "ride_cancelled", rideId: rideIdToCancel }
+              })
+            });
+            console.log("✅ تم إرسال إشعار للسائق: الراكب ألغى");
+          } else {
+            console.log("ℹ️ الطلب لم يكن مقبول من سائق — لا حاجة لإشعار");
+          }
+        }
       }
+    } catch (notifyErr) {
+      console.warn("⚠️ فشل إرسال الإشعار (غير مؤثر):", notifyErr?.message);
     }
-  }
-} catch (err) { 
-  console.error("❌ فشل إشعار الإلغاء:", err?.message || err); 
-}
-// ===================================================
 
-    cleanupRideState(); 
-    rideUiNone(); 
-
+    cleanupRideState();
+    rideUiNone();
     playSound("cancel");
-
     notify({ title: "تم إلغاء الطلب", body: "تم إلغاء الطلب بنجاح", tag: "ride-canceled" });
-  } catch (e) { 
-    console.error("CANCEL ERROR:", e); 
-    setStatus("خطأ"); 
+
+  } catch (e) {
+    console.error("CANCEL ERROR:", e);
+    setStatus("خطأ");
   }
 });
 
