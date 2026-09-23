@@ -1180,8 +1180,12 @@ setDriverStatus("بانتظار رد الراكب");
 
 btnAccept?.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
+  
+  // ⚠️ حماية من الضغط المتكرر
+  btnAccept.disabled = true;
+  btnAccept.textContent = "⏳ جاري القبول...";
+  
   setDriverStatus("يقبل...");
-  btnAccept.disabled = true;   // ←←← الجديد
   try {
     const rideRef = doc(db, "rides", selectedRideId); const rideSnap = await getDoc(rideRef); if (!rideSnap.exists()) throw new Error("الطلب غير موجود");
     const liveRide = rideSnap.data(); const status = String(liveRide?.status || ""); const mine = liveRide?.driverId === myUser.uid;
