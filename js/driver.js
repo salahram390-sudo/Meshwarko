@@ -1105,15 +1105,31 @@ item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
         "tmanya": "🚌"
       }[r.vehicleType] || "🚗";
 
-      item.innerHTML = `
-  ${isMine ? `
-    <div class="drv-ride-header">
-      <div class="drv-ride-badge mine">🚗 طلبي الحالي</div>
+      // نظّف النصوص
+const pickupText = (r.pickupText || "—").split("،").slice(-2).join("، ").trim();
+const dropoffText = (r.dropoffText || "—").split("،").slice(-2).join("، ").trim();
+
+item.innerHTML = `
+  <div class="drv-ride-header">
+    <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
+      ${isMine ? '🚗 طلبي الحالي' : '🟢 طلب جديد'}
     </div>
-  ` : ''}
+  </div>
+
   <div class="drv-ride-meta">
     <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
     ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
+  </div>
+
+  <div class="drv-route-mini">
+    <div class="drv-route-row">
+      <span class="drv-route-icon">🟢</span>
+      <span class="drv-route-text">${escapeHtml(pickupText)}</span>
+    </div>
+    <div class="drv-route-row">
+      <span class="drv-route-icon">🔴</span>
+      <span class="drv-route-text">${escapeHtml(dropoffText)}</span>
+    </div>
   </div>
 `;
 
