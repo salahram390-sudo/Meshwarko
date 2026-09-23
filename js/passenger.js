@@ -1457,6 +1457,26 @@ onAuthStateChanged(auth, async (user) => {
 }
   document.documentElement.style.visibility = "visible";
   await initFirebaseMessaging(user.uid);
+
+  // 🔔 إنشاء Android Notification Channel
+try {
+  if (window.median && window.median.notifications && window.median.notifications.createChannel) {
+    window.median.notifications.createChannel({
+      id: "meshwarko-rides",
+      name: "طلبات المشاوير",
+      description: "إشعارات طلبات المشاوير الجديدة",
+      importance: "high",
+      sound: "default",
+      vibration: true,
+      lights: true,
+      lightColor: "#FFD700",
+      lockscreenVisibility: "public"
+    });
+    console.log("✅ Notification Channel created");
+  }
+} catch (e) {
+  console.warn("⚠️ Channel creation failed:", e);
+}
   
   // ============ OneSignal: Web + Median ============
 if (window.median && window.median.onesignal) {
