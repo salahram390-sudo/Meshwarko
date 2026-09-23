@@ -1228,7 +1228,10 @@ requestSoundActive = false;
 playSound("success");
 notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });
 setDriverStatus("على الطريق");
-  } catch (e) { console.error("DRIVER ACCEPT ERROR:", e); alert("ACCEPT ERROR: " + (e?.message || e)); setDriverStatus("خطأ"); }
+  } catch (e) { console.error("DRIVER ACCEPT ERROR:", e); alert("ACCEPT ERROR: " + (e?.message || e)); setDriverStatus("خطأ");
+          btnAccept.disabled = false;              // ←←← الجديد
+  btnAccept.textContent = "✅ اقبل بسعر الطلب"; // ←←← الجديد
+}}
 });
 
 btnArrived?.addEventListener("click", async () => {
