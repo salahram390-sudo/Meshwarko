@@ -9,10 +9,20 @@
   OneSignalDeferred.push(async function (OneSignal) {
     try {
       await OneSignal.init({
-        appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
-        serviceWorkerParam: { scope: "/" },
-serviceWorkerPath: "/OneSignalSDKWorker.js"
-      });
+  appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
+  serviceWorkerParam: { scope: "/" },
+  serviceWorkerPath: "/OneSignalSDKWorker.js",
+  notifyButton: { enable: false },
+  allowLocalhostAsSecureOrigin: false,
+  autoResubscribe: true,
+  autoPrompt: false,
+  // 🔔 إعدادات الصوت
+  safari_web_id: null,
+  webConfig: {
+    showNotifications: true,
+    showNotificationSound: true,
+  }
+});
       console.log("✅ OneSignal initialized");
     } catch (e) {
       console.warn("⚠️ OneSignal init failed (non-critical):", e?.message);
