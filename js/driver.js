@@ -24,6 +24,28 @@ async function initDriverPushNotifications() {
       myUser?.uid || auth.currentUser?.uid
     );
 
+    // 🔔 إنشاء Android Notification Channel بأهمية عالية
+try {
+  if (window.median && window.median.notifications && window.median.notifications.createChannel) {
+    window.median.notifications.createChannel({
+      id: "meshwarko-rides",
+      name: "طلبات المشاوير",
+      description: "إشعارات طلبات المشاوير الجديدة",
+      importance: "high",
+      sound: "default",
+      vibration: true,
+      lights: true,
+      lightColor: "#FFD700",
+      lockscreenVisibility: "public"
+    });
+    console.log("✅ Notification Channel created");
+  } else {
+    console.log("ℹ️ Median notifications API not available");
+  }
+} catch (e) {
+  console.warn("⚠️ Channel creation failed:", e);
+}
+
     // ============ OneSignal: Web + Median ============
 console.log("🔍 OneSignal setup starting...");
 console.log("🔍 driverUid:", myUser?.uid, "| authUid:", auth.currentUser?.uid);
