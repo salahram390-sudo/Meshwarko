@@ -18,13 +18,12 @@ export const app = initializeApp(firebaseConfig);
 let db;
 try {
   db = initializeFirestore(app, {
-    experimentalForceLongPolling: true,
+    experimentalAutoDetectLongPolling: true,
     useFetchStreams: false,
   });
 } catch (_) {
   db = getFirestore(app);
 }
-
 export const auth = getAuth(app);
 
 setPersistence(auth, browserLocalPersistence).catch((err) => {
