@@ -1106,17 +1106,16 @@ item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
       }[r.vehicleType] || "🚗";
 
       item.innerHTML = `
-  <div class="drv-ride-header">
-    <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
-      ${isMine ? '🚗 طلبي الحالي' : '🟢 جديد'}
+  ${isMine ? `
+    <div class="drv-ride-header">
+      <div class="drv-ride-badge mine">🚗 طلبي الحالي</div>
     </div>
+  ` : ''}
+  <div class="drv-ride-meta">
+    <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
+    ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
   </div>
-
-        <div class="drv-ride-meta">
-          <span class="drv-ride-chip">${vehicleIcon} ${escapeHtml(r.vehicleType || "—")}</span>
-          ${distText ? `<span class="drv-ride-chip gold">📍 ${distText}</span>` : ""}
-        </div>
-      `;
+`;
 
       item.onclick = () => selectRide(r.id, r);
       ridesList.appendChild(item);
