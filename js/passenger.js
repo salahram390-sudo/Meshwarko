@@ -1130,10 +1130,21 @@ logoutBtn?.addEventListener("click", async () => {
 
 deleteAccountBtn?.addEventListener("click", async () => {
   const ok = confirm(
-    "هل تريد حذف الحساب نهائياً؟ سيتم حذف جميع بياناتك."
+    "هل تريد حذف الحساب نهائياً؟\n\nسيتم حذف:\n• بيانات حسابك\n• سجل الرحلات\n• المحادثات\n\nهذا الإجراء لا يمكن التراجع عنه."
   );
 
   if (!ok) return;
+
+  const confirmText = prompt(
+    'اكتب كلمة "احذف" لتأكيد الحذف النهائي:'
+  );
+
+  if (String(confirmText || "").trim() !== "احذف") {
+    alert("تم إلغاء الحذف.");
+    return;
+  }
+
+  setStatus?.("جاري الحذف...");
 
   try {
     const user = auth.currentUser;
@@ -1141,23 +1152,55 @@ deleteAccountBtn?.addEventListener("click", async () => {
 
     const uid = user.uid;
 
-    await deleteDoc(doc(db, "driversOnline", uid))
-      .catch(() => {});
+    // 1) حذف من driversOnline
+    await deleteDoc(doc(db, "driversOnline", uid)).catch(() => {});
 
+    // 2) حذف رسائل المستخدم في الرحلات
+    try {
+      const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", uid)));
+      const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", uid)));
+      const rideIds = [...new Set([...r1.docs, ...r2.docs].map((d) => d.id))];
+
+      for (const rideId of rideIds) {
+        try {
+          const msgs = await getDocs(collection(db, "rides", rideId, "messages"));
+          for (const m of msgs.docs) {
+            if (m.data().senderId === uid) {
+              await deleteDoc(doc(db, "rides", rideId, "messages", m.id));
+            }
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    // 3) حذف user doc
     await deleteDoc(doc(db, "users", uid));
+
+    // 4) حذف حساب الـ Auth نفسه
+    try {
+      await user.delete();
+    } catch (delErr) {
+      if (delErr.code === "auth/requires-recent-login") {
+        alert("لأسباب أمنية، لازم تسجل دخول تاني الأول وبعدين تدوس زرار الحذف مرة تانية.");
+        await signOut(auth);
+        location.href = "./index.html";
+        return;
+      }
+      throw delErr;
+    }
 
     await signOut(auth);
 
-    alert("تم حذف الحساب بنجاح");
+    alert("تم حذف الحساب بنجاح ✅");
 
     location.href = "./index.html";
   } catch (err) {
-    console.error(err);
+    console.error("DELETE ACCOUNT ERROR:", err);
 
     if (err.code === "auth/requires-recent-login") {
       alert("يجب تسجيل الدخول مرة أخرى قبل حذف الحساب.");
     } else {
-      alert("فشل حذف الحساب.");
+      alert("فشل حذف الحساب: " + (err?.message || err));
     }
   }
 });
