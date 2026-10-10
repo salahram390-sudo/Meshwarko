@@ -1,40 +1,5 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-  <script>
-  (function () {
-    // تحويل فوري من localStorage (بدون انتظار Firebase)
-    try {
-      var role = localStorage.getItem("lastRole");
-      if (role === "driver") {
-        window.location.replace("./driver.html");
-        return;
-      } else if (role === "passenger") {
-        window.location.replace("./passenger.html");
-        return;
-      } else if (role === "admin") {
-        window.location.replace("./admin.html");
-        return;
-      }
-    } catch (_) {}
-  })();
-</script>
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function (OneSignal) {
-    try {
-      await OneSignal.init({
-        appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
-        serviceWorkerParam: { scope: "/" },
-serviceWorkerPath: "/OneSignalSDKWorker.js"
-      });
-      console.log("✅ OneSignal initialized");
-    } catch (e) {
-      console.warn("⚠️ OneSignal init failed (non-critical):", e?.message);
-      // لا نوقف باقي الصفحة
-    }
-  });
-</script>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -42,6 +7,39 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
   <title>Meshwarko - اطلب مشوارك</title>
   <link rel="manifest" href="./manifest.json" />
   <link rel="stylesheet" href="./assets/styles.css" />
+
+  <script>
+    document.documentElement.style.visibility = "hidden";
+  </script>
+
+  <script>
+    try {
+      var role = localStorage.getItem("lastRole");
+      if (role === "driver") {
+        window.location.replace("./driver.html");
+      } else if (role === "passenger") {
+        window.location.replace("./passenger.html");
+      } else if (role === "admin") {
+        window.location.replace("./admin.html");
+      }
+    } catch (_) {}
+  </script>
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      try {
+        await OneSignal.init({
+          appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
+          serviceWorkerParam: { scope: "/" },
+          serviceWorkerPath: "/OneSignalSDKWorker.js"
+        });
+      } catch (e) {
+        console.warn("OneSignal init failed:", e?.message);
+      }
+    });
+  </script>
 </head>
 <body>
 
@@ -49,7 +47,7 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
     <header class="topbar">
       <div class="brand">
         <div class="user-avatar">
-  <img src="assets/avatar.png" alt="User">
+          <img src="assets/avatar.png" alt="User">
         </div>
         <div>
           <div class="brand-title">مشوارك</div>
@@ -57,9 +55,9 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
         </div>
       </div>
       <div class="top-actions">
-  <a id="adminEntryBtn" class="btn ghost small hidden" href="./admin.html">لوحة الإدارة</a>
-  <span class="badge">v4</span>
-</div>
+        <a id="adminEntryBtn" class="btn ghost small hidden" href="./admin.html">لوحة الإدارة</a>
+        <span class="badge">v4</span>
+      </div>
     </header>
 
     <main class="auth-container">
@@ -67,9 +65,7 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
         <div class="segmented">
           <button id="tabLogin" class="seg-btn active" type="button">تسجيل الدخول</button>
           <button id="tabRegister" class="seg-btn" type="button">تسجيل جديد</button>
-          <button id="resetPasswordBtn" class="btn small" type="button">
-نسيت كلمة المرور؟
-</button>
+          <button id="resetPasswordBtn" class="btn small" type="button">نسيت كلمة المرور؟</button>
         </div>
 
         <div class="form-row" style="margin-top:12px">
@@ -82,51 +78,51 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
         </div>
 
         <form id="loginForm" class="form">
-  <div class="form-row">
-    <label class="label" for="loginEmail">البريد الإلكتروني</label>
-    <input id="loginEmail" class="input" type="email" required autocomplete="email" />
-  </div>
+          <div class="form-row">
+            <label class="label" for="loginEmail">البريد الإلكتروني</label>
+            <input id="loginEmail" class="input" type="email" required autocomplete="email" />
+          </div>
 
-  <div class="form-row">
-    <label class="label" for="loginPass">كلمة المرور</label>
-    <input id="loginPass" class="input" type="password" required autocomplete="current-password" />
-  </div>
+          <div class="form-row">
+            <label class="label" for="loginPass">كلمة المرور</label>
+            <input id="loginPass" class="input" type="password" required autocomplete="current-password" />
+          </div>
 
-  <div id="passengerExtrasLogin" class="card-lite">
-    <div class="panel-title">اختيارات الراكب</div>
-
-    <div class="grid2" style="margin-top:10px">
-      <div class="form-row">
-        <label class="label">المحافظة</label>
-        <div class="select-wrap">
-  <select id="pGovLogin"></select>
-</div>
-      </div>
-
-      <div class="form-row">
-        <label class="label">المركز/الحي</label>
-<div class="select-wrap">
-  <select id="pCenterLogin"></select>
-</div>
-      </div>
-    </div>
-  </div>
-
-  <div id="driverExtrasLogin" class="card-lite hidden">
-            <div class="panel-title">بيانات السائق</div>
+          <div id="passengerExtrasLogin" class="card-lite">
+            <div class="panel-title">اختيارات الراكب</div>
 
             <div class="grid2" style="margin-top:10px">
               <div class="form-row">
                 <label class="label">المحافظة</label>
                 <div class="select-wrap">
-  <select id="dGovLogin"></select>
+                  <select id="pGovLogin"></select>
                 </div>
               </div>
 
               <div class="form-row">
                 <label class="label">المركز/الحي</label>
                 <div class="select-wrap">
-  <select id="dCenterLogin"></select>
+                  <select id="pCenterLogin"></select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="driverExtrasLogin" class="card-lite hidden">
+            <div class="panel-title">بيانات السائق</div>
+
+            <div class="grid2" style="margin-top:10px">
+              <div class="form-row">
+                <label class="label">المحافظة</label>
+                <div class="select-wrap">
+                  <select id="dGovLogin"></select>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <label class="label">المركز/الحي</label>
+                <div class="select-wrap">
+                  <select id="dCenterLogin"></select>
                 </div>
               </div>
             </div>
@@ -181,14 +177,14 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
               <div class="form-row">
                 <label class="label">المحافظة</label>
                 <div class="select-wrap">
-  <select id="pGov"></select>
-</div>
+                  <select id="pGov"></select>
+                </div>
               </div>
               <div class="form-row">
                 <label class="label">المركز/الحي</label>
                 <div class="select-wrap">
-  <select id="pCenter"></select>
-</div>
+                  <select id="pCenter"></select>
+                </div>
               </div>
             </div>
           </div>
@@ -199,14 +195,14 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
               <div class="form-row">
                 <label class="label">المحافظة</label>
                 <div class="select-wrap">
-  <select id="dGov"></select>
-</div>
+                  <select id="dGov"></select>
+                </div>
               </div>
               <div class="form-row">
                 <label class="label">المركز/الحي</label>
                 <div class="select-wrap">
-  <select id="dCenter"></select>
-</div>
+                  <select id="dCenter"></select>
+                </div>
               </div>
             </div>
 
@@ -238,32 +234,26 @@ serviceWorkerPath: "/OneSignalSDKWorker.js"
     </main>
   </div>
 
-  <script type="module" src="./js/auth.js"></script>
-  <script>
-  (function () {
-    var s = document.createElement('script');
-    s.src = "https://cdn.jsdelivr.net/npm/eruda";
-    s.onload = function () { eruda.init(); };
-    document.body.appendChild(s);
-  })();
-  </script>
   <div id="customAlert" class="custom-alert hidden">
-  <div class="custom-alert-backdrop"></div>
-  <div class="custom-alert-card">
-    <div class="custom-alert-icon">⚠️</div>
-    <div class="custom-alert-message" id="customAlertMessage"></div>
-    <button id="customAlertBtn" class="btn primary">موافق</button>
-  </div>
-</div>
-  <div id="customSelectSheet" class="custom-select-sheet hidden">
-  <div class="custom-select-backdrop"></div>
-  <div class="custom-select-panel">
-    <div class="custom-select-head">
-      <div class="custom-select-title" id="customSelectTitle">اختر</div>
-      <button class="custom-select-close" id="customSelectClose" type="button">✕</button>
+    <div class="custom-alert-backdrop"></div>
+    <div class="custom-alert-card">
+      <div class="custom-alert-icon">⚠️</div>
+      <div class="custom-alert-message" id="customAlertMessage"></div>
+      <button id="customAlertBtn" class="btn primary">موافق</button>
     </div>
-    <div class="custom-select-options" id="customSelectOptions"></div>
   </div>
-</div>
+
+  <div id="customSelectSheet" class="custom-select-sheet hidden">
+    <div class="custom-select-backdrop"></div>
+    <div class="custom-select-panel">
+      <div class="custom-select-head">
+        <div class="custom-select-title" id="customSelectTitle">اختر</div>
+        <button class="custom-select-close" id="customSelectClose" type="button">✕</button>
+      </div>
+      <div class="custom-select-options" id="customSelectOptions"></div>
+    </div>
+  </div>
+
+  <script type="module" src="./js/auth.js"></script>
 </body>
 </html>
