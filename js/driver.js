@@ -1086,6 +1086,92 @@ function watchRidesForDriver() {
   };
 }
 
+function openDeleteAccountModal() {
+  deleteAccountModal?.classList.remove("hidden");
+  deleteAccountBackdrop?.classList.add("show");
+}
+function closeDeleteAccountModal() {
+  deleteAccountBackdrop?.classList.remove("show");
+  deleteAccountModal?.classList.add("hidden");
+}
+
+deleteAccountBtn?.addEventListener("click", () => {
+  closeDriverDrawer();
+  openDeleteAccountModal();
+});
+deleteAccountCancel?.addEventListener("click", closeDeleteAccountModal);
+deleteAccountBackdrop?.addEventListener("click", closeDeleteAccountModal);
+
+deleteAccountConfirm?.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const confirmText = prompt('اكتب كلمة "احذف" لتأكيد الحذف النهائي:');
+  if (String(confirmText || "").trim() !== "احذف") {
+    alert("تم إلغاء الحذف.");
+    return;
+  }
+
+  setDriverStatus("جاري الحذف...");
+  closeDeleteAccountModal();
+
+  try {
+    const uid = user.uid;
+
+    // إيقاف كل حاجة
+    try { stopRequestSound(); } catch (_) {}
+    try { stopLiveTracking(); } catch (_) {}
+    try { stopDriverHeartbeat(); } catch (_) {}
+    try { await cleanupDriverOnline(); } catch (_) {}
+
+    // حذف رسائل المستخدم
+    try {
+      const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", uid)));
+      const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", uid)));
+      const rideIds = [...new Set([...r1.docs, ...r2.docs].map((d) => d.id))];
+
+      for (const rideId of rideIds) {
+        try {
+          const msgs = await getDocs(collection(db, "rides", rideId, "messages"));
+          for (const m of msgs.docs) {
+            if (m.data().senderId === uid) {
+              await deleteDoc(doc(db, "rides", rideId, "messages", m.id));
+            }
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    // حذف user doc
+    await deleteDoc(doc(db, "users", uid));
+
+    // حذف حساب الـ Auth
+    try {
+      await user.delete();
+    } catch (delErr) {
+      if (delErr.code === "auth/requires-recent-login") {
+        alert("لأسباب أمنية، لازم تسجل دخول تاني الأول وبعدين تدوس حذف مرة تانية.");
+        await signOut(auth);
+        localStorage.removeItem("lastRole");
+        localStorage.removeItem("lastAppPage");
+        location.href = "./index.html";
+        return;
+      }
+      throw delErr;
+    }
+
+    await signOut(auth);
+    localStorage.removeItem("lastRole");
+    localStorage.removeItem("lastAppPage");
+
+    alert("تم حذف الحساب بنجاح ✅");
+    location.href = "./index.html";
+  } catch (err) {
+    console.error("DELETE ACCOUNT ERROR:", err);
+    alert("فشل حذف الحساب: " + (err?.message || err));
+  }
+});
+
 logoutBtn?.addEventListener("click", async () => {
   closeDriverDrawer(); stopLiveTracking(); stopDriverHeartbeat(); await cleanupDriverOnline();
   if (chatUnsubDriver) { chatUnsubDriver(); chatUnsubDriver = null; }
