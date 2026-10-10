@@ -357,25 +357,28 @@ registerForm?.addEventListener("submit", async (e) => {
 
     await setDoc(doc(db, "users", cred.user.uid), { ...common, ...profile });
 
-    // ============ إشعار للأدمن: مستخدم جديد ============
     try {
-      const ADMIN_UID = "pW7aljtlVge5jR34akYTs9hBuwW2";
-      await fetch("https://meshwarko-push.salahram390.workers.dev", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
-        },
-        body: JSON.stringify({
-          driverUids: [ADMIN_UID],
-          title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
-          body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
-          data: { type: "new_user", userId: cred.user.uid, role: role }
-        })
-      });
-    } catch (e) {
-      console.warn("فشل إشعار الأدمن:", e?.message);
-    }
+  const adminCfg = await getDoc(doc(db, "config", "admins"));
+  const adminUids = adminCfg.exists() ? (adminCfg.data()?.uids || []) : [];
+
+  if (adminUids.length > 0) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+      },
+      body: JSON.stringify({
+        driverUids: adminUids,
+        title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
+        body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
+        data: { type: "new_user", userId: cred.user.uid, role: role }
+      })
+    });
+  }
+} catch (e) {
+  console.warn("فشل إشعار الأدمن:", e?.message);
+}
     // ====================================================
     await redirectLoggedUser(cred.user);
   } catch (err) {
