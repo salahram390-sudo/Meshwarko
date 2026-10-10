@@ -209,6 +209,11 @@ const chatCloseDriver = $("#chatCloseDriver");
 const chatMessagesDriver = $("#chatMessagesDriver");
 const chatInputDriver = $("#chatInputDriver");
 const chatSendDriver = $("#chatSendDriver");
+const deleteAccountBtn = $("#deleteAccountBtn");
+const deleteAccountModal = $("#deleteAccountModal");
+const deleteAccountBackdrop = $("#deleteAccountBackdrop");
+const deleteAccountCancel = $("#deleteAccountCancel");
+const deleteAccountConfirm = $("#deleteAccountConfirm");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
