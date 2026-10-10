@@ -1,23 +1,45 @@
 {
-  "name": "Meshwarko - اطلب مشوارك",
-  "short_name": "Meshwarko",
-  "start_url": "./index.html",
+  "id": "/",
+  "name": "مشوارك - Meshwarko",
+  "short_name": "مشوارك",
+  "description": "تطبيق مشوارك لطلب المشاوير داخل مصر. اطلب توكتوك، ملاكي، ميكروباص، تروسيكل، نقل، وموتوسيكل دليفري.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
   "background_color": "#0E0D08",
   "theme_color": "#0E0D08",
   "lang": "ar",
   "dir": "rtl",
-  "orientation": "portrait",
+  "categories": ["travel", "transportation", "navigation"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "./assets/logo.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "./assets/logo.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "طلب مشوار جديد",
+      "short_name": "طلب مشوار",
+      "description": "اطلب مشوار جديد بسرعة",
+      "url": "./passenger.html"
     }
   ]
 }
