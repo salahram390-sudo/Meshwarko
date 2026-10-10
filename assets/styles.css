@@ -2331,17 +2331,6 @@ input[type="range"] {
   box-shadow: none !important;
 }
 
-/* إزالة الإطار الذهبي من كارت "حالة الطلب" */
-.ride-status-card {
-  border: none !important;
-  background: #050607 !important;
-  box-shadow: none !important;
-}
-
-.ride-status-card::after {
-  display: none !important;
-}
-
 /* ========== Custom Alert Modal ========== */
 .custom-alert {
   position: fixed;
