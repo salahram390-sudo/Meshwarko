@@ -11,14 +11,6 @@ export function moneyEGP(value) {
   return `${Math.round(n)} ج`;
 }
 
-export function debounce(fn, wait = 350) {
-  let t = null;
-  return (...args) => {
-    clearTimeout(t);
-    t = setTimeout(() => fn(...args), wait);
-  };
-}
-
 export function escapeHtml(s) {
   return String(s ?? "")
     .replaceAll("&", "&amp;")
@@ -26,10 +18,6 @@ export function escapeHtml(s) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-export function nowTs() {
-  return Date.now();
 }
 
 export function timestampToMillis(ts) {
@@ -95,7 +83,6 @@ export function haversineMeters(a, b) {
   const c = 2 * Math.atan2(Math.sqrt(aa), Math.sqrt(1 - aa));
   return R * c;
 }
-
 
 export function formatRideDate(ts) {
   const ms = timestampToMillis(ts);
