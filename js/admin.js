@@ -115,8 +115,8 @@ let allDriversOnline = [];
 
 logoutBtn?.addEventListener("click", async () => {
   await signOut(auth);
-  localStorage.removeItem("lastRole");   // ← ← ← السطر الجديد
-  localStorage.removeItem("lastAppPage");   // ← ← ← السطر الجديد
+  localStorage.removeItem("lastRole");
+  localStorage.removeItem("lastAppPage");
   location.href = "./index.html";
 });
 
@@ -304,15 +304,12 @@ function onlineDriverCard(d) {
 }
 
 async function deleteUserAppData(userId) {
-  // حذف من users (لازم ينجح)
   await deleteDoc(doc(db, "users", userId));
 
-  // حذف من driversOnline (لو فشل مش مشكلة)
   await deleteDoc(doc(db, "driversOnline", userId)).catch((err) => {
     console.warn("driversOnline delete skipped:", err?.message || err);
   });
 
-  // هات الرحلات المرتبطة
   const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", userId)));
   const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", userId)));
 
@@ -354,37 +351,37 @@ async function handleUsersClick(e) {
   }
 
   const deleteBtn = e.target.closest('[data-action="delete-user"]');
-if (deleteBtn) {
-  const id = deleteBtn.dataset.id;
-  const u = allUsers.find((x) => x.id === id);
-  if (!u) return;
+  if (deleteBtn) {
+    const id = deleteBtn.dataset.id;
+    const u = allUsers.find((x) => x.id === id);
+    if (!u) return;
 
-  if (currentAdmin?.uid === id) {
-    alert("لا يمكنك حذف حسابك الحالي من لوحة الإدارة.");
+    if (currentAdmin?.uid === id) {
+      alert("لا يمكنك حذف حسابك الحالي من لوحة الإدارة.");
+      return;
+    }
+
+    const ok1 = confirm(`هل أنت متأكد من حذف المستخدم "${u.name || u.email || id}" نهائيًا؟`);
+    if (!ok1) return;
+
+    const ok2 = confirm("سيتم حذف بياناته من التطبيق والرحلات المرتبطة به. هل تريد المتابعة؟");
+    if (!ok2) return;
+
+    try {
+      await deleteUserAppData(id);
+
+      notify({
+        title: "الإدارة",
+        body: "تم حذف المستخدم من التطبيق",
+        tag: "delete-user"
+      });
+    } catch (err) {
+      console.error("DELETE USER ERROR:", err);
+      alert("فشل حذف المستخدم: " + (err?.message || err));
+    }
+
     return;
   }
-
-  const ok1 = confirm(`هل أنت متأكد من حذف المستخدم "${u.name || u.email || id}" نهائيًا؟`);
-  if (!ok1) return;
-
-  const ok2 = confirm("سيتم حذف بياناته من التطبيق والرحلات المرتبطة به. هل تريد المتابعة؟");
-  if (!ok2) return;
-
-  try {
-    await deleteUserAppData(id);
-
-    notify({
-      title: "الإدارة",
-      body: "تم حذف المستخدم من التطبيق",
-      tag: "delete-user"
-    });
-  } catch (err) {
-    console.error("DELETE USER ERROR:", err);
-    alert("فشل حذف المستخدم: " + (err?.message || err));
-  }
-
-  return;
-}
 
   const walletBtn = e.target.closest('[data-action="wallet-user"]');
   if (walletBtn) {
@@ -555,8 +552,6 @@ function rerenderAll() {
 }
 
 onAuthStateChanged(auth, async (user) => {
-  console.log("ADMIN CHECK UID:", user?.uid);
-
   if (!user) {
     location.href = "./index.html";
     return;
@@ -565,9 +560,6 @@ onAuthStateChanged(auth, async (user) => {
   await ensureNotificationPermission(true);
 
   const me = await getDoc(doc(db, "users", user.uid));
-
-  console.log("ME EXISTS:", me.exists());
-  console.log("ME DATA:", me.exists() ? me.data() : null);
 
   if (!me.exists() || me.data().role !== "admin" || me.data().status === "blocked") {
     location.href = "./index.html";
