@@ -1,41 +1,35 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-  <script>
-  document.documentElement.style.visibility = "hidden";
-</script>
-  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function (OneSignal) {
-    try {
-      await OneSignal.init({
-  appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
-  serviceWorkerParam: { scope: "/" },
-  serviceWorkerPath: "/OneSignalSDKWorker.js",
-  notifyButton: { enable: false },
-  allowLocalhostAsSecureOrigin: false,
-  autoResubscribe: true,
-  autoPrompt: false,
-  // 🔔 إعدادات الصوت
-  safari_web_id: null,
-  webConfig: {
-    showNotifications: true,
-    showNotificationSound: true,
-  }
-});
-      console.log("✅ OneSignal initialized");
-    } catch (e) {
-      console.warn("⚠️ OneSignal init failed (non-critical):", e?.message);
-      // لا نوقف باقي الصفحة
-    }
-  });
-</script>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Meshwarko - الراكب</title>
   <link rel="stylesheet" href="./assets/styles.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <script>
+    document.documentElement.style.visibility = "hidden";
+  </script>
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      try {
+        await OneSignal.init({
+          appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
+          serviceWorkerParam: { scope: "/" },
+          serviceWorkerPath: "/OneSignalSDKWorker.js",
+          notifyButton: { enable: false },
+          allowLocalhostAsSecureOrigin: false,
+          autoResubscribe: true,
+          autoPrompt: false
+        });
+      } catch (e) {
+        console.warn("OneSignal init failed:", e?.message);
+      }
+    });
+  </script>
 </head>
 <body>
   <div class="app-shell">
@@ -101,81 +95,79 @@
         </div>
 
         <div class="panel-body">
-  <div class="form-row" style="margin-top:10px">
-    <label class="label">مكان القيام</label>
-    <div class="input-group">
-      <input id="pickupText" class="input" placeholder="ابحث عن المكان..." />
-      <button id="pickupSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
-      <button id="pickupPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
-      <button id="pickupMyLoc" class="btn ghost small map-btn" type="button">📍 موقعي</button>
-    </div>
-    <div id="pickupResults" class="search-results hidden"></div>
-  </div>
+          <div class="form-row" style="margin-top:10px">
+            <label class="label">مكان القيام</label>
+            <div class="input-group">
+              <input id="pickupText" class="input" placeholder="ابحث عن المكان..." />
+              <button id="pickupSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
+              <button id="pickupPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
+              <button id="pickupMyLoc" class="btn ghost small map-btn" type="button">📍 موقعي</button>
+            </div>
+            <div id="pickupResults" class="search-results hidden"></div>
+          </div>
 
-  <div class="form-row">
-    <label class="label">مكان الوصول</label>
-    <div class="input-group">
-      <input id="dropText" class="input" placeholder="ابحث عن المكان..." />
-      <button id="dropSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
-      <button id="dropPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
-    </div>
-    <div id="dropResults" class="search-results hidden"></div>
+          <div class="form-row">
+            <label class="label">مكان الوصول</label>
+            <div class="input-group">
+              <input id="dropText" class="input" placeholder="ابحث عن المكان..." />
+              <button id="dropSearchBtn" class="btn ghost small search-btn" type="button">🔍</button>
+              <button id="dropPick" class="btn ghost small map-btn" type="button">من الخريطة</button>
+            </div>
+            <div id="dropResults" class="search-results hidden"></div>
+          </div>
 
-<!-- خانة نبذة عن المشوار -->
-<div class="form-row">
-  <label class="label">نبذة عن المشوار</label>
-  <textarea id="rideNote" class="input" placeholder="اكتب نبذة عن مشوارك..."></textarea>
-</div>
-  </div>
+          <div class="form-row">
+            <label class="label">نبذة عن المشوار</label>
+            <textarea id="rideNote" class="input" placeholder="اكتب نبذة عن مشوارك..."></textarea>
+          </div>
 
-  <div class="card-lite">
-    <div class="panel-title">نوع المركبة</div>
+          <div class="card-lite">
+            <div class="panel-title">نوع المركبة</div>
 
-    <div class="form-row" style="margin-top:10px">
-      <label class="label">نوع المركبة</label>
-      <div id="pVehicles" class="vehicle-grid"></div>
-    </div>
+            <div class="form-row" style="margin-top:10px">
+              <label class="label">نوع المركبة</label>
+              <div id="pVehicles" class="vehicle-grid"></div>
+            </div>
 
-    <p class="hint" id="passengerAreaHint">
-      يتم استخدام المحافظة والمركز المحفوظين في حسابك تلقائيًا.
-    </p>
-  </div>
+            <p class="hint" id="passengerAreaHint">
+              يتم استخدام المحافظة والمركز المحفوظين في حسابك تلقائيًا.
+            </p>
+          </div>
 
-  <div class="card-lite">
-    <div class="row-between">
-      <div>
-        <div class="label-inline">السعر المقترح</div>
-        <div class="price" id="priceValue">—</div>
-      </div>
-      <div class="muted" id="distanceValue">—</div>
-    </div>
+          <div class="card-lite">
+            <div class="row-between">
+              <div>
+                <div class="label-inline">السعر المقترح</div>
+                <div class="price" id="priceValue">—</div>
+              </div>
+              <div class="muted" id="distanceValue">—</div>
+            </div>
 
-    <div class="form-row" style="margin-top:12px">
-  <label class="label">السعر (خطوة 5 جنيه)</label>
-  
-  <div style="display: flex; align-items: center; gap: 12px; margin: 10px 0;">
-    
-    <button id="priceMinus" class="price-btn" 
-            style="width: 42px; height: 42px; font-size: 18px; border-radius: 8px; background: #333; color: white; border: none; display: flex; align-items: center; justify-content: center;">
-      −
-    </button>
-    
-    <input id="priceSlider" class="slider" type="range" min="15" max="3000" step="5" value="50" style="flex: 1;"/>
-    
-    <button id="pricePlus" class="price-btn" 
-            style="width: 42px; height: 42px; font-size: 18px; border-radius: 8px; background: #333; color: white; border: none; display: flex; align-items: center; justify-content: center;">
-      +
-    </button>
-  </div>
+            <div class="form-row" style="margin-top:12px">
+              <label class="label">السعر (خطوة 5 جنيه)</label>
 
-  <div class="row-between muted small">
-    <span>15</span><span>1500</span><span>3000</span>
-  </div>
-</div>
-    
-    <p class="hint" id="surgeHint">يتم تحسين السعر حسب المسافة وزمن الذروة تلقائيًا.</p>
-  </div>
-          
+              <div style="display: flex; align-items: center; gap: 12px; margin: 10px 0;">
+                <button id="priceMinus" class="price-btn"
+                        style="width: 42px; height: 42px; font-size: 18px; border-radius: 8px; background: #333; color: white; border: none; display: flex; align-items: center; justify-content: center;">
+                  −
+                </button>
+
+                <input id="priceSlider" class="slider" type="range" min="15" max="3000" step="5" value="50" style="flex: 1;"/>
+
+                <button id="pricePlus" class="price-btn"
+                        style="width: 42px; height: 42px; font-size: 18px; border-radius: 8px; background: #333; color: white; border: none; display: flex; align-items: center; justify-content: center;">
+                  +
+                </button>
+              </div>
+
+              <div class="row-between muted small">
+                <span>15</span><span>1500</span><span>3000</span>
+              </div>
+            </div>
+
+            <p class="hint" id="surgeHint">يتم تحسين السعر حسب المسافة وزمن الذروة تلقائيًا.</p>
+          </div>
+
           <div class="actions">
             <button id="btnRequest" class="btn request-btn" type="button">إرسال الطلب</button>
             <button id="btnCancel" class="btn danger" type="button" disabled style="display:none">إلغاء</button>
@@ -184,25 +176,26 @@
           <div class="divider"></div>
 
           <div class="card-lite ride-status-card">
-  <div class="panel-title">حالة الطلب / التفاوض</div>
+            <div class="panel-title">حالة الطلب / التفاوض</div>
             <div class="ride-card" id="rideCard">
               <div class="muted">لا يوجد طلب نشط.</div>
             </div>
-            <div class="actions" style="margin-top:10px">
-  <button id="btnAcceptOffer" class="btn success" type="button" disabled style="display:none">قبول سعر السائق</button>
-  <button id="btnRejectOffer" class="btn danger" type="button" disabled style="display:none">رفض السعر</button>
-</div>
-            
-            <div class="actions" style="margin-top:10px">
-  <button id="btnTrack" class="btn ghost" type="button" disabled style="display:none">تتبع الرحلة</button>
-  <button id="btnComplete" class="btn danger" type="button" disabled style="display:none">إنهاء الرحلة</button>
-  <button id="btnChatPassenger" class="btn primary" type="button" disabled style="display:none">محادثة</button>
-</div>
 
             <div class="actions" style="margin-top:10px">
-  <button id="btnCall" class="btn ghost" type="button" disabled style="display:none">اتصال بالسائق</button>
-  <button id="btnWhats" class="btn ghost" type="button" disabled style="display:none">واتساب</button>
-</div>
+              <button id="btnAcceptOffer" class="btn success" type="button" disabled style="display:none">قبول سعر السائق</button>
+              <button id="btnRejectOffer" class="btn danger" type="button" disabled style="display:none">رفض السعر</button>
+            </div>
+
+            <div class="actions" style="margin-top:10px">
+              <button id="btnTrack" class="btn ghost" type="button" disabled style="display:none">تتبع الرحلة</button>
+              <button id="btnComplete" class="btn danger" type="button" disabled style="display:none">إنهاء الرحلة</button>
+              <button id="btnChatPassenger" class="btn primary" type="button" disabled style="display:none">محادثة</button>
+            </div>
+
+            <div class="actions" style="margin-top:10px">
+              <button id="btnCall" class="btn ghost" type="button" disabled style="display:none">اتصال بالسائق</button>
+              <button id="btnWhats" class="btn ghost" type="button" disabled style="display:none">واتساب</button>
+            </div>
           </div>
 
           <div class="spacer"></div>
@@ -272,21 +265,17 @@
         </div>
         <div id="passengerAccountInfo" style="margin-top:12px"></div>
 
-<div style="margin-top:15px">
-  <button
-    id="deleteAccountBtn"
-    class="btn danger"
-    type="button"
-    style="width:100%">
-    حذف الحساب نهائياً
-  </button>
-</div>
+        <div style="margin-top:15px">
+          <button id="deleteAccountBtn" class="btn danger" type="button" style="width:100%">
+            حذف الحساب نهائياً
+          </button>
+        </div>
       </div>
     </div>
 
     <div id="toastRoot"></div>
   </div>
-  
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="./js/passenger.js"></script>
 
@@ -366,29 +355,21 @@
     </div>
   </div>
 
-  <!-- ====================== Eruda Console (مفعل) ====================== -->
-  <script>
-    (function () {
-      var s = document.createElement('script');
-      s.src = "https://cdn.jsdelivr.net/npm/eruda";
-      s.onload = function () { eruda.init(); };
-      document.body.appendChild(s);
-    })();
-  </script>
   <div id="customSelectSheet" class="custom-select-sheet hidden">
-  <div class="custom-select-backdrop"></div>
-  <div class="custom-select-panel">
-    <div class="custom-select-head">
-      <div class="custom-select-title" id="customSelectTitle">اختر</div>
-      <button class="custom-select-close" id="customSelectClose" type="button">✕</button>
+    <div class="custom-select-backdrop"></div>
+    <div class="custom-select-panel">
+      <div class="custom-select-head">
+        <div class="custom-select-title" id="customSelectTitle">اختر</div>
+        <button class="custom-select-close" id="customSelectClose" type="button">✕</button>
+      </div>
+      <div class="custom-select-options" id="customSelectOptions"></div>
     </div>
-    <div class="custom-select-options" id="customSelectOptions"></div>
   </div>
-</div>
+
   <script>
-  setTimeout(() => {
-    document.documentElement.style.visibility = "visible";
-  }, 2000);
-</script>
+    setTimeout(() => {
+      document.documentElement.style.visibility = "visible";
+    }, 2000);
+  </script>
 </body>
 </html>
