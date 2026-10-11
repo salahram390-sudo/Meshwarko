@@ -2331,17 +2331,6 @@ input[type="range"] {
   box-shadow: none !important;
 }
 
-/* إزالة الإطار الذهبي من كارت "حالة الطلب" */
-.ride-status-card {
-  border: none !important;
-  background: #050607 !important;
-  box-shadow: none !important;
-}
-
-.ride-status-card::after {
-  display: none !important;
-}
-
 /* ========== Custom Alert Modal ========== */
 .custom-alert {
   position: fixed;
@@ -2451,7 +2440,7 @@ input[type="range"] {
   padding: 16px 18px;
   border-bottom: 1px solid rgba(212, 175, 55, 0.15);
   flex: 0 0 auto;
-  background: #000000;   /* ← ← ← السطر الجديد */
+  background: #000000; 
 }
 .custom-select-title {
   color: #FFD700;
@@ -2476,7 +2465,7 @@ input[type="range"] {
   flex: 1 1 auto;
   overflow-y: auto;
   padding: 6px 0 20px;
-  background: #000000;   /* ← ← ← السطر الجديد */
+  background: #000000;   
 }
 .custom-select-option {
   width: 100%;

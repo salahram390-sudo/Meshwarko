@@ -75,6 +75,7 @@
         <button id="drawerSupportDriver" class="drawer-item" type="button">🛟 الدعم</button>
         <button id="editProfileBtn" class="drawer-item" type="button">✏️ تعديل البيانات</button>
         <button id="switchRoleBtn" class="drawer-item" type="button">🔄 التحويل إلى راكب</button>
+        <button id="deleteAccountBtn" class="drawer-item danger" type="button">🗑️ حذف الحساب نهائياً</button>
         <button id="logoutBtn" class="drawer-item danger" type="button">🚪 تسجيل الخروج</button>
       </div>
     </aside>
@@ -235,19 +236,41 @@
   </div>
 </div>
 
+    <!-- Modal تأكيد حذف الحساب -->
+<div id="deleteAccountModal" class="modal hidden" role="dialog" aria-modal="true">
+  <div class="modal-backdrop" id="deleteAccountBackdrop"></div>
+  <div class="modal-card" style="max-width: 400px;">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title">⚠️ حذف الحساب نهائياً</div>
+        <div class="panel-sub">هذا الإجراء لا يمكن التراجع عنه</div>
+      </div>
+    </div>
+    <div style="padding: 18px 0; font-size: 14.5px; line-height: 1.7; color: #ddd;">
+      سيتم حذف:
+      <ul style="margin: 10px 0; padding-right: 20px;">
+        <li>بيانات حسابك بالكامل</li>
+        <li>سجل الرحلات</li>
+        <li>المحادثات</li>
+        <li>محفظتك (لو فيها رصيد)</li>
+      </ul>
+      <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 12px; padding: 10px; margin-top: 12px; color: #fca5a5; font-size: 13px;">
+        ⚠️ لأسباب أمنية، لو حسابك قديم، ممكن تحتاج تسجل دخول تاني قبل الحذف.
+      </div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button id="deleteAccountCancel" class="btn ghost" style="flex:1;" type="button">إلغاء</button>
+      <button id="deleteAccountConfirm" class="btn danger" style="flex:1;" type="button">حذف نهائي</button>
+    </div>
+  </div>
+</div>
+    
+
 <div id="toastRoot"></div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script type="module" src="./js/driver.js"></script>
-  <script>
-    (function () {
-      var s = document.createElement('script');
-      s.src = "https://cdn.jsdelivr.net/npm/eruda";
-      s.onload = function () { eruda.init(); };
-      document.body.appendChild(s);
-    })();
-  </script>
   <div id="customSelectSheet" class="custom-select-sheet hidden">
   <div class="custom-select-backdrop"></div>
   <div class="custom-select-panel">

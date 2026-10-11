@@ -17,84 +17,71 @@ import {
 } from "./map.js";
 import { loadEgyptAdmin } from "./admin_data.js";
 import { notify, ensureNotificationPermission, playSound, startRequestSound, stopRequestSound } from "./notify.js";
-// ====================== FCM Push Notifications (Driver) ======================
+
+// ====================== Push Notifications (Driver) ======================
 async function initDriverPushNotifications() {
   try {
     const token = await initFirebaseMessaging(
       myUser?.uid || auth.currentUser?.uid
     );
 
-    // 🔔 إنشاء Android Notification Channel بأهمية عالية
-try {
-  if (window.median && window.median.notifications && window.median.notifications.createChannel) {
-    window.median.notifications.createChannel({
-      id: "meshwarko-rides",
-      name: "طلبات المشاوير",
-      description: "إشعارات طلبات المشاوير الجديدة",
-      importance: "high",
-      sound: "default",
-      vibration: true,
-      lights: true,
-      lightColor: "#FFD700",
-      lockscreenVisibility: "public"
-    });
-    console.log("✅ Notification Channel created");
-  } else {
-    console.log("ℹ️ Median notifications API not available");
-  }
-} catch (e) {
-  console.warn("⚠️ Channel creation failed:", e);
-}
+    // إنشاء Android Notification Channel
+    try {
+      if (window.median && window.median.notifications && window.median.notifications.createChannel) {
+        window.median.notifications.createChannel({
+          id: "meshwarko-rides",
+          name: "طلبات المشاوير",
+          description: "إشعارات طلبات المشاوير الجديدة",
+          importance: "high",
+          sound: "default",
+          vibration: true,
+          lights: true,
+          lightColor: "#FFD700",
+          lockscreenVisibility: "public"
+        });
+      }
+    } catch (e) {
+      console.warn("Channel creation failed:", e);
+    }
 
     // ============ OneSignal: Web + Median ============
-console.log("🔍 OneSignal setup starting...");
-console.log("🔍 driverUid:", myUser?.uid, "| authUid:", auth.currentUser?.uid);
-console.log("🔍 median exists?", !!window.median);
-console.log("🔍 median.onesignal exists?", !!(window.median && window.median.onesignal));
+    const driverUid = myUser?.uid || auth.currentUser?.uid;
 
-const driverUid = myUser?.uid || auth.currentUser?.uid;
+    if (driverUid) {
+      if (window.median && window.median.onesignal) {
+        try {
+          await window.median.onesignal.register();
 
-if (driverUid) {
-  if (window.median && window.median.onesignal) {
-    try {
-      await window.median.onesignal.register();
-      console.log("✅ OneSignal registered");
-      
-      await Promise.race([
-  window.median.onesignal.login(driverUid),
-  new Promise(resolve => setTimeout(resolve, 3000))
-]);
-      console.log("✅ External User ID set:", driverUid);
+          await Promise.race([
+            window.median.onesignal.login(driverUid),
+            new Promise(resolve => setTimeout(resolve, 3000))
+          ]);
 
-      // إضافة Tags
-try {
-  window.location.href = 'gonative://onesignal/tags/set?tags=' + encodeURIComponent(JSON.stringify({"role":"driver"}));
-  console.log("✅ Tag added: driver");
-} catch (e) {
-  console.warn("⚠️ Tag add failed:", e);
-}
-      
-      window.median.onesignal.enableForegroundNotifications(true);
-    } catch (e) {
-      console.warn("⚠️ Median OneSignal error:", e);
+          try {
+            window.location.href = 'gonative://onesignal/tags/set?tags=' + encodeURIComponent(JSON.stringify({"role":"driver"}));
+          } catch (e) {
+            console.warn("Tag add failed:", e);
+          }
+
+          window.median.onesignal.enableForegroundNotifications(true);
+        } catch (e) {
+          console.warn("Median OneSignal error:", e);
+        }
+      } else if (window.OneSignalDeferred) {
+        window.OneSignalDeferred.push(async function (OneSignal) {
+          await OneSignal.login(driverUid);
+        });
+      } else {
+        console.warn("OneSignal not available in driver.js");
+      }
+    } else {
+      console.warn("driverUid is empty");
     }
-  } else if (window.OneSignalDeferred) {
-    window.OneSignalDeferred.push(async function (OneSignal) {
-      await OneSignal.login(driverUid);
-      console.log("✅ OneSignal (Web) linked to DRIVER UID:", driverUid);
-    });
-  } else {
-    console.warn("⚠️ OneSignal not available in driver.js");
-  }
-} else {
-  console.warn("⚠️ driverUid is empty");
-}
-// ================================================
+    // ================================================
 
-    console.log("Driver FCM initialized:", !!token);
-
+    return token;
   } catch (error) {
-    console.error("❌ Driver Push Setup Failed:", error);
+    console.error("Driver Push Setup Failed:", error);
   }
 }
 
@@ -172,8 +159,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-console.log("driver.js loaded ✅");
-
 localStorage.setItem("lastAppPage", "driver.html");
 const meBadge = $("#meBadge");
 const logoutBtn = $("#logoutBtn");
@@ -224,6 +209,11 @@ const chatCloseDriver = $("#chatCloseDriver");
 const chatMessagesDriver = $("#chatMessagesDriver");
 const chatInputDriver = $("#chatInputDriver");
 const chatSendDriver = $("#chatSendDriver");
+const deleteAccountBtn = $("#deleteAccountBtn");
+const deleteAccountModal = $("#deleteAccountModal");
+const deleteAccountBackdrop = $("#deleteAccountBackdrop");
+const deleteAccountCancel = $("#deleteAccountCancel");
+const deleteAccountConfirm = $("#deleteAccountConfirm");
 
 const map = createMap("map", { center: [26.56, 31.70], zoom: 13 });
 const routeLayerRef = { current: null };
@@ -248,7 +238,6 @@ const MAX_VISIBLE_RIDE_DISTANCE_M = 8000;
 const AUTO_COMPLETE_DISTANCE_M = 100;
 let autoCompletingRide = false;
 let completedHandledForRideId = null;
-let lastOpenRideIds = new Set();
 const ignoredRideIds = new Set();
 let requestSoundActive = false;
 
@@ -369,7 +358,6 @@ function isRideVisibleForDriver(ride) {
   const myUid = auth.currentUser?.uid || null;
   const status = String(ride.status || "");
 
-  // ✅ رفض فوري للحالات المنتهية
   if (status === "canceled" || status === "completed" || status === "driver_declined") {
     return false;
   }
@@ -377,15 +365,12 @@ function isRideVisibleForDriver(ride) {
   if (!isActiveRideStatus(status)) return false;
   if (isRideExpired(ride, getRideFreshMaxAgeMs(status))) return false;
 
-  // لو الطلب اتاخد بسائق تاني، اخفيه
   if (ride.driverId && ride.driverId !== myUid) return false;
 
-  // نفس نوع المركبة
   if (myUser?.vehicleType && ride.vehicleType && myUser.vehicleType !== ride.vehicleType) {
     return false;
   }
 
-  // نفس المحافظة والمركز احتياطيًا
   if (myUser?.governorate && ride.governorate && ride.governorate !== myUser.governorate) {
     return false;
   }
@@ -409,15 +394,15 @@ function getRideDistanceToMe(ride) {
 function syncOfferBtn() { const v = Number((offerInput.value || "").trim()); btnSendOffer.disabled = !selectedRideId || !Number.isFinite(v) || v <= 0; }
 function syncIncomingRequestSound(rides = []) {
   const myUid = auth.currentUser?.uid || null;
-  
-  const openRideIds = new Set( 
-    rides 
-      .filter((r) => r.status === "requested" && !r.driverId) 
-      .map((r) => r.id) 
+
+  const openRideIds = new Set(
+    rides
+      .filter((r) => r.status === "requested" && !r.driverId)
+      .map((r) => r.id)
   );
 
-  const hasMineActiveRide = rides.some( 
-    (r) => r.driverId === myUid && ["accepted", "arrived", "started"].includes(r.status) 
+  const hasMineActiveRide = rides.some(
+    (r) => r.driverId === myUid && ["accepted", "arrived", "started"].includes(r.status)
   );
 
   if (hasMineActiveRide || openRideIds.size === 0) {
@@ -431,9 +416,8 @@ function syncIncomingRequestSound(rides = []) {
       requestSoundActive = true;
     }
   }
-
-  lastOpenRideIds = openRideIds;
 }
+
 menuBtnDriver?.addEventListener("click", openDriverDrawer);
 drawerCloseDriver?.addEventListener("click", closeDriverDrawer);
 drawerBackdropDriver?.addEventListener("click", closeDriverDrawer);
@@ -474,26 +458,26 @@ async function completeRideCore({ auto = false } = {}) {
     if (ride.status === "completed" || ride.status === "canceled") return;
     if (ride.status !== "started") return;
     await updateDoc(rideRef, { status: "completed", completedAt: serverTimestamp(), archived: true, autoCompleted: auto });
-    // ============ إشعار الراكب: انتهت الرحلة ============
-try {
-  if (ride?.passengerId) {
-    await fetch("https://meshwarko-push.salahram390.workers.dev", {
-      method: "POST",
-      headers: { 
-  "Content-Type": "application/json", 
-  "Authorization": `Bearer ${await auth.currentUser.getIdToken()}` 
-},
-      body: JSON.stringify({
-        driverUids: [ride.passengerId],
-        title: "وصلت! 🎉",
-        body: "تم إنهاء الرحلة بنجاح. لا تنسَ تقييم السائق",
-        data: { type: "ride_completed", rideId: selectedRideId }
-      })
-    });
-    console.log("✅ تم إرسال إشعار للراكب: انتهت الرحلة");
-  }
-} catch (err) { console.error("❌ فشل إشعار الإنهاء:", err?.message || err); }
-// ====================================================
+
+    // إشعار الراكب: انتهت الرحلة
+    try {
+      if (ride?.passengerId) {
+        await fetch("https://meshwarko-push.salahram390.workers.dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+          },
+          body: JSON.stringify({
+            driverUids: [ride.passengerId],
+            title: "وصلت! 🎉",
+            body: "تم إنهاء الرحلة بنجاح. لا تنسَ تقييم السائق",
+            data: { type: "ride_completed", rideId: selectedRideId }
+          })
+        });
+      }
+    } catch (err) { console.warn("فشل إشعار الإنهاء:", err?.message || err); }
+
     if (ride && myUser) {
       const price = Number(ride.price || 0); const walletBalance = Number(myUser.walletBalance || 0) + price; const totalEarnings = Number(myUser.totalEarnings || 0) + price; const completedTrips = Number(myUser.completedTrips || 0) + 1;
       await updateDoc(doc(db, "users", myUser.uid), { walletBalance, totalEarnings, completedTrips, updatedAt: serverTimestamp() }).catch(() => {});
@@ -511,10 +495,10 @@ try {
       }
     }
     stopRequestSound();
-requestSoundActive = false;
-playSound("success");
-finalizeDriverRideCleanup(auto ? "تم الوصول وإنهاء الرحلة تلقائيًا." : "تمت الرحلة بنجاح ✅");
-notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الوصول لمكان الوصول وإنهاء الرحلة تلقائيًا." : "تم إنهاء الرحلة بنجاح.", tag: auto ? "ride-auto-complete" : "ride-complete" });
+    requestSoundActive = false;
+    playSound("success");
+    finalizeDriverRideCleanup(auto ? "تم الوصول وإنهاء الرحلة تلقائيًا." : "تمت الرحلة بنجاح ✅");
+    notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الوصول لمكان الوصول وإنهاء الرحلة تلقائيًا." : "تم إنهاء الرحلة بنجاح.", tag: auto ? "ride-auto-complete" : "ride-complete" });
   } catch (e) { console.error(e); setDriverStatus("خطأ"); }
   finally { if (auto) autoCompletingRide = false; }
 }
@@ -523,150 +507,115 @@ notify({ title: "تمت الرحلة بنجاح 🎉", body: auto ? "تم الو
 let declineCallback = null;
 
 async function declineRide() {
-    if (!selectedRideId || !selectedRideData) {
-        notify({ title: "خطأ", body: "لا يوجد رحلة محددة", tag: "error" });
-        return;
-    }
-
-    const status = selectedRideData.status || "";
-    if (!["accepted", "arrived"].includes(status)) {
-        notify({ title: "غير مسموح", body: "لا يمكن الاعتذار في هذه المرحلة", tag: "error" });
-        return;
-    }
-
-    // عرض الـ Modal الاحترافي
-    const modal = document.getElementById('declineConfirmModal');
-    modal.classList.remove('hidden');
-    document.getElementById('declineBackdrop').classList.add('show');
-
-    // إعداد الأزرار
-    declineCallback = async () => {
-        try {
-            setDriverStatus("جاري الاعتذار...");
-
-            await updateDoc(doc(db, "rides", selectedRideId), {
-                status: "driver_declined",
-                declinedAt: serverTimestamp(),
-                declinedBy: myUser.uid,
-                declinedReason: "اعتذار السائق قبل بدء الرحلة"
-            });
-
-          // ============ إشعار الراكب: السائق اعتذر ============
-try {
-  if (selectedRideData.passengerId) {
-    await fetch("https://meshwarko-push.salahram390.workers.dev", {
-      method: "POST",
-      headers: { 
-  "Content-Type": "application/json", 
-  "Authorization": `Bearer ${await auth.currentUser.getIdToken()}` 
-},
-      body: JSON.stringify({
-        driverUids: [selectedRideData.passengerId],
-        title: "السائق اعتذر ⚠️",
-        body: "السائق اعتذر عن الرحلة. جاري البحث عن سائق آخر...",
-        data: { type: "driver_declined", rideId: selectedRideId }
-      })
-    });
-    console.log("✅ إشعار: السائق اعتذر");
+  if (!selectedRideId || !selectedRideData) {
+    notify({ title: "خطأ", body: "لا يوجد رحلة محددة", tag: "error" });
+    return;
   }
-} catch (e) { console.error("❌ فشل:", e?.message); }
 
-            if (selectedRideData.passengerId) {
-                await notify({
-                    userId: selectedRideData.passengerId,
-                    title: "اعتذار السائق",
-                    body: "السائق اعتذر عن الرحلة. جاري البحث عن سائق آخر...",
-                    tag: "ride-declined"
-                });
-            }
+  const status = selectedRideData.status || "";
+  if (!["accepted", "arrived"].includes(status)) {
+    notify({ title: "غير مسموح", body: "لا يمكن الاعتذار في هذه المرحلة", tag: "error" });
+    return;
+  }
 
-            notify({ title: "تم الاعتذار", body: "تم إرجاع الطلب بنجاح", tag: "success" });
-            playSound("notification");
+  const modal = document.getElementById('declineConfirmModal');
+  modal.classList.remove('hidden');
+  document.getElementById('declineBackdrop').classList.add('show');
 
-            resetSelectedRideUi("تم الاعتذار عن الرحلة");
-            watchRidesForDriver();
+  declineCallback = async () => {
+    try {
+      setDriverStatus("جاري الاعتذار...");
 
-        } catch (error) {
-            console.error("Decline ride error:", error);
-            notify({ title: "خطأ", body: "حدث خطأ أثناء الاعتذار", tag: "error" });
+      await updateDoc(doc(db, "rides", selectedRideId), {
+        status: "driver_declined",
+        declinedAt: serverTimestamp(),
+        declinedBy: myUser.uid,
+        declinedReason: "اعتذار السائق قبل بدء الرحلة"
+      });
+
+      // إشعار الراكب: السائق اعتذر
+      try {
+        if (selectedRideData.passengerId) {
+          await fetch("https://meshwarko-push.salahram390.workers.dev", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+            },
+            body: JSON.stringify({
+              driverUids: [selectedRideData.passengerId],
+              title: "السائق اعتذر ⚠️",
+              body: "السائق اعتذر عن الرحلة. جاري البحث عن سائق آخر...",
+              data: { type: "driver_declined", rideId: selectedRideId }
+            })
+          });
         }
-    };
+      } catch (e) { console.warn("فشل إشعار الاعتذار:", e?.message); }
+
+      notify({ title: "تم الاعتذار", body: "تم إرجاع الطلب بنجاح", tag: "success" });
+      playSound("notify");
+
+      resetSelectedRideUi("تم الاعتذار عن الرحلة");
+      watchRidesForDriver();
+
+    } catch (error) {
+      console.error("Decline ride error:", error);
+      notify({ title: "خطأ", body: "حدث خطأ أثناء الاعتذار", tag: "error" });
+    }
+  };
 }
 
-// إغلاق الـ Modal
 function closeDeclineModal() {
-    const modal = document.getElementById('declineConfirmModal');
-    modal.classList.add('hidden');
-    document.getElementById('declineBackdrop').classList.remove('show');
-    declineCallback = null;
+  const modal = document.getElementById('declineConfirmModal');
+  modal.classList.add('hidden');
+  document.getElementById('declineBackdrop').classList.remove('show');
+  declineCallback = null;
 }
 
-// ربط الأزرار (ضعها بعد تعريف الدوال)
 document.getElementById('declineCancelBtn')?.addEventListener('click', closeDeclineModal);
 document.getElementById('declineConfirmBtn')?.addEventListener('click', () => {
-    if (declineCallback) declineCallback();
-    closeDeclineModal();
+  if (declineCallback) declineCallback();
+  closeDeclineModal();
 });
 
 async function tryAutoCompleteCurrentRide() { if (!selectedRideId || !selectedRideData || selectedRideData.status !== "started" || !isDriverNearDropoff(selectedRideData)) return; await completeRideCore({ auto: true }); }
 function finalizeDriverRideCleanup(successMessage = "تمت الرحلة بنجاح ✅") { try { closeDriverDrawer(); closeDriverChatModal(); resetSelectedRideUi(successMessage); setDriverStatus("متاح"); } catch (e) { console.error("Driver cleanup error:", e); } }
 function resetSelectedRideUi(message = "لم يتم تحديد طلب.") {
-  if (acceptedRideUnsub) { 
-    acceptedRideUnsub(); 
-    acceptedRideUnsub = null; 
+  if (acceptedRideUnsub) {
+    acceptedRideUnsub();
+    acceptedRideUnsub = null;
   }
-  
-  selectedRideId = null; 
-  selectedRideData = null; 
+
+  selectedRideId = null;
+  selectedRideData = null;
   completedHandledForRideId = null;
-  
+
   hideSelectedRideBox();
-  clearRouteAndMarkers(); 
-  btnSendOffer.disabled = true; 
-  btnAccept.disabled = true; 
-  btnTrackToggle.disabled = true; 
-  btnCancel.disabled = true; 
-  btnArrived.disabled = true; 
-btnDeclineRide.disabled = true;   // ← أضف ده
-btnComplete.disabled = true;
+  clearRouteAndMarkers();
+  btnSendOffer.disabled = true;
+  btnAccept.disabled = true;
+  btnTrackToggle.disabled = true;
+  btnCancel.disabled = true;
+  btnArrived.disabled = true;
+  btnDeclineRide.disabled = true;
+  btnComplete.disabled = true;
   driverStartRideBtn.disabled = true;
-  
+
   if (btnChatDriver) btnChatDriver.disabled = true;
-  
-  if (chatUnsubDriver) { 
-    chatUnsubDriver(); 
-    chatUnsubDriver = null; 
+
+  if (chatUnsubDriver) {
+    chatUnsubDriver();
+    chatUnsubDriver = null;
   }
-  
-  closeDriverChatModal(); 
-  if (chatMessagesDriver) chatMessagesDriver.innerHTML = ""; 
+
+  closeDriverChatModal();
+  if (chatMessagesDriver) chatMessagesDriver.innerHTML = "";
   if (chatInputDriver) chatInputDriver.value = "";
-  
+
   offerInput.value = "";
 
-  // === إيقاف الصوت بشكل قوي جدًا ===
   stopRequestSound();
   requestSoundActive = false;
-
-  // Force cleanup
-  try {
-    if (typeof requestLoopSource !== "undefined") requestLoopSource = null;
-    if (typeof window.requestLoopSource !== "undefined") window.requestLoopSource = null;
-  } catch (_) {}
-
-  try {
-    if (requestLoopSource) {
-      requestLoopSource.stop(0);
-      requestLoopSource.disconnect();
-      requestLoopSource = null;
-    }
-  } catch (_) {}
-
-  try {
-    if (window.requestLoopSource) window.requestLoopSource = null;
-  } catch (_) {}
-
-  // ========================
 
   stopLiveTracking();
 }
@@ -679,26 +628,24 @@ function updateOwnDriverMarker(lat, lon, pan = false) {
 async function pushDriverOnline() {
   const u = auth.currentUser;
   if (!u || !myUser || !ownDriverPosDocRef) return;
-  
-  // لو الموقع لسه مجاش، نستخدم إحداثيات مؤقتة عشان النبضة تفضل شغالة
-  const lat = myLocation?.lat || 26.56; 
+
+  const lat = myLocation?.lat || 26.56;
   const lon = myLocation?.lon || 31.70;
 
   try {
-    await setDoc(ownDriverPosDocRef, { 
-      uid: u.uid, 
-      name: myUser.name || "", 
-      governorate: myUser.governorate || "", 
-      center: myUser.center || "", 
-      vehicleType: myUser.vehicleType || "", 
-      lat: lat, 
-      lon: lon, 
-      lastSeenMs: Date.now(), 
-      updatedAt: serverTimestamp() 
+    await setDoc(ownDriverPosDocRef, {
+      uid: u.uid,
+      name: myUser.name || "",
+      governorate: myUser.governorate || "",
+      center: myUser.center || "",
+      vehicleType: myUser.vehicleType || "",
+      lat: lat,
+      lon: lon,
+      lastSeenMs: Date.now(),
+      updatedAt: serverTimestamp()
     }, { merge: true });
-    console.log("✅ Heartbeat updated"); // ضفنا اللوج ده عشان نتأكد
-  } catch (e) { 
-    console.error("pushDriverOnline error", e); 
+  } catch (e) {
+    console.error("pushDriverOnline error", e);
   }
 }
 async function cleanupDriverOnline() { try { if (ownDriverPosDocRef) await deleteDoc(ownDriverPosDocRef); } catch (e) { console.warn("cleanupDriverOnline failed", e); } }
@@ -749,61 +696,57 @@ async function drawRideRoute(ride) {
 }
 
 function refreshSelectedRideButtons(ride) {
-  const myUid = auth.currentUser?.uid || null, 
-        mine = ride?.driverId === myUid, 
+  const myUid = auth.currentUser?.uid || null,
+        mine = ride?.driverId === myUid,
         status = String(ride?.status || "");
 
   const canOffer = status === "requested" && !ride?.driverId;
-  const canAccept = (status === "requested" && !ride?.driverId) || 
-                   (status === "offered" && (!ride?.driverId || mine)) || 
+  const canAccept = (status === "requested" && !ride?.driverId) ||
+                   (status === "offered" && (!ride?.driverId || mine)) ||
                    (status === "accepted" && mine);
   const canTrack = mine && ["accepted", "arrived", "started"].includes(status);
   const canArrive = mine && status === "accepted";
   const canStart = mine && status === "arrived";
 
-  // === التعديل الجديد ===
   const canDecline = mine && ["accepted", "arrived"].includes(status);
   const canComplete = mine && (status === "started" || ride?.passengerEndRequested === true);
 
-  const canCancel = (status === "requested" && !ride?.driverId) || 
+  const canCancel = (status === "requested" && !ride?.driverId) ||
   (mine && ["accepted", "arrived", "started", "offered"].includes(status));
   const canChat = mine && ["accepted", "arrived", "started"].includes(status);
 
-  // ✅ لو الطلب منتهي — عطّل كل الأزرار فورًا
-const isFinished = ["canceled", "completed", "driver_declined"].includes(status);
+  const isFinished = ["canceled", "completed", "driver_declined"].includes(status);
 
-if (isFinished) {
-  driverStartRideBtn.disabled = true;
-  btnSendOffer.disabled = true;
-  btnAccept.disabled = true;
-  btnTrackToggle.disabled = true;
-  btnCancel.disabled = true;
-  btnArrived.disabled = true;
-  btnDeclineRide.disabled = true;
-  btnComplete.disabled = true;
-  if (btnChatDriver) btnChatDriver.disabled = true;
-  updateDriverRideUI(ride);
-  return;
-}
+  if (isFinished) {
+    driverStartRideBtn.disabled = true;
+    btnSendOffer.disabled = true;
+    btnAccept.disabled = true;
+    btnTrackToggle.disabled = true;
+    btnCancel.disabled = true;
+    btnArrived.disabled = true;
+    btnDeclineRide.disabled = true;
+    btnComplete.disabled = true;
+    if (btnChatDriver) btnChatDriver.disabled = true;
+    updateDriverRideUI(ride);
+    return;
+  }
 
-// تفعيل / تعطيل الأزرار (الحالات العادية)
-driverStartRideBtn.disabled = !canStart; 
-btnSendOffer.disabled = !canOffer; 
-btnAccept.disabled = !canAccept; 
-btnTrackToggle.disabled = !canTrack; 
-btnCancel.disabled = !canCancel; 
-btnArrived.disabled = !canArrive; 
-btnDeclineRide.disabled = !canDecline;
-btnComplete.disabled = !canComplete;
+  driverStartRideBtn.disabled = !canStart;
+  btnSendOffer.disabled = !canOffer;
+  btnAccept.disabled = !canAccept;
+  btnTrackToggle.disabled = !canTrack;
+  btnCancel.disabled = !canCancel;
+  btnArrived.disabled = !canArrive;
+  btnDeclineRide.disabled = !canDecline;
+  btnComplete.disabled = !canComplete;
 
-    if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
+  if (!canTrack) { trackingEnabled = false; setTrackBtn(); }
   if (btnChatDriver) btnChatDriver.disabled = !canChat;
 
   updateDriverRideUI(ride);
 }
-// ==========================================
+
 // 🎨 Driver Professional Ride UI Controller
-// ==========================================
 function updateDriverRideUI(ride) {
   const badgeEl = document.getElementById("driverRideBadge");
   const badgeTextEl = document.getElementById("driverRideBadgeText");
@@ -821,7 +764,6 @@ function updateDriverRideUI(ride) {
   const status = String(ride.status || "requested");
   const mine = ride.driverId === auth.currentUser?.uid;
 
-  // Meta
   const priceEl = document.getElementById("driverRidePrice");
   const distEl = document.getElementById("driverRideDistance");
   const pickupEl = document.getElementById("driverRidePickup");
@@ -832,13 +774,11 @@ function updateDriverRideUI(ride) {
   const dist = getRideDistanceToMe(ride);
   if (distEl) distEl.textContent = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "—";
   if (pickupEl) pickupEl.textContent = (ride.pickupText || "—").split("،").slice(-2).join("، ").trim();
-if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").slice(-2).join("، ").trim();
+  if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").slice(-2).join("، ").trim();
   if (vehicleEl) vehicleEl.textContent = ride.vehicleType || "—";
 
-  // Hide offer wrap by default
   offerWrap?.classList.add("hidden");
 
-  // Reset classes
   if (primaryBtn) primaryBtn.className = "drv-primary-btn";
   if (secBtn1) secBtn1.className = "drv-secondary-btn";
   if (secBtn2) secBtn2.className = "drv-secondary-btn drv-danger";
@@ -846,7 +786,6 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
   if (secBtn1) secBtn1.style.display = "";
   if (secBtn2) secBtn2.style.display = "";
 
-  // Passenger info
   if (passengerInfo) {
     if (mine && ["accepted", "arrived", "started"].includes(status)) {
       passengerInfo.classList.remove("hidden");
@@ -860,9 +799,6 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
     }
   }
 
-  // ============ حسب المرحلة ============
-
-  // 1) طلب جديد
   if (status === "requested" && !ride.driverId) {
     if (badgeEl) badgeEl.className = "drv-badge drv-badge-new";
     if (badgeTextEl) badgeTextEl.textContent = "طلب جديد";
@@ -884,7 +820,6 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
     }
   }
 
-  // 2) عرض سعر - بانتظار الرد
   else if (status === "offered" && mine) {
     if (badgeEl) badgeEl.className = "drv-badge drv-badge-offered";
     if (badgeTextEl) badgeTextEl.textContent = "بانتظار رد الراكب";
@@ -903,7 +838,6 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
     }
   }
 
-  // 3) مقبول - في الطريق للراكب
   else if (status === "accepted" && mine) {
     if (badgeEl) badgeEl.className = "drv-badge drv-badge-accepted";
     if (badgeTextEl) badgeTextEl.textContent = "في الطريق للراكب";
@@ -923,7 +857,6 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
     }
   }
 
-  // 4) وصلت للراكب
   else if (status === "arrived" && mine) {
     if (badgeEl) badgeEl.className = "drv-badge drv-badge-arrived";
     if (badgeTextEl) badgeTextEl.textContent = "وصلت للراكب";
@@ -943,7 +876,6 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
     }
   }
 
-  // 5) الرحلة جارية
   else if (status === "started" && mine) {
     if (badgeEl) badgeEl.className = "drv-badge drv-badge-started";
     if (badgeTextEl) badgeTextEl.textContent = "الرحلة جارية";
@@ -960,30 +892,29 @@ if (dropoffEl) dropoffEl.textContent = (ride.dropoffText || "—").split("،").s
     if (secBtn2) secBtn2.style.display = "none";
   }
 
-  // 6) منتهية / ملغية / اعتذار
-else if (status === "completed" || status === "canceled" || status === "driver_declined") {
-  if (badgeEl) badgeEl.className = "drv-badge drv-badge-done";
-  if (badgeTextEl) badgeTextEl.textContent = 
-    status === "completed" ? "✓ مكتملة" : 
-    status === "canceled" ? "✕ ملغية" : 
-    "↩️ معتذر عنها";
+  else if (status === "completed" || status === "canceled" || status === "driver_declined") {
+    if (badgeEl) badgeEl.className = "drv-badge drv-badge-done";
+    if (badgeTextEl) badgeTextEl.textContent =
+      status === "completed" ? "✓ مكتملة" :
+      status === "canceled" ? "✕ ملغية" :
+      "↩️ معتذر عنها";
 
-  if (primaryBtn) {
-    primaryBtn.style.display = "none";
-    primaryBtn.onclick = null;
-    primaryBtn.disabled = true;
-  }
-  if (secBtn1) {
-    secBtn1.style.display = "none";
-    secBtn1.onclick = null;
-  }
-  if (secBtn2) {
-    secBtn2.style.display = "none";
-    secBtn2.onclick = null;
+    if (primaryBtn) {
+      primaryBtn.style.display = "none";
+      primaryBtn.onclick = null;
+      primaryBtn.disabled = true;
+    }
+    if (secBtn1) {
+      secBtn1.style.display = "none";
+      secBtn1.onclick = null;
+    }
+    if (secBtn2) {
+      secBtn2.style.display = "none";
+      secBtn2.onclick = null;
+    }
   }
 }
-}
-// =========================================
+
 async function selectRide(id, ride) {
   showSelectedRideBox();
   selectedRideId = id;
@@ -1006,7 +937,7 @@ async function selectRide(id, ride) {
       icon: createDropoffIcon()
     });
   }
-  
+
   await drawRideRoute(selectedRideData);
 }
 
@@ -1022,25 +953,25 @@ async function showAcceptedDetails(rideId) {
 function watchRidesForDriver() {
   if (ridesUnsub) { ridesUnsub(); ridesUnsub = null; }
   if (!myUser?.governorate || !myUser?.center || !auth.currentUser?.uid) return;
-  
+
   const driverUid = auth.currentUser.uid;
-  const qOpen = query(collection(db, "rides"), 
-    where("status", "==", "requested"), 
-    where("driverId", "==", null), 
-    where("archived", "==", false), 
-    where("governorate", "==", myUser.governorate), 
+  const qOpen = query(collection(db, "rides"),
+    where("status", "==", "requested"),
+    where("driverId", "==", null),
+    where("archived", "==", false),
+    where("governorate", "==", myUser.governorate),
     where("center", "==", myUser.center)
   );
   const qMine = query(collection(db, "rides"), where("driverId", "==", driverUid));
-  
+
   let openRows = [], mineRows = [];
-  
+
   const renderMerged = () => {
     const mergedMap = new Map();
-    [...openRows, ...mineRows].forEach((r) => { 
-      if (isRideVisibleForDriver(r) && !ignoredRideIds.has(r.id)) mergedMap.set(r.id, r); 
+    [...openRows, ...mineRows].forEach((r) => {
+      if (isRideVisibleForDriver(r) && !ignoredRideIds.has(r.id)) mergedMap.set(r.id, r);
     });
-    
+
     const rides = Array.from(mergedMap.values()).sort((a, b) => {
       const aMine = a.driverId === driverUid ? 1 : 0;
       const bMine = b.driverId === driverUid ? 1 : 0;
@@ -1049,10 +980,9 @@ function watchRidesForDriver() {
       if (Number.isFinite(da) || Number.isFinite(db)) return da - db;
       return (b.createdAt?.toMillis?.() || b.createdAtMs || 0) - (a.createdAt?.toMillis?.() || a.createdAtMs || 0);
     });
-    
+
     syncIncomingRequestSound(rides);
 
-    // إشعار + صوت لما يجي طلب جديد
     if (rides.some(r => r.status === "requested" && !r.driverId)) {
       notify({
         title: "🔔 طلب مشوار جديد!",
@@ -1071,9 +1001,9 @@ function watchRidesForDriver() {
       return void (ridesList.innerHTML = `<div class="muted small">لا توجد طلبات متاحة الآن في منطقتك.</div>`);
     }
 
-    const preferredRide = 
-      rides.find((r) => r.driverId === driverUid && ["accepted", "arrived", "started"].includes(r.status)) 
-      || rides.find((r) => r.id === selectedRideId) 
+    const preferredRide =
+      rides.find((r) => r.driverId === driverUid && ["accepted", "arrived", "started"].includes(r.status))
+      || rides.find((r) => r.id === selectedRideId)
       || rides[0];
 
     if (preferredRide) {
@@ -1085,12 +1015,11 @@ function watchRidesForDriver() {
       }
     }
 
-    // ============ رسم كل الطلبات في القائمة ============
     rides.forEach((r) => {
       const isMine = r.driverId === driverUid;
       const item = document.createElement("div");
-item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
-    item.dataset.rideId = r.id;
+      item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
+      item.dataset.rideId = r.id;
 
       const dist = getRideDistanceToMe(r);
       const distText = Number.isFinite(dist) ? (dist / 1000).toFixed(1) + " كم" : "";
@@ -1105,11 +1034,10 @@ item.className = "drv-ride-item" + (selectedRideId === r.id ? " active" : "");
         "tmanya": "🚌"
       }[r.vehicleType] || "🚗";
 
-      // نظّف النصوص
-const pickupText = (r.pickupText || "—").split("،").slice(-2).join("، ").trim();
-const dropoffText = (r.dropoffText || "—").split("،").slice(-2).join("، ").trim();
+      const pickupText = (r.pickupText || "—").split("،").slice(-2).join("، ").trim();
+      const dropoffText = (r.dropoffText || "—").split("،").slice(-2).join("، ").trim();
 
-item.innerHTML = `
+      item.innerHTML = `
   <div class="drv-ride-header">
     <div class="drv-ride-badge ${isMine ? 'mine' : 'new'}">
       ${isMine ? '🚗 طلبي الحالي' : '🟢 طلب جديد'}
@@ -1137,27 +1065,112 @@ item.innerHTML = `
       ridesList.appendChild(item);
     });
   };
-  // ========================================================
 
-  const unsubOpen = onSnapshot(qOpen, (snap) => { 
-    openRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); 
-    renderMerged(); 
-  }, (err) => { 
-    console.error("qOpen snapshot error:", err); 
-    const isPermission = String(err?.code || err?.message || "").includes("permission"); 
-    ridesList.innerHTML = `<div class="muted small">${isPermission ? "Firestore Rules تمنع قراءة الطلبات." : "تعذر تحميل الطلبات المفتوحة."}</div>`; 
+  const unsubOpen = onSnapshot(qOpen, (snap) => {
+    openRows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderMerged();
+  }, (err) => {
+    console.error("qOpen snapshot error:", err);
+    const isPermission = String(err?.code || err?.message || "").includes("permission");
+    ridesList.innerHTML = `<div class="muted small">${isPermission ? "Firestore Rules تمنع قراءة الطلبات." : "تعذر تحميل الطلبات المفتوحة."}</div>`;
   });
-  
-  const unsubMine = onSnapshot(qMine, (snap) => { 
-    mineRows = snap.docs.map((d) => ({ id: d.id, ...d.data() })); 
-    renderMerged(); 
+
+  const unsubMine = onSnapshot(qMine, (snap) => {
+    mineRows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderMerged();
   }, (err) => console.error("qMine snapshot error:", err));
-  
-    ridesUnsub = () => { 
-    try { unsubOpen(); } catch (_) {} 
-    try { unsubMine(); } catch (_) {} 
+
+  ridesUnsub = () => {
+    try { unsubOpen(); } catch (_) {}
+    try { unsubMine(); } catch (_) {}
   };
 }
+
+function openDeleteAccountModal() {
+  deleteAccountModal?.classList.remove("hidden");
+  deleteAccountBackdrop?.classList.add("show");
+}
+function closeDeleteAccountModal() {
+  deleteAccountBackdrop?.classList.remove("show");
+  deleteAccountModal?.classList.add("hidden");
+}
+
+deleteAccountBtn?.addEventListener("click", () => {
+  closeDriverDrawer();
+  openDeleteAccountModal();
+});
+deleteAccountCancel?.addEventListener("click", closeDeleteAccountModal);
+deleteAccountBackdrop?.addEventListener("click", closeDeleteAccountModal);
+
+deleteAccountConfirm?.addEventListener("click", async () => {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const confirmText = prompt('اكتب كلمة "احذف" لتأكيد الحذف النهائي:');
+  if (String(confirmText || "").trim() !== "احذف") {
+    alert("تم إلغاء الحذف.");
+    return;
+  }
+
+  setDriverStatus("جاري الحذف...");
+  closeDeleteAccountModal();
+
+  try {
+    const uid = user.uid;
+
+    // إيقاف كل حاجة
+    try { stopRequestSound(); } catch (_) {}
+    try { stopLiveTracking(); } catch (_) {}
+    try { stopDriverHeartbeat(); } catch (_) {}
+    try { await cleanupDriverOnline(); } catch (_) {}
+
+    // حذف رسائل المستخدم
+    try {
+      const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", uid)));
+      const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", uid)));
+      const rideIds = [...new Set([...r1.docs, ...r2.docs].map((d) => d.id))];
+
+      for (const rideId of rideIds) {
+        try {
+          const msgs = await getDocs(collection(db, "rides", rideId, "messages"));
+          for (const m of msgs.docs) {
+            if (m.data().senderId === uid) {
+              await deleteDoc(doc(db, "rides", rideId, "messages", m.id));
+            }
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    // حذف user doc
+    await deleteDoc(doc(db, "users", uid));
+
+    // حذف حساب الـ Auth
+    try {
+      await user.delete();
+    } catch (delErr) {
+      if (delErr.code === "auth/requires-recent-login") {
+        alert("لأسباب أمنية، لازم تسجل دخول تاني الأول وبعدين تدوس حذف مرة تانية.");
+        await signOut(auth);
+        localStorage.removeItem("lastRole");
+        localStorage.removeItem("lastAppPage");
+        location.href = "./index.html";
+        return;
+      }
+      throw delErr;
+    }
+
+    await signOut(auth);
+    localStorage.removeItem("lastRole");
+    localStorage.removeItem("lastAppPage");
+
+    alert("تم حذف الحساب بنجاح ✅");
+    location.href = "./index.html";
+  } catch (err) {
+    console.error("DELETE ACCOUNT ERROR:", err);
+    alert("فشل حذف الحساب: " + (err?.message || err));
+  }
+});
 
 logoutBtn?.addEventListener("click", async () => {
   closeDriverDrawer(); stopLiveTracking(); stopDriverHeartbeat(); await cleanupDriverOnline();
@@ -1166,8 +1179,8 @@ logoutBtn?.addEventListener("click", async () => {
   stopRequestSound();
   requestSoundActive = false;
   await signOut(auth);
-  localStorage.removeItem("lastRole");   // ← ← ← السطر الجديد
-  localStorage.removeItem("lastAppPage");   // ← ← ← السطر الجديد
+  localStorage.removeItem("lastRole");
+  localStorage.removeItem("lastAppPage");
   location.href = "./index.html";
 });
 switchRoleBtn?.addEventListener("click", async () => {
@@ -1208,20 +1221,19 @@ btnSendOffer?.addEventListener("click", async () => {
     const liveRide = rideSnap.data(); if (!isRideVisibleForDriver(liveRide) || liveRide.status !== "requested") throw new Error("الطلب لم يعد متاحاً");
     await updateDoc(rideRef, { status: "offered", driverId: myUser.uid, offerPrice: offer, driverName: myUser.name || "", driverPhone: myUser.phone || "", driverVehicleType: myUser.vehicleType || "", driverVehicleCode: myUser.vehicleCode || "", offeredAt: serverTimestamp() });
     btnSendOffer.disabled = true;
-setTimeout(syncOfferBtn, 800);
-playSound("success");
-notify({ title: "تم إرسال العرض", body: `عرض سعر: ${offer} ج`, tag: "offer-sent" });
-setDriverStatus("بانتظار رد الراكب");
+    setTimeout(syncOfferBtn, 800);
+    playSound("success");
+    notify({ title: "تم إرسال العرض", body: `عرض سعر: ${offer} ج`, tag: "offer-sent" });
+    setDriverStatus("بانتظار رد الراكب");
   } catch (e) { console.error(e); setDriverStatus("خطأ"); }
 });
 
 btnAccept?.addEventListener("click", async () => {
   if (!selectedRideId || !myUser) return;
-  
-  // ⚠️ حماية من الضغط المتكرر
+
   btnAccept.disabled = true;
   btnAccept.textContent = "⏳ جاري القبول...";
-  
+
   setDriverStatus("يقبل...");
   try {
     const rideRef = doc(db, "rides", selectedRideId); const rideSnap = await getDoc(rideRef); if (!rideSnap.exists()) throw new Error("الطلب غير موجود");
@@ -1233,46 +1245,48 @@ btnAccept?.addEventListener("click", async () => {
     }
     if (!["requested", "offered"].includes(status)) throw new Error(`لا يمكن قبول الطلب الآن لأن حالته الحالية هي: ${status || "غير معروفة"}`);
     await updateDoc(rideRef, { status: "accepted", driverId: myUser.uid, driverName: myUser.name || "", driverPhone: myUser.phone || "", driverVehicleType: myUser.vehicleType || "", driverVehicleCode: myUser.vehicleCode || "", price: liveRide.offerPrice || liveRide.price || 0, acceptedAt: serverTimestamp(), expiresAt: null, expiresAtMs: null });
-        // ================== إشعار للراكب بقبول الطلب ==================
-try {
-  if (liveRide.passengerId) {
-    const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
-    
-    await fetch(workerUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
-      },
-      body: JSON.stringify({
-        driverUids: [liveRide.passengerId],
-        title: "تم قبول طلبك ✅",
-        body: `السائق ${myUser.name || ""} في الطريق إليك`,
-        data: {
-          type: "ride_accepted",
-          rideId: selectedRideId
-        }
-      })
-    });
-    
-    console.log("✅ تم إرسال إشعار للراكب بقبول الطلب");
-  }
-} catch (err) {
-  console.error("❌ فشل إرسال إشعار للراكب:", err?.message || err);
-}
-// ================================================================
+
+    // إشعار للراكب بقبول الطلب
+    try {
+      if (liveRide.passengerId) {
+        const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
+
+        await fetch(workerUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+          },
+          body: JSON.stringify({
+            driverUids: [liveRide.passengerId],
+            title: "تم قبول طلبك ✅",
+            body: `السائق ${myUser.name || ""} في الطريق إليك`,
+            data: {
+              type: "ride_accepted",
+              rideId: selectedRideId
+            }
+          })
+        });
+      }
+    } catch (err) {
+      console.warn("فشل إرسال إشعار للراكب:", err?.message || err);
+    }
+
     selectedRideData = { ...liveRide, id: selectedRideId, status: "accepted", driverId: myUser.uid, driverName: myUser.name || "", driverPhone: myUser.phone || "", driverVehicleType: myUser.vehicleType || "", driverVehicleCode: myUser.vehicleCode || "", price: liveRide.offerPrice || liveRide.price || 0, expiresAt: null, expiresAtMs: null };
     refreshSelectedRideButtons(selectedRideData); await showAcceptedDetails(selectedRideId);
     if (selectedRideId) { startLiveTracking(selectedRideId); watchPassengerEndRequest(selectedRideId); }
     stopRequestSound();
-requestSoundActive = false;
-playSound("success");
-notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });
-setDriverStatus("على الطريق");
-  } catch (e) { console.error("DRIVER ACCEPT ERROR:", e); alert("ACCEPT ERROR: " + (e?.message || e)); setDriverStatus("خطأ");
-          btnAccept.disabled = false;              // ←←← الجديد
-  btnAccept.textContent = "✅ اقبل بسعر الطلب"; // ←←← الجديد
-}
+    requestSoundActive = false;
+    playSound("success");
+    notify({ title: "تم قبول الطلب", body: "الآن يمكنك بدء التتبع والتوجه للراكب.", tag: "ride-accepted" });
+    setDriverStatus("على الطريق");
+  } catch (e) {
+    console.error("DRIVER ACCEPT ERROR:", e);
+    alert("ACCEPT ERROR: " + (e?.message || e));
+    setDriverStatus("خطأ");
+    btnAccept.disabled = false;
+    btnAccept.textContent = "✅ اقبل بسعر الطلب";
+  }
 });
 
 btnArrived?.addEventListener("click", async () => {
@@ -1280,28 +1294,28 @@ btnArrived?.addEventListener("click", async () => {
   setDriverStatus("وصل لموقع الراكب");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), { status: "arrived", arrivedAtPickup: true, arrivedAt: serverTimestamp() });
-    // ============ إشعار الراكب: السائق وصل ============
-try {
-  const rideSnap = await getDoc(doc(db, "rides", selectedRideId));
-  const ride = rideSnap.data();
-  if (ride?.passengerId) {
-    await fetch("https://meshwarko-push.salahram390.workers.dev", {
-      method: "POST",
-      headers: { 
-  "Content-Type": "application/json", 
-  "Authorization": `Bearer ${await auth.currentUser.getIdToken()}` 
-},
-      body: JSON.stringify({
-        driverUids: [ride.passengerId],
-        title: "السائق وصل 📍",
-        body: `${myUser?.name || "السائق"} وصل لمكان القيام، استعد للركوب`,
-        data: { type: "driver_arrived", rideId: selectedRideId }
-      })
-    });
-    console.log("✅ تم إرسال إشعار للراكب: السائق وصل");
-  }
-} catch (err) { console.error("❌ فشل إشعار الوصول:", err?.message || err); }
-// ================================================
+
+    // إشعار الراكب: السائق وصل
+    try {
+      const rideSnap = await getDoc(doc(db, "rides", selectedRideId));
+      const ride = rideSnap.data();
+      if (ride?.passengerId) {
+        await fetch("https://meshwarko-push.salahram390.workers.dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+          },
+          body: JSON.stringify({
+            driverUids: [ride.passengerId],
+            title: "السائق وصل 📍",
+            body: `${myUser?.name || "السائق"} وصل لمكان القيام، استعد للركوب`,
+            data: { type: "driver_arrived", rideId: selectedRideId }
+          })
+        });
+      }
+    } catch (err) { console.warn("فشل إشعار الوصول:", err?.message || err); }
+
     btnArrived.disabled = true; notify({ title: "وصلت", body: "تم إشعار الراكب أنك وصلت", tag: "arrived" });
   } catch (e) { console.error(e); setDriverStatus("خطأ"); }
 });
@@ -1311,78 +1325,75 @@ driverStartRideBtn?.addEventListener("click", async () => {
   setDriverStatus("بدء الرحلة...");
   try {
     await updateDoc(doc(db, "rides", selectedRideId), { status: "started", startedAt: serverTimestamp() });
-    // ============ إشعار الراكب: بدأت الرحلة ============
-try {
-  const rideSnap = await getDoc(doc(db, "rides", selectedRideId));
-  const ride = rideSnap.data();
-  if (ride?.passengerId) {
-    await fetch("https://meshwarko-push.salahram390.workers.dev", {
-      method: "POST",
-      headers: { 
-  "Content-Type": "application/json", 
-  "Authorization": `Bearer ${await auth.currentUser.getIdToken()}` 
-},
-      body: JSON.stringify({
-        driverUids: [ride.passengerId],
-        title: "بدأت الرحلة 🚗",
-        body: "رحلة سعيدة! وصلتك في أمان",
-        data: { type: "ride_started", rideId: selectedRideId }
-      })
-    });
-    console.log("✅ تم إرسال إشعار للراكب: بدأت الرحلة");
-  }
-} catch (err) { console.error("❌ فشل إشعار البداية:", err?.message || err); }
-// ==================================================
+
+    // إشعار الراكب: بدأت الرحلة
+    try {
+      const rideSnap = await getDoc(doc(db, "rides", selectedRideId));
+      const ride = rideSnap.data();
+      if (ride?.passengerId) {
+        await fetch("https://meshwarko-push.salahram390.workers.dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+          },
+          body: JSON.stringify({
+            driverUids: [ride.passengerId],
+            title: "بدأت الرحلة 🚗",
+            body: "رحلة سعيدة! وصلتك في أمان",
+            data: { type: "ride_started", rideId: selectedRideId }
+          })
+        });
+      }
+    } catch (err) { console.warn("فشل إشعار البداية:", err?.message || err); }
+
     if (selectedRideData) { selectedRideData = { ...selectedRideData, status: "started", startedAt: Timestamp.now() }; refreshSelectedRideButtons(selectedRideData); }
     notify({ title: "بدأت الرحلة", body: "تم بدء الرحلة مع الراكب.", tag: "ride-started" }); setDriverStatus("الرحلة بدأت");
   } catch (err) { console.error(err); setDriverStatus("خطأ"); }
 });
 btnComplete?.addEventListener("click", async () => { if (!selectedRideId) return; await completeRideCore({ auto: false }); });
-// ربط زر الاعتذار
 btnDeclineRide?.addEventListener("click", declineRide);
 
 // ====================== زر التجاهل (Ignore Request) ======================
 btnCancel?.addEventListener("click", async () => {
-    if (!selectedRideId || !selectedRideData) return;
+  if (!selectedRideId || !selectedRideData) return;
 
-    const status = String(selectedRideData.status || "");
+  const status = String(selectedRideData.status || "");
 
-    // تجاهل الطلب الجديد (requested)
-    if (status === "requested" && !selectedRideData.driverId) {
-        ignoredRideIds.add(selectedRideId);
-        resetSelectedRideUi("تم تجاهل الطلب");
+  if (status === "requested" && !selectedRideData.driverId) {
+    ignoredRideIds.add(selectedRideId);
+    resetSelectedRideUi("تم تجاهل الطلب");
 
-        const card = document.querySelector(`.drv-ride-item[data-ride-id="${selectedRideId}"]`);
-if (card) {
-  card.remove();
-}
-
-        notify({ 
-            title: "تم التجاهل", 
-            body: "تم إخفاء الطلب من قائمتك", 
-            tag: "ride-ignored" 
-        });
-
-        return;
+    const card = document.querySelector(`.drv-ride-item[data-ride-id="${selectedRideId}"]`);
+    if (card) {
+      card.remove();
     }
 
-    // إلغاء الرحلة في المراحل المتقدمة
-    if (["accepted", "arrived", "started", "offered"].includes(status)) {
-        if (!confirm("هل تريد إلغاء الرحلة الحالية؟")) return;
-        
-        try {
-            await updateDoc(doc(db, "rides", selectedRideId), {
-                status: "canceled",
-                canceledBy: "driver",
-                canceledAt: serverTimestamp()
-            });
-            resetSelectedRideUi("تم إلغاء الرحلة");
-            notify({ title: "تم الإلغاء", body: "تم إلغاء الرحلة", tag: "ride-canceled" });
-        } catch (e) {
-            console.error(e);
-            notify({ title: "خطأ", body: "فشل في الإلغاء", tag: "error" });
-        }
+    notify({
+      title: "تم التجاهل",
+      body: "تم إخفاء الطلب من قائمتك",
+      tag: "ride-ignored"
+    });
+
+    return;
+  }
+
+  if (["accepted", "arrived", "started", "offered"].includes(status)) {
+    if (!confirm("هل تريد إلغاء الرحلة الحالية؟")) return;
+
+    try {
+      await updateDoc(doc(db, "rides", selectedRideId), {
+        status: "canceled",
+        canceledBy: "driver",
+        canceledAt: serverTimestamp()
+      });
+      resetSelectedRideUi("تم إلغاء الرحلة");
+      notify({ title: "تم الإلغاء", body: "تم إلغاء الرحلة", tag: "ride-canceled" });
+    } catch (e) {
+      console.error(e);
+      notify({ title: "خطأ", body: "فشل في الإلغاء", tag: "error" });
     }
+  }
 });
 
 editProfileBtn?.addEventListener("click", async () => {
@@ -1412,25 +1423,24 @@ if (!user) {
   return;
 }
 
-  // جلب بيانات السائق من Firestore
   const me = await getDoc(doc(db, "users", user.uid));
   if (!me.exists() || me.data().role !== "driver") {
-  localStorage.removeItem("lastAppPage");
-  location.href = "./passenger.html";
-  return;
-}
+    localStorage.removeItem("lastAppPage");
+    location.href = "./passenger.html";
+    return;
+  }
 
   myUser = { uid: user.uid, ...me.data() };
 
-  if (myUser.role === "admin") { 
-    location.href = "./admin.html"; 
-    return; 
+  if (myUser.role === "admin") {
+    location.href = "./admin.html";
+    return;
   }
-  if (myUser.status === "blocked") { 
-    await signOut(auth); 
-    alert("هذا الحساب محظور من الإدارة."); 
-    location.href = "./index.html"; 
-    return; 
+  if (myUser.status === "blocked") {
+    await signOut(auth);
+    alert("هذا الحساب محظور من الإدارة.");
+    location.href = "./index.html";
+    return;
   }
   await initDriverPushNotifications();
   setText(meBadge, `${myUser.name || "سائق"} • ${escapeHtml(myUser.governorate || "")}/${escapeHtml(myUser.center || "")}`);
@@ -1441,15 +1451,13 @@ if (!user) {
 
   ownDriverPosDocRef = doc(db, "driversOnline", user.uid);
 
-// 1. شغل النبضة فوراً بمجرد الدخول
-startDriverHeartbeat();
+  startDriverHeartbeat();
 
-// 2. جيب الموقع وحدثه لو متاح
-locateOnce(map, async (loc) => { 
-  myLocation = loc; 
-  updateOwnDriverMarker(loc.lat, loc.lon, true); 
-  await pushDriverOnline(); 
-});
+  locateOnce(map, async (loc) => {
+    myLocation = loc;
+    updateOwnDriverMarker(loc.lat, loc.lon, true);
+    await pushDriverOnline();
+  });
 
   watchRidesForDriver();
 });
@@ -1460,5 +1468,3 @@ window.addEventListener("beforeunload", () => {
   stopDriverHeartbeat();
   cleanupDriverOnline();
 });
-window.addEventListener("error", (e) => { alert(`JS ERROR: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`); });
-window.addEventListener("unhandledrejection", (e) => { alert(`PROMISE ERROR: ${e.reason?.message || e.reason}`); });

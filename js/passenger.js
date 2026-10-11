@@ -17,7 +17,6 @@ import {
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { notify, ensureNotificationPermission, playSound, startRequestSound, stopRequestSound } from "./notify.js";
 localStorage.setItem("lastAppPage", "passenger.html");
-console.log("passenger.js loaded ✅");
 
 // ========== Custom Select Bottom Sheet ==========
 function initCustomSelects() {
@@ -295,7 +294,6 @@ function clampPrice(v) {
   if (!Number.isFinite(n)) return 15;
   return Math.min(3000, Math.max(15, Math.round(n / 5) * 5));
 }
-// زيادة أو نقصان السعر بخطوة 5
 function changePrice(delta) {
   let current = Number(priceSlider.value) || 15;
   let newPrice = Math.max(15, Math.min(3000, current + delta));
@@ -303,7 +301,6 @@ function changePrice(delta) {
   updatePriceUI();
 }
 
-// ربط الأزرار
 function setupPriceControls() {
   const minusBtn = document.getElementById('priceMinus');
   const plusBtn = document.getElementById('pricePlus');
@@ -312,11 +309,10 @@ function setupPriceControls() {
   if (minusBtn) minusBtn.addEventListener('click', () => changePrice(-5));
   if (plusBtn)  plusBtn.addEventListener('click', () => changePrice(5));
 
-  // التأكد إن الـ Slider دايماً بخطوات 5
   if (slider) {
     slider.addEventListener('input', () => {
       let val = Number(slider.value);
-      slider.value = Math.round(val / 5) * 5;   // يجبره على مضاعفات 5
+      slider.value = Math.round(val / 5) * 5;
       updatePriceUI();
     });
   }
@@ -447,26 +443,13 @@ function watchPassengerChat(rideId) {
     const rows = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 
     if (rows.length > lastMsgCount) {
-  const lastMsg = rows[rows.length - 1];
-  if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) {
-    playSound("message");
-  }
-}
+      const lastMsg = rows[rows.length - 1];
+      if (lastMsg && lastMsg.senderId !== auth.currentUser?.uid) {
+        playSound("message");
+      }
+    }
 
     lastMsgCount = rows.length;
-
- //   const unread = snap.docs.filter((docSnap) => {
- //     const msg = docSnap.data();
- //     return msg.senderRole === "driver" && msg.read !== true;
-//    });
-
-//    for (const docSnap of unread.slice(0, 3)) {
- //     await updateDoc(
- //       doc(db, "rides", rideId, "messages", docSnap.id),
-   //     { read: true }
-//      );
-//    }
-
     renderPassengerChatMessages(rows);
   });
 }
@@ -594,8 +577,7 @@ async function findNearestDriversMeta({ governorate, center, vehicleType, pickup
 function updatePriceUI() {
   let price = clampPrice(priceSlider.value);
   setText(priceValue, moneyEGP(price));
-  
-  // تحديث الـ hint
+
   const hintText = `تحسين تلقائي: ذروة × ${surgeMultiplier().toFixed(2)} • يمكنك تعديل السعر.`;
   setText(surgeHint, hintText);
 }
@@ -1007,7 +989,6 @@ async function handleRideSnapshot(rideSnap) {
     setStatus("السائق اعتذر عن الرحلة");
     setText(routeMeta, "السائق اعتذر. سيتم إعادة الطلب تلقائياً...");
 
-    // إعادة الطلب إلى حالة البحث
     try {
       await updateDoc(doc(db, "rides", currentRideId), {
         status: "requested",
@@ -1026,10 +1007,9 @@ async function handleRideSnapshot(rideSnap) {
       console.error("Failed to reset ride after decline:", e);
     }
 
-    return; // مش هنكمل الباقي
+    return;
   }
 
-  // ====================== باقي الحالات العادية ======================
   if (ride.archived === true || ride.status === "completed" || ride.status === "canceled") {
     if (ride.status === "completed") {
       if (completedToastShownFor !== rideSnap.id) {
@@ -1104,8 +1084,8 @@ async function handleRideSnapshot(rideSnap) {
     notify({ title: "السائق وصل", body: "السائق وصل لمكان القيام ✅", tag: "driver-arrived" });
   }
 
-  const driverProfile = ["accepted", "arrived", "started"].includes(ride.status) 
-    ? { name: ride.driverName || "", phone: ride.driverPhone || "", vehicleType: ride.driverVehicleType || ride.vehicleType || "", vehicleCode: ride.driverVehicleCode || "" } 
+  const driverProfile = ["accepted", "arrived", "started"].includes(ride.status)
+    ? { name: ride.driverName || "", phone: ride.driverPhone || "", vehicleType: ride.driverVehicleType || ride.vehicleType || "", vehicleCode: ride.driverVehicleCode || "" }
     : null;
 
   renderRideCard(ride, driverProfile);
@@ -1138,23 +1118,33 @@ drawerTripsPassenger?.addEventListener("click", () => { closePassengerDrawer(); 
 drawerWalletPassenger?.addEventListener("click", () => { closePassengerDrawer(); openPassengerWalletModal(); });
 drawerSupportPassenger?.addEventListener("click", () => { closePassengerDrawer(); notify({ title: "الدعم", body: "تواصل معنا عبر واتساب السائق أو أضف وسيلة دعم مخصصة لاحقًا.", tag: "support-info" }); });
 switchRoleBtn?.addEventListener("click", () => { closePassengerDrawer(); openSwitchDriverModal(); });
-logoutBtn?.addEventListener("click", async () => { closePassengerDrawer(); stopLiveDrivers(); stopDriverTracking(); await signOut(auth); location.href = "./index.html"; });
 logoutBtn?.addEventListener("click", async () => {
   closePassengerDrawer();
   stopLiveDrivers();
   stopDriverTracking();
   await signOut(auth);
-  localStorage.removeItem("lastRole");   // ← ← ← السطر الجديد
-  localStorage.removeItem("lastAppPage");   // ← ← ← السطر الجديد
+  localStorage.removeItem("lastRole");
+  localStorage.removeItem("lastAppPage");
   location.href = "./index.html";
 });
 
 deleteAccountBtn?.addEventListener("click", async () => {
   const ok = confirm(
-    "هل تريد حذف الحساب نهائياً؟ سيتم حذف جميع بياناتك."
+    "هل تريد حذف الحساب نهائياً؟\n\nسيتم حذف:\n• بيانات حسابك\n• سجل الرحلات\n• المحادثات\n\nهذا الإجراء لا يمكن التراجع عنه."
   );
 
   if (!ok) return;
+
+  const confirmText = prompt(
+    'اكتب كلمة "احذف" لتأكيد الحذف النهائي:'
+  );
+
+  if (String(confirmText || "").trim() !== "احذف") {
+    alert("تم إلغاء الحذف.");
+    return;
+  }
+
+  setStatus?.("جاري الحذف...");
 
   try {
     const user = auth.currentUser;
@@ -1162,23 +1152,55 @@ deleteAccountBtn?.addEventListener("click", async () => {
 
     const uid = user.uid;
 
-    await deleteDoc(doc(db, "driversOnline", uid))
-      .catch(() => {});
+    // 1) حذف من driversOnline
+    await deleteDoc(doc(db, "driversOnline", uid)).catch(() => {});
 
+    // 2) حذف رسائل المستخدم في الرحلات
+    try {
+      const r1 = await getDocs(query(collection(db, "rides"), where("passengerId", "==", uid)));
+      const r2 = await getDocs(query(collection(db, "rides"), where("driverId", "==", uid)));
+      const rideIds = [...new Set([...r1.docs, ...r2.docs].map((d) => d.id))];
+
+      for (const rideId of rideIds) {
+        try {
+          const msgs = await getDocs(collection(db, "rides", rideId, "messages"));
+          for (const m of msgs.docs) {
+            if (m.data().senderId === uid) {
+              await deleteDoc(doc(db, "rides", rideId, "messages", m.id));
+            }
+          }
+        } catch (_) {}
+      }
+    } catch (_) {}
+
+    // 3) حذف user doc
     await deleteDoc(doc(db, "users", uid));
 
-await signOut(auth);
+    // 4) حذف حساب الـ Auth نفسه
+    try {
+      await user.delete();
+    } catch (delErr) {
+      if (delErr.code === "auth/requires-recent-login") {
+        alert("لأسباب أمنية، لازم تسجل دخول تاني الأول وبعدين تدوس زرار الحذف مرة تانية.");
+        await signOut(auth);
+        location.href = "./index.html";
+        return;
+      }
+      throw delErr;
+    }
 
-alert("تم حذف الحساب بنجاح");
+    await signOut(auth);
 
-location.href = "./index.html";
+    alert("تم حذف الحساب بنجاح ✅");
+
+    location.href = "./index.html";
   } catch (err) {
-    console.error(err);
+    console.error("DELETE ACCOUNT ERROR:", err);
 
     if (err.code === "auth/requires-recent-login") {
       alert("يجب تسجيل الدخول مرة أخرى قبل حذف الحساب.");
     } else {
-      alert("فشل حذف الحساب.");
+      alert("فشل حذف الحساب: " + (err?.message || err));
     }
   }
 });
@@ -1189,90 +1211,86 @@ btnRequest.addEventListener("click", async () => {
   const price = clampPrice(priceSlider.value); const createdAtMs = Date.now(); const expiresAtMs = createdAtMs + REQUEST_EXPIRE_MS; const expiresAt = Timestamp.fromMillis(expiresAtMs); setStatus("يرسل...");
   try {
     const savedGov = String(myData?.governorate || "").trim();
-const savedCenter = String(myData?.center || "").trim();
+    const savedCenter = String(myData?.center || "").trim();
 
-if (!savedGov || !savedCenter) {
-  setStatus("ناقص");
-  setText(routeMeta, "لازم تحدد المحافظة والمركز من صفحة التسجيل/الدخول أولاً.");
-  return;
-}
+    if (!savedGov || !savedCenter) {
+      setStatus("ناقص");
+      setText(routeMeta, "لازم تحدد المحافظة والمركز من صفحة التسجيل/الدخول أولاً.");
+      return;
+    }
 
-await updateDoc(doc(db, "users", user.uid), {
-  vehicleType: passengerVehicle,
-  updatedAt: serverTimestamp()
-}).catch(() => {});
+    await updateDoc(doc(db, "users", user.uid), {
+      vehicleType: passengerVehicle,
+      updatedAt: serverTimestamp()
+    }).catch(() => {});
 
-const nearestMeta = await findNearestDriversMeta({
-  governorate: savedGov,
-  center: savedCenter,
-  vehicleType: passengerVehicle,
-  pickupPoint: pickup,
-  limit: 8
-});
+    const nearestMeta = await findNearestDriversMeta({
+      governorate: savedGov,
+      center: savedCenter,
+      vehicleType: passengerVehicle,
+      pickupPoint: pickup,
+      limit: 8
+    });
     const rideNoteValue = ($("#rideNote")?.value || "").trim();
-    
+
     const rideRef = await addDoc(collection(db, "rides"), {
       passengerId: user.uid, passengerName: myData.name || "", passengerPhone: myData.phone || "", driverId: null, status: "requested", createdAt: serverTimestamp(), createdAtMs, clientCreatedAtMs: createdAtMs, expiresAt, expiresAtMs,
       governorate: savedGov,
-center: savedCenter,
-vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dropoff: { lat: dropoff.lat, lon: dropoff.lon }, pickupText: pickupText.value.trim(), dropoffText: dropText.value.trim(),
+      center: savedCenter,
+      vehicleType: passengerVehicle, pickup: { lat: pickup.lat, lon: pickup.lon }, dropoff: { lat: dropoff.lat, lon: dropoff.lon }, pickupText: pickupText.value.trim(), dropoffText: dropText.value.trim(),
       distanceMeters: lastDistanceMeters, durationSec: lastDurationSec, pricing: buildPricingSummary(lastDistanceMeters, lastDurationSec, price), price, archived: false, passengerLoc: myLocation ? { lat: myLocation.lat, lon: myLocation.lon } : null,
       nearestDriverId: nearestMeta.nearestDriverId || null, nearestDriverIds: nearestMeta.nearestDriverIds || [], nearestDrivers: nearestMeta.nearestDrivers || [], rideNote: rideNoteValue
     });
-          currentRideId = rideRef.id;
-startRequestSound();
-setText(routeMeta, "تم إرسال الطلب. جاري البحث عن سائق...");
-setStatus("جاري البحث");
-notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
+    currentRideId = rideRef.id;
+    startRequestSound();
+    setText(routeMeta, "تم إرسال الطلب. جاري البحث عن سائق...");
+    setStatus("جاري البحث");
+    notify({ title: "تم إرسال الطلب", body: "جارٍ البحث عن سائق...", tag: "ride-sent" });
 
-// ================== إرسال إشعار للسائقين القريبين ==================
-try {
-  // ⚠️ فحص: المستخدم مسجل دخول؟
-  if (!auth.currentUser) {
-    console.warn("⚠️ لا يمكن إرسال إشعار للسائقين: المستخدم غير مسجل الدخول.");
-  } else {
-    const nearbyDriverUids = nearestMeta.nearestDriverIds || [];
-    
-    if (nearbyDriverUids.length > 0) {
-      const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
-      
-      // حفظ الإحداثيات في متغيرات محلية
-      const localPickupLat = pickup?.lat;
-      const localPickupLon = pickup?.lon;
-      
-      const token = await auth.currentUser.getIdToken();
-      
-      await fetch(workerUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          driverUids: nearbyDriverUids,
-          title: "طلب مشوار جديد 🚗",
-          body: `راكب في ${savedCenter || ""} - ${savedGov || ""} • المسافة: ${((lastDistanceMeters || 0) / 1000).toFixed(1)} كم • السعر: ${price || 0} ج`,
-          data: {
-            type: "new_ride_request",
-            rideId: rideRef.id,
-            pickupLat: String(localPickupLat || ""),
-            pickupLon: String(localPickupLon || "")
-          }
-        })
-      });
-      
-      console.log(`✅ تم إرسال الإشعار لـ ${nearbyDriverUids.length} سائق قريب`);
-    } else {
-      console.warn("⚠️ لا يوجد سائقين قريبين لإرسال الإشعار لهم");
+    // ================== إرسال إشعار للسائقين القريبين ==================
+    try {
+      if (!auth.currentUser) {
+        console.warn("لا يمكن إرسال إشعار للسائقين: المستخدم غير مسجل الدخول.");
+      } else {
+        const nearbyDriverUids = nearestMeta.nearestDriverIds || [];
+
+        if (nearbyDriverUids.length > 0) {
+          const workerUrl = "https://meshwarko-push.salahram390.workers.dev";
+
+          const localPickupLat = pickup?.lat;
+          const localPickupLon = pickup?.lon;
+
+          const token = await auth.currentUser.getIdToken();
+
+          await fetch(workerUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+              driverUids: nearbyDriverUids,
+              title: "طلب مشوار جديد 🚗",
+              body: `راكب في ${savedCenter || ""} - ${savedGov || ""} • المسافة: ${((lastDistanceMeters || 0) / 1000).toFixed(1)} كم • السعر: ${price || 0} ج`,
+              data: {
+                type: "new_ride_request",
+                rideId: rideRef.id,
+                pickupLat: String(localPickupLat || ""),
+                pickupLon: String(localPickupLon || "")
+              }
+            })
+          });
+        } else {
+          console.warn("لا يوجد سائقين قريبين لإرسال الإشعار لهم");
+        }
+      }
+    } catch (notifyErr) {
+      console.warn("فشل إرسال إشعار للسائقين:", notifyErr?.message || notifyErr?.toString() || JSON.stringify(notifyErr));
     }
-  }
-} catch (notifyErr) {
-  console.error("❌ فشل إرسال إشعار للسائقين:", notifyErr?.message || notifyErr?.toString() || JSON.stringify(notifyErr));
-}
-// ===================================================================
+    // ===================================================================
   } catch (e) {
-  stopRequestSound();
-  console.error("ADD DOC ERROR:", e); const msg = String(e?.message || e || "");
+    stopRequestSound();
+    console.error("ADD DOC ERROR:", e); const msg = String(e?.message || e || "");
     if (msg.includes("Missing or insufficient permissions") || msg.includes("permission-denied")) alert("Firestore Rules تمنع إنشاء الطلب. فعّل القراءة والكتابة للمستخدم المسجل دخول مؤقتاً ثم أعد المحاولة.");
     else alert("FIRESTORE ERROR: " + msg);
     setStatus("خطأ"); setText(routeMeta, "تعذر إرسال الطلب. جرّب مرة أخرى.");
@@ -1282,21 +1300,18 @@ try {
 btnCancel.addEventListener("click", async () => {
   if (!currentRideId) return rideUiNone();
 
-  // ⚠️ احفظ الـ ID قبل أي تعديل
   const rideIdToCancel = currentRideId;
 
   setStatus("جاري الإلغاء...");
   stopRequestSound();
 
   try {
-    // 1) حدّث حالة الرحلة أولاً
     await updateDoc(doc(db, "rides", rideIdToCancel), {
       status: "canceled",
       canceledAt: serverTimestamp(),
       archived: true
     });
 
-    // 2) ابعت إشعار للسائق (في try-catch منفصل عشان ميأثرش على الإلغاء)
     try {
       if (auth.currentUser) {
         const rideSnap = await getDoc(doc(db, "rides", rideIdToCancel));
@@ -1319,14 +1334,11 @@ btnCancel.addEventListener("click", async () => {
                 data: { type: "ride_cancelled", rideId: rideIdToCancel }
               })
             });
-            console.log("✅ تم إرسال إشعار للسائق: الراكب ألغى");
-          } else {
-            console.log("ℹ️ الطلب لم يكن مقبول من سائق — لا حاجة لإشعار");
           }
         }
       }
     } catch (notifyErr) {
-      console.warn("⚠️ فشل إرسال الإشعار (غير مؤثر):", notifyErr?.message);
+      console.warn("فشل إرسال الإشعار (غير مؤثر):", notifyErr?.message);
     }
 
     cleanupRideState();
@@ -1359,15 +1371,15 @@ btnRejectOffer.addEventListener("click", async () => {
   try {
     const refreshedCreatedAtMs = Date.now(); const refreshedExpiresAtMs = refreshedCreatedAtMs + REQUEST_EXPIRE_MS;
     const savedGov = String(myData?.governorate || "").trim();
-const savedCenter = String(myData?.center || "").trim();
+    const savedCenter = String(myData?.center || "").trim();
 
-const nearestMeta = await findNearestDriversMeta({
-  governorate: savedGov,
-  center: savedCenter,
-  vehicleType: passengerVehicle,
-  pickupPoint: pickup,
-  limit: 8
-});
+    const nearestMeta = await findNearestDriversMeta({
+      governorate: savedGov,
+      center: savedCenter,
+      vehicleType: passengerVehicle,
+      pickupPoint: pickup,
+      limit: 8
+    });
     await updateDoc(doc(db, "rides", currentRideId), {
       status: "requested", driverId: null, offerPrice: null, offeredAt: null, driverName: null, driverPhone: null, driverVehicleType: null, driverVehicleCode: null,
       createdAtMs: refreshedCreatedAtMs, expiresAt: Timestamp.fromMillis(refreshedExpiresAtMs), expiresAtMs: refreshedExpiresAtMs,
@@ -1421,15 +1433,15 @@ async function openSwitchDriverModal() {
   const modal = $("#switchDriverModal"); const backdrop = $("#switchDriverBackdrop"); const hint = $("#switchDriverHint"); hint.textContent = "";
   const adm = await loadEgyptAdmin(); fillSelect($("#sdGov"), adm.governorates.map((g) => g.name));
   const sdGov = $("#sdGov");
-const sdCenter = $("#sdCenter");
+  const sdCenter = $("#sdCenter");
 
-const setCenters = () => {
-  const g = adm.governorates.find((x) => x.name === sdGov.value);
-  fillSelect(sdCenter, g?.centers || ["-"]);
-};
+  const setCenters = () => {
+    const g = adm.governorates.find((x) => x.name === sdGov.value);
+    fillSelect(sdCenter, g?.centers || ["-"]);
+  };
 
-sdGov.onchange = setCenters;
-setCenters();
+  sdGov.onchange = setCenters;
+  setCenters();
   sdSelectedVehicle = adm.vehicleTypes?.[0]?.id || null;
   const render = () => renderVehicleGrid($("#sdVehicles"), adm.vehicleTypes, sdSelectedVehicle, (id) => { sdSelectedVehicle = id; render(); });
   render(); modal?.classList.remove("hidden"); backdrop?.classList.add("show");
@@ -1450,103 +1462,94 @@ $("#switchDriverSave")?.addEventListener("click", async () => {
 });
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { 
-  localStorage.removeItem("lastAppPage");
-  location.href = "./index.html"; 
-  return; 
-}
+  if (!user) {
+    localStorage.removeItem("lastAppPage");
+    location.href = "./index.html";
+    return;
+  }
   document.documentElement.style.visibility = "visible";
   await initFirebaseMessaging(user.uid);
 
-  // 🔔 إنشاء Android Notification Channel
-try {
-  if (window.median && window.median.notifications && window.median.notifications.createChannel) {
-    window.median.notifications.createChannel({
-      id: "meshwarko-rides",
-      name: "طلبات المشاوير",
-      description: "إشعارات طلبات المشاوير الجديدة",
-      importance: "high",
-      sound: "default",
-      vibration: true,
-      lights: true,
-      lightColor: "#FFD700",
-      lockscreenVisibility: "public"
-    });
-    console.log("✅ Notification Channel created");
-  }
-} catch (e) {
-  console.warn("⚠️ Channel creation failed:", e);
-}
-  
-  // ============ OneSignal: Web + Median ============
-if (window.median && window.median.onesignal) {
+  // إنشاء Android Notification Channel
   try {
-    await window.median.onesignal.register();
-    console.log("✅ OneSignal registered");
-    
-    await Promise.race([
-  window.median.onesignal.login(user.uid),
-  new Promise(resolve => setTimeout(resolve, 3000))
-]);
-    console.log("✅ External User ID set:", user.uid);
-    
-    // إضافة Tags
-try {
-  window.location.href = 'gonative://onesignal/tags/set?tags=' + encodeURIComponent(JSON.stringify({"role":"passenger"}));
-  console.log("✅ Tag added: passenger");
-} catch (e) {
-  console.warn("⚠️ Tag add failed:", e);
-}
-    
-    window.median.onesignal.enableForegroundNotifications(true);
+    if (window.median && window.median.notifications && window.median.notifications.createChannel) {
+      window.median.notifications.createChannel({
+        id: "meshwarko-rides",
+        name: "طلبات المشاوير",
+        description: "إشعارات طلبات المشاوير الجديدة",
+        importance: "high",
+        sound: "default",
+        vibration: true,
+        lights: true,
+        lightColor: "#FFD700",
+        lockscreenVisibility: "public"
+      });
+    }
   } catch (e) {
-    console.warn("⚠️ Median OneSignal error:", e);
+    console.warn("Channel creation failed:", e);
   }
-} else if (window.OneSignalDeferred) {
-  window.OneSignalDeferred.push(async function (OneSignal) {
-    await OneSignal.login(user.uid);
-    console.log("✅ OneSignal (Web) linked to UID:", user.uid);
-  });
-} else {
-  console.warn("⚠️ OneSignal not available in passenger.js");
-}
-// ================================================
+
+  // ============ OneSignal: Web + Median ============
+  if (window.median && window.median.onesignal) {
+    try {
+      await window.median.onesignal.register();
+
+      await Promise.race([
+        window.median.onesignal.login(user.uid),
+        new Promise(resolve => setTimeout(resolve, 3000))
+      ]);
+
+      try {
+        window.location.href = 'gonative://onesignal/tags/set?tags=' + encodeURIComponent(JSON.stringify({"role":"passenger"}));
+      } catch (e) {
+        console.warn("Tag add failed:", e);
+      }
+
+      window.median.onesignal.enableForegroundNotifications(true);
+    } catch (e) {
+      console.warn("Median OneSignal error:", e);
+    }
+  } else if (window.OneSignalDeferred) {
+    window.OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.login(user.uid);
+    });
+  } else {
+    console.warn("OneSignal not available in passenger.js");
+  }
+  // ================================================
 
   await ensureNotificationPermission(true);
   const me = await getDoc(doc(db, "users", user.uid)); myData = me.exists() ? me.data() : {};
-  if (myData.role === "admin") { 
-  localStorage.removeItem("lastAppPage");
-  location.href = "./admin.html"; 
-  return; 
-}
+  if (myData.role === "admin") {
+    localStorage.removeItem("lastAppPage");
+    location.href = "./admin.html";
+    return;
+  }
   if (myData.status === "blocked") { await signOut(auth); alert("هذا الحساب محظور من الإدارة."); location.href = "./index.html"; return; }
   setText(meBadge, `${myData.name || "مستخدم"} • راكب`);
   if (myData.vehicleType) passengerVehicle = myData.vehicleType;
-await initAdmin().catch(() => {});
-  // ============== تشغيل الموقع تلقائياً عند فتح الصفحة ==============
-(function autoLocate() {
-  // 1) اعرض آخر موقع مخزّن فوراً (أقل من ثانية)
-  try {
-    const cached = localStorage.getItem("lastKnownLocation");
-    if (cached) {
-      const c = JSON.parse(cached);
-      if (c.lat && c.lon && Date.now() - (c.ts || 0) < 30 * 60 * 1000) {
-        myLocation = { lat: c.lat, lon: c.lon };
-        showMyLocation(map, myLocation, { pan: true });
-        console.log("⚡ موقع مخزّن ظهر فوراً:", myLocation);
-      }
-    }
-  } catch (_) {}
+  await initAdmin().catch(() => {});
 
-  // 2) اطلب الموقع الحقيقي في الخلفية وحدّثه لما يجي
-  locateOnce(map, (loc) => {
-    myLocation = loc;
-    showMyLocation(map, loc, { pan: true });
-    console.log("🎯 تم تحديث الموقع الحقيقي:", loc);
-  }, (err) => {
-    console.warn("⚠️ تعذر الحصول على الموقع الحقيقي:", err?.message);
-  });
-})();
+  // ============== تشغيل الموقع تلقائياً عند فتح الصفحة ==============
+  (function autoLocate() {
+    try {
+      const cached = localStorage.getItem("lastKnownLocation");
+      if (cached) {
+        const c = JSON.parse(cached);
+        if (c.lat && c.lon && Date.now() - (c.ts || 0) < 30 * 60 * 1000) {
+          myLocation = { lat: c.lat, lon: c.lon };
+          showMyLocation(map, myLocation, { pan: true });
+        }
+      }
+    } catch (_) {}
+
+    locateOnce(map, (loc) => {
+      myLocation = loc;
+      showMyLocation(map, loc, { pan: true });
+    }, (err) => {
+      console.warn("تعذر الحصول على الموقع الحقيقي:", err?.message);
+    });
+  })();
   watchCurrentRide(user.uid);
   setupPriceControls();
 });

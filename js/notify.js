@@ -1,6 +1,5 @@
 import { $, escapeHtml } from "./utils.js";
 
-let audioCtx = null;
 let requestLoopAudio = null;
 
 export async function ensureNotificationPermission(ask = true) {
@@ -15,20 +14,6 @@ export async function ensureNotificationPermission(ask = true) {
   }
 }
 
-function beep() {
-  try{
-    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
-    const o = audioCtx.createOscillator();
-    const g = audioCtx.createGain();
-    o.connect(g); g.connect(audioCtx.destination);
-    o.type = "sine";
-    o.frequency.value = 880;
-    g.gain.value = 0.03;
-    o.start();
-    setTimeout(()=>{ o.stop(); }, 120);
-  } catch {}
-}
-
 export function playSound(type = "notify") {
   let file = "./assets/sounds/notify.mp3";
   if (type === "request") file = "./assets/sounds/request.mp3";
@@ -40,7 +25,6 @@ export function playSound(type = "notify") {
   else if (type === "cancel") file = "./assets/sounds/cancel.mp3";
   else if (type === "message") file = "./assets/sounds/message.mp3";
 
-  // طلب Audio Focus من Median (لو موجود)
   if (window.median && window.median.android && window.median.android.audio) {
     try { window.median.android.audio.requestFocus(); } catch (_) {}
   }
@@ -100,8 +84,6 @@ export async function notify({
   sound = true,
   icon = "./logo.png"
 }) {
-
-  // Toast + صوت + اهتزاز فقط (الإشعارات النظامية بتاعت OneSignal)
   toast(title, body);
 
   if (sound) {

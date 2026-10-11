@@ -247,7 +247,6 @@ loginForm?.addEventListener("submit", async (e) => {
     }
 
     const cred = await signInWithEmailAndPassword(auth, email, pass);
-console.log("LOGIN UID:", cred.user.uid);
 
     const u = auth.currentUser;
     if (!u) {
@@ -291,7 +290,6 @@ console.log("LOGIN UID:", cred.user.uid);
     }
 
     const profile = snap.data();
-    const r = profile?.role || "passenger";
 
     if (profile?.status === "blocked") {
       await signOut(auth);
@@ -299,12 +297,11 @@ console.log("LOGIN UID:", cred.user.uid);
       return;
     }
 
-await redirectLoggedUser(u);
+    await redirectLoggedUser(u);
 
   } catch (err) {
-    console.log("LOGIN ERROR:", err.code, err.message, err);
     setText(loginHint, "خطأ: " + (err.code || "unknown"));
-    } finally {
+  } finally {
     isAuthProcessing = false;
   }
 });
@@ -360,29 +357,33 @@ registerForm?.addEventListener("submit", async (e) => {
 
     await setDoc(doc(db, "users", cred.user.uid), { ...common, ...profile });
 
-    // ============ إشعار للأدمن: مستخدم جديد ============
-try {
-  const ADMIN_UID = "pW7aljtlVge5jR34akYTs9hBuwW2";
-  await fetch("https://meshwarko-push.salahram390.workers.dev", {
-  method: "POST",
-  headers: { 
-    "Content-Type": "application/json", 
-    "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
-  },
-  body: JSON.stringify({
-    driverUids: [ADMIN_UID],
-    title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
-    body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
-    data: { type: "new_user", userId: cred.user.uid, role: role }
-  })
-});
-  console.log("✅ إشعار: مستخدم جديد للأدمن");
-} catch (e) { console.error("❌ فشل إشعار الأدمن:", e?.message); }
-// ====================================================
-await redirectLoggedUser(cred.user);
+    try {
+  const adminCfg = await getDoc(doc(db, "config", "admins"));
+  const adminUids = adminCfg.exists() ? (adminCfg.data()?.uids || []) : [];
+
+  if (adminUids.length > 0) {
+    await fetch("https://meshwarko-push.salahram390.workers.dev", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+      },
+      body: JSON.stringify({
+        driverUids: adminUids,
+        title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
+        body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
+        data: { type: "new_user", userId: cred.user.uid, role: role }
+      })
+    });
+  }
+} catch (e) {
+  console.warn("فشل إشعار الأدمن:", e?.message);
+}
+    // ====================================================
+    await redirectLoggedUser(cred.user);
   } catch (err) {
     setText(regHint, friendlyAuthError(err));
-    } finally {
+  } finally {
     isAuthProcessing = false;
   }
 });
@@ -431,8 +432,7 @@ function getSafeTargetPage(profile) {
 
 onAuthStateChanged(auth, async (user) => {
   if (isAuthProcessing) return;
-  
-  // ✅ إظهار الواجهة بمجرد ما Firebase يرد
+
   const appRootEl = document.getElementById("appRoot");
   if (appRootEl) appRootEl.classList.remove("app-hidden");
   if (user) {
@@ -441,14 +441,10 @@ onAuthStateChanged(auth, async (user) => {
     try {
       const snap = await getDoc(doc(db, "users", user.uid));
       const profile = snap.exists() ? snap.data() : null;
-      if (profile?.role) {
-        try { localStorage.setItem("lastRole", profile.role); } catch (_) {}
-      }
-      // ← ← ←
-      // حفظ الدور في localStorage
-try {
-  localStorage.setItem("lastRole", profile?.role || "passenger");
-} catch (_) {}
+
+      try {
+        localStorage.setItem("lastRole", profile?.role || "passenger");
+      } catch (_) {}
 
       if (!snap.exists()) {
         await signOut(auth);
@@ -473,32 +469,24 @@ try {
         location.replace(`./${targetPage}`);
         return;
       }
-      
+
       try {
-  await ensureNotificationPermission(true);
+        await ensureNotificationPermission(true);
 
-      console.log("👉 Checking OneSignal...");
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
 
-// نضمن إن OneSignalDeferred موجودة
-window.OneSignalDeferred = window.OneSignalDeferred || [];
+        window.OneSignalDeferred.push(async function (OneSignal) {
+          try {
+            await OneSignal.login(user.uid);
+          } catch (e) {
+            console.warn("OneSignal login error:", e);
+          }
+        });
 
-window.OneSignalDeferred.push(async function (OneSignal) {
-  console.log("👉 Inside OneSignalDeferred, trying to login...");
-  try {
-    await OneSignal.login(user.uid);
-    console.log("✅ OneSignal linked to UID:", user.uid);
-  } catch (e) {
-    console.error("❌ OneSignal login error:", e);
-  }
-});
-
-console.log("👉 OneSignal login pushed to queue.");
-
-  // هنخلي FCM شغال برضه عادي
-  await initFirebaseMessaging(user.uid);
-} catch (err) {
-  console.warn("Notification init warning:", err?.message || err);
-}
+        await initFirebaseMessaging(user.uid);
+      } catch (err) {
+        console.warn("Notification init warning:", err?.message || err);
+      }
     } catch (err) {
       console.warn("AUTH STATE ERROR:", err?.message || err);
       adminEntryBtn?.classList.add("hidden");
@@ -524,20 +512,13 @@ function friendlyAuthError(err) {
   return "حدث خطأ. حاول مرة أخرى.";
 }
 
-console.log("AUTH LOADED OK");
-
 // ============ Fail-safe: إظهار الواجهة بعد 3 ثواني ============
 setTimeout(() => {
   const root = document.getElementById("appRoot");
   if (root && root.classList.contains("app-hidden")) {
-    console.log("⚠️ Fail-safe: إظهار الواجهة قسرياً");
     root.classList.remove("app-hidden");
   }
 }, 3000);
-
-window.addEventListener("error", (e) => {
-  alert(`JS Error: ${e.message}\n${e.filename}:${e.lineno}:${e.colno}`);
-});
 
 const resetBtn = document.getElementById("resetPasswordBtn");
 

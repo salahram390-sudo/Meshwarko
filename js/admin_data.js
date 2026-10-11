@@ -4,16 +4,13 @@ export async function loadEgyptAdmin() {
   return await res.json();
 }
 
-export function fillSelect(selectEl, items, placeholder = "اختر") {
+export function fillSelect(selectEl, items) {
   selectEl.innerHTML = "";
   for (const it of items) {
     const opt = document.createElement("option");
     opt.value = it;
     opt.textContent = it;
     selectEl.appendChild(opt);
-  }
-  if (placeholder) {
-    // nothing: keep direct list for mobile
   }
 }
 
@@ -31,11 +28,5 @@ export function renderVehicleGrid(rootEl, vehicleTypes, selectedId, onSelect) {
     `;
     div.onclick = () => onSelect(v.id);
     rootEl.appendChild(div);
-  });
-}
-
-export function setActiveVehicle(rootEl, id) {
-  rootEl.querySelectorAll(".vehicle").forEach((el, idx) => {
-    const isActive = el.classList.contains("active");
   });
 }

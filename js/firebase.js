@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { initializeFirestore, getFirestore, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { initializeFirestore, getFirestore } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 import { getAuth, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBY72SkEi6HX4R9fSYAQhnYCLVbPu-W4Ko",
@@ -35,15 +34,8 @@ export { db };
 window.__auth = auth;
 window.__db = db;
 
-export let messaging = null;
-
 export async function initFirebaseMessaging(uid) {
   // OneSignal handles all push notifications
   // FCM is disabled to avoid Service Worker scope conflict
-  console.log("FCM skipped — OneSignal handles push notifications");
   return null;
-}
-export function listenForegroundMessages(cb) {
-  // OneSignal handles all messages — FCM listener removed
-  return;
 }
