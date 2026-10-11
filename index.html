@@ -26,20 +26,32 @@
   </script>
 
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-  <script>
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function (OneSignal) {
-      try {
-        await OneSignal.init({
-          appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
-          serviceWorkerParam: { scope: "/" },
-          serviceWorkerPath: "/OneSignalSDKWorker.js"
-        });
-      } catch (e) {
-        console.warn("OneSignal init failed:", e?.message);
-      }
-    });
-  </script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function (OneSignal) {
+    try {
+      // ✅ حل ذكي يشتغل على GitHub Pages و Netlify
+      const isGitHubPages = location.hostname.includes("github.io");
+      const basePath = isGitHubPages ? "/Meshwarko/" : "/";
+
+      await OneSignal.init({
+        appId: "e4c91cce-d41e-4553-8de6-f7a9651a1a76",
+        serviceWorkerParam: { scope: basePath },
+        serviceWorkerPath: basePath + "OneSignalSDKWorker.js"
+      });
+      console.log("✅ OneSignal initialized on:", basePath);
+    } catch (e) {
+      console.warn("⚠️ OneSignal init failed (non-critical):", e?.message);
+    }
+  });
+</script>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b0f14" />
+  <title>Meshwarko - اطلب مشوارك</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="stylesheet" href="./assets/styles.css" />
 </head>
 <body>
 
