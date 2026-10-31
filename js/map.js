@@ -396,20 +396,22 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
   if (!Number.isFinite(lim)) lim = 8;
   lim = clamp(Math.round(lim), 1, 20);
 
+  // 1. بنطلب 40 نتيجة عشان نضمن إننا نجيب كل الأماكن القريبة والبعيدة
+  const fetchLimit = 40;
   const countryCode = String(options.countryCode || "eg").toLowerCase();
 
-  // 1) لو عندي موقع المستخدم: ابحث في صندوق صغير حوله فقط
+  // 2. لو معانا موقع المستخدم: هندور في نطاق أوسع شوية حواليه (حوالي 50 كم)
   if (biasLocation?.lat && biasLocation?.lon) {
     const localUrl = new URL("https://nominatim.openstreetmap.org/search");
     localUrl.searchParams.set("format", "jsonv2");
     localUrl.searchParams.set("addressdetails", "1");
-    localUrl.searchParams.set("limit", String(lim));
+    localUrl.searchParams.set("limit", String(fetchLimit)); 
     localUrl.searchParams.set("accept-language", "ar");
     localUrl.searchParams.set("countrycodes", countryCode);
     localUrl.searchParams.set("q", q);
 
-    const dLon = 0.35;
-    const dLat = 0.25;
+    const dLon = 0.5; // نطاق أوسع شوية
+    const dLat = 0.5;
 
     localUrl.searchParams.set(
       "viewbox",
@@ -419,19 +421,51 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
 
     try {
       const localData = await fetchJson(localUrl.toString());
-      const localItems = (Array.isArray(localData) ? localData : [])
+      let localItems = (Array.isArray(localData) ? localData : [])
         .map((x) => normalizeSearchItem(x, q))
         .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 
-      if (localItems.length) {
+      if (localItems.length > 0) {
+        // ترتيب حسب الأقرب
         localItems.sort(
           (a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b)
         );
-        return localItems;
+        return localItems.slice(0, lim); // نرجع أقرب "lim" نتيجة
       }
     } catch (_) {}
   }
 
+  // 3. لو مفيش نتائج قريبة، بندور في مصر كلها (برضه بنجيب 40 ونرتبهم)
+  const url = new URL("https://nominatim.openstreetmap.org/search");
+  url.searchParams.set("format", "jsonv2");
+  url.searchParams.set("addressdetails", "1");
+  url.searchParams.set("limit", String(fetchLimit));
+  url.searchParams.set("accept-language", "ar");
+  url.searchParams.set("countrycodes", countryCode);
+  url.searchParams.set("q", q);
+  url.searchParams.set(
+    "viewbox",
+    `${EGYPT_BOUNDS.minLon},${EGYPT_BOUNDS.maxLat},${EGYPT_BOUNDS.maxLon},${EGYPT_BOUNDS.minLat}`
+  );
+  url.searchParams.set("bounded", "1");
+
+  try {
+    const data = await fetchJson(url.toString());
+    let items = (Array.isArray(data) ? data : [])
+      .map((x) => normalizeSearchItem(x, q))
+      .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
+
+    if (biasLocation?.lat && biasLocation?.lon) {
+      items.sort(
+        (a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b)
+      );
+    }
+
+    return items.slice(0, lim); // نرجع أقرب "lim" نتيجة
+  } catch (_) {
+    return [];
+  }
+}
   // 2) fallback داخل مصر كلها
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "jsonv2");
