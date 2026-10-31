@@ -301,9 +301,7 @@ export async function routeOSRM(from, to) {
   }
 }
 
-
 export function locateOnce(map, onLoc, onErr) {
-  // إذا كنا داخل تطبيق Median، نطلب تفعيل خدمات الموقع أولاً
   if (window.median && window.median.android && window.median.android.geoLocation) {
     window.median.android.geoLocation.promptLocationServices();
   }
@@ -396,11 +394,9 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
   if (!Number.isFinite(lim)) lim = 8;
   lim = clamp(Math.round(lim), 1, 20);
 
-  // 1. بنطلب 40 نتيجة عشان نضمن إننا نجيب كل الأماكن القريبة والبعيدة
-  const fetchLimit = 40;
+  const fetchLimit = 40; 
   const countryCode = String(options.countryCode || "eg").toLowerCase();
 
-  // 2. لو معانا موقع المستخدم: هندور في نطاق أوسع شوية حواليه (حوالي 50 كم)
   if (biasLocation?.lat && biasLocation?.lon) {
     const localUrl = new URL("https://nominatim.openstreetmap.org/search");
     localUrl.searchParams.set("format", "jsonv2");
@@ -410,7 +406,7 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
     localUrl.searchParams.set("countrycodes", countryCode);
     localUrl.searchParams.set("q", q);
 
-    const dLon = 0.5; // نطاق أوسع شوية
+    const dLon = 0.5; 
     const dLat = 0.5;
 
     localUrl.searchParams.set(
@@ -426,16 +422,14 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
         .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
 
       if (localItems.length > 0) {
-        // ترتيب حسب الأقرب
         localItems.sort(
           (a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b)
         );
-        return localItems.slice(0, lim); // نرجع أقرب "lim" نتيجة
+        return localItems.slice(0, lim); 
       }
     } catch (_) {}
   }
 
-  // 3. لو مفيش نتائج قريبة، بندور في مصر كلها (برضه بنجيب 40 ونرتبهم)
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "jsonv2");
   url.searchParams.set("addressdetails", "1");
@@ -461,38 +455,7 @@ export async function geocodeNominatim(q, limit = 8, biasLocation = null, option
       );
     }
 
-    return items.slice(0, lim); // نرجع أقرب "lim" نتيجة
-  } catch (_) {
-    return [];
-  }
-}
-  // 2) fallback داخل مصر كلها
-  const url = new URL("https://nominatim.openstreetmap.org/search");
-  url.searchParams.set("format", "jsonv2");
-  url.searchParams.set("addressdetails", "1");
-  url.searchParams.set("limit", String(lim));
-  url.searchParams.set("accept-language", "ar");
-  url.searchParams.set("countrycodes", countryCode);
-  url.searchParams.set("q", q);
-  url.searchParams.set(
-    "viewbox",
-    `${EGYPT_BOUNDS.minLon},${EGYPT_BOUNDS.maxLat},${EGYPT_BOUNDS.maxLon},${EGYPT_BOUNDS.minLat}`
-  );
-  url.searchParams.set("bounded", "1");
-
-  try {
-    const data = await fetchJson(url.toString());
-    const items = (Array.isArray(data) ? data : [])
-      .map((x) => normalizeSearchItem(x, q))
-      .filter((x) => Number.isFinite(x.lat) && Number.isFinite(x.lon));
-
-    if (biasLocation?.lat && biasLocation?.lon) {
-      items.sort(
-        (a, b) => haversineMeters(biasLocation, a) - haversineMeters(biasLocation, b)
-      );
-    }
-
-    return items;
+    return items.slice(0, lim); 
   } catch (_) {
     return [];
   }
