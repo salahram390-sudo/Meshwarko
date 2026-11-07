@@ -14,7 +14,9 @@ import {
 import { $, setText } from "./utils.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { ensureNotificationPermission } from "./notify.js";
+
 let isAuthProcessing = false;
+
 // دالة ذكية: لو المدخل أرقام، بتحولها لإيميل وهمي، ولو إيميل بتسيبه زي ما هو
 function formatEmailOrPhone(input) {
   const val = String(input || "").trim();
@@ -226,8 +228,8 @@ loginForm?.addEventListener("submit", async (e) => {
 
   try {
     const emailInput = $("#loginEmail")?.value.trim();
-const email = formatEmailOrPhone(emailInput); // هنا بنحول الرقم لإيميل وهمي
-const pass = $("#loginPass")?.value;
+    const email = formatEmailOrPhone(emailInput); // هنا بنحول الرقم لإيميل وهمي
+    const pass = $("#loginPass")?.value;
 
     if (!email || !pass) {
       setText(loginHint, "أدخل الإيميل وكلمة المرور.");
@@ -323,9 +325,12 @@ registerForm?.addEventListener("submit", async (e) => {
   try {
     const name = $("#regName")?.value.trim();
     const phone = $("#regPhone")?.value.trim();
+    
     const emailInput = $("#regEmail")?.value.trim();
-const email = formatEmailOrPhone(emailInput); // هنا بنحول الرقم لإيميل وهمي
-const pass = $("#regPass")?.value;
+    const email = formatEmailOrPhone(emailInput); // هنا بنحول الرقم لإيميل وهمي
+    
+    const pass = $("#regPass")?.value;
+
     if (!name || !phone || !email || !pass) {
       setText(regHint, "أكمل جميع البيانات المطلوبة.");
       return;
@@ -367,27 +372,27 @@ const pass = $("#regPass")?.value;
     await setDoc(doc(db, "users", cred.user.uid), { ...common, ...profile });
 
     try {
-  const adminCfg = await getDoc(doc(db, "config", "admins"));
-  const adminUids = adminCfg.exists() ? (adminCfg.data()?.uids || []) : [];
+      const adminCfg = await getDoc(doc(db, "config", "admins"));
+      const adminUids = adminCfg.exists() ? (adminCfg.data()?.uids || []) : [];
 
-  if (adminUids.length > 0) {
-    await fetch("https://meshwarko-push.salahram390.workers.dev", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
-      },
-      body: JSON.stringify({
-        driverUids: adminUids,
-        title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
-        body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
-        data: { type: "new_user", userId: cred.user.uid, role: role }
-      })
-    });
-  }
-} catch (e) {
-  console.warn("فشل إشعار الأدمن:", e?.message);
-}
+      if (adminUids.length > 0) {
+        await fetch("https://meshwarko-push.salahram390.workers.dev", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${await auth.currentUser.getIdToken()}`
+          },
+          body: JSON.stringify({
+            driverUids: adminUids,
+            title: role === "driver" ? "سائق جديد 🚗" : "راكب جديد 👤",
+            body: `${name} سجل في التطبيق (${role === "driver" ? "سائق" : "راكب"})`,
+            data: { type: "new_user", userId: cred.user.uid, role: role }
+          })
+        });
+      }
+    } catch (e) {
+      console.warn("فشل إشعار الأدمن:", e?.message);
+    }
     // ====================================================
     await redirectLoggedUser(cred.user);
   } catch (err) {
@@ -529,17 +534,27 @@ setTimeout(() => {
   }
 }, 3000);
 
+// ============ زرار نسيت كلمة المرور (معدل) ============
 const resetBtn = document.getElementById("resetPasswordBtn");
 
 resetBtn?.addEventListener("click", async () => {
-  const emailInput = prompt("اكتب الإيميل أو رقم الموبايل بتاعك");
-const email = formatEmailOrPhone(emailInput);
-  if (!email) return;
+  const input = prompt("اكتب الإيميل أو رقم الموبايل بتاعك");
+  if (!input) return;
 
+  const isPhone = /^[0-9]{10,15}$/.test(input.trim());
+
+  // لو المدخل رقم موبايل، نمنع الاسترجاع ونطلب منه يتواصل مع الدعم
+  if (isPhone) {
+    alert("عذراً، أنت مسجل برقم الهاتف. لا يمكن استرجاع كلمة المرور عبر الإيميل. يرجى التواصل مع الدعم الفني أو إنشاء حساب جديد.");
+    return;
+  }
+
+  // لو إيميل حقيقي، نكمل عادي
+  const email = formatEmailOrPhone(input);
   try {
     await sendPasswordResetEmail(auth, email);
-    alert("تم ارسال رابط تغيير الباسورد على ايميلك");
+    alert("تم إرسال رابط تغيير كلمة المرور على بريدك الإلكتروني.");
   } catch (err) {
-    alert("خطأ: " + err.message);
+    alert("خطأ: " + (err.code || err.message));
   }
 });
