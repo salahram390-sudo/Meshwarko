@@ -532,7 +532,8 @@ setTimeout(() => {
 const resetBtn = document.getElementById("resetPasswordBtn");
 
 resetBtn?.addEventListener("click", async () => {
-  const email = prompt("اكتب الايميل بتاعك");
+  const emailInput = prompt("اكتب الإيميل أو رقم الموبايل بتاعك");
+const email = formatEmailOrPhone(emailInput);
   if (!email) return;
 
   try {
