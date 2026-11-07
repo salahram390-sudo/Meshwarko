@@ -323,9 +323,9 @@ registerForm?.addEventListener("submit", async (e) => {
   try {
     const name = $("#regName")?.value.trim();
     const phone = $("#regPhone")?.value.trim();
-    const email = $("#regEmail")?.value.trim();
-    const pass = $("#regPass")?.value;
-
+    const emailInput = $("#regEmail")?.value.trim();
+const email = formatEmailOrPhone(emailInput); // هنا بنحول الرقم لإيميل وهمي
+const pass = $("#regPass")?.value;
     if (!name || !phone || !email || !pass) {
       setText(regHint, "أكمل جميع البيانات المطلوبة.");
       return;
