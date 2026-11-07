@@ -15,6 +15,14 @@ import { $, setText } from "./utils.js";
 import { loadEgyptAdmin, fillSelect, renderVehicleGrid } from "./admin_data.js";
 import { ensureNotificationPermission } from "./notify.js";
 let isAuthProcessing = false;
+// دالة ذكية: لو المدخل أرقام، بتحولها لإيميل وهمي، ولو إيميل بتسيبه زي ما هو
+function formatEmailOrPhone(input) {
+  const val = String(input || "").trim();
+  if (/^[0-9]{10,15}$/.test(val)) {
+    return val + "@meshwarko.com";
+  }
+  return val;
+}
 
 // ========== Custom Select Bottom Sheet ==========
 function initCustomSelects() {
