@@ -225,8 +225,9 @@ loginForm?.addEventListener("submit", async (e) => {
   setText(loginHint, "جارٍ تسجيل الدخول...");
 
   try {
-    const email = $("#loginEmail")?.value.trim();
-    const pass = $("#loginPass")?.value;
+    const emailInput = $("#loginEmail")?.value.trim();
+const email = formatEmailOrPhone(emailInput); // هنا بنحول الرقم لإيميل وهمي
+const pass = $("#loginPass")?.value;
 
     if (!email || !pass) {
       setText(loginHint, "أدخل الإيميل وكلمة المرور.");
